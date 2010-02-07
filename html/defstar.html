@@ -45,7 +45,7 @@ Constant summary</th>
 </tr>
 <tr class="table-row-color">
 <td class="summary-name">
-<a href="defstar.html#_g6">
+<a href="defstar.html#_g48906">
 +defun*-arrow-symbol+</a>
 </td>
 <td class="summary">
@@ -59,7 +59,7 @@ Function summary</th>
 </tr>
 <tr class="table-row-color">
 <td class="summary-name">
-<a href="defstar.html#_g5">
+<a href="defstar.html#_g48905">
 defstar/ampersand-symbol?</a>
 </td>
 <td class="summary">
@@ -67,7 +67,7 @@ sym</td>
 </tr>
 <tr class="table-row-color">
 <td class="summary-name">
-<a href="defstar.html#_g4">
+<a href="defstar.html#_g48904">
 defstar/make-keyword</a>
 </td>
 <td class="summary">
@@ -75,7 +75,7 @@ defstar/make-keyword</a>
 </tr>
 <tr class="table-row-color">
 <td class="summary-name">
-<a href="defstar.html#_g3">
+<a href="defstar.html#_g48903">
 defstar/split-defun-body</a>
 </td>
 <td class="summary">
@@ -83,7 +83,7 @@ body</td>
 </tr>
 <tr class="table-row-color">
 <td class="summary-name">
-<a href="defstar.html#_g8">
+<a href="defstar.html#_g48908">
 defun*-term</a>
 </td>
 <td class="summary">
@@ -91,7 +91,7 @@ term last-amp-kwd <em>&amp;key</em> (def-type 'defun)</td>
 </tr>
 <tr class="table-row-color">
 <td class="summary-name">
-<a href="defstar.html#_g9">
+<a href="defstar.html#_g48909">
 safe-define</a>
 </td>
 <td class="summary">
@@ -105,7 +105,7 @@ Macro summary</th>
 </tr>
 <tr class="table-row-color">
 <td class="summary-name">
-<a href="defstar.html#_g13">
+<a href="defstar.html#_g48913">
 defgeneric*</a>
 </td>
 <td class="summary">
@@ -113,7 +113,7 @@ fname generic-arglist <em>&amp;body</em> options</td>
 </tr>
 <tr class="table-row-color">
 <td class="summary-name">
-<a href="defstar.html#_g12">
+<a href="defstar.html#_g48912">
 defmethod*</a>
 </td>
 <td class="summary">
@@ -121,7 +121,7 @@ fname method-arglist <em>&amp;body</em> body</td>
 </tr>
 <tr class="table-row-color">
 <td class="summary-name">
-<a href="defstar.html#_g15">
+<a href="defstar.html#_g48915">
 defparameter*</a>
 </td>
 <td class="summary">
@@ -129,7 +129,7 @@ var value <em>&amp;optional</em> docstring</td>
 </tr>
 <tr class="table-row-color">
 <td class="summary-name">
-<a href="defstar.html#_g11">
+<a href="defstar.html#_g48911">
 defun*</a>
 </td>
 <td class="summary">
@@ -137,7 +137,7 @@ fname arglist <em>&amp;body</em> body</td>
 </tr>
 <tr class="table-row-color">
 <td class="summary-name">
-<a href="defstar.html#_g14">
+<a href="defstar.html#_g48914">
 defvar*</a>
 </td>
 <td class="summary">
@@ -145,7 +145,7 @@ var value <em>&amp;optional</em> docstring</td>
 </tr>
 <tr class="table-row-color">
 <td class="summary-name">
-<a href="defstar.html#_g10">
+<a href="defstar.html#_g48910">
 defvar/param</a>
 </td>
 <td class="summary">
@@ -153,7 +153,7 @@ toplevel-form-name var value <em>&amp;optional</em> docstring</td>
 </tr>
 <tr class="table-row-color">
 <td class="summary-name">
-<a href="defstar.html#_g16">
+<a href="defstar.html#_g48916">
 flet*</a>
 </td>
 <td class="summary">
@@ -161,7 +161,7 @@ clauses <em>&amp;body</em> body</td>
 </tr>
 <tr class="table-row-color">
 <td class="summary-name">
-<a href="defstar.html#_g17">
+<a href="defstar.html#_g48917">
 labels*</a>
 </td>
 <td class="summary">
@@ -169,7 +169,7 @@ clauses <em>&amp;body</em> body</td>
 </tr>
 <tr class="table-row-color">
 <td class="summary-name">
-<a href="defstar.html#_g18">
+<a href="defstar.html#_g48918">
 lambda*</a>
 </td>
 <td class="summary">
@@ -178,7 +178,7 @@ arglist <em>&amp;body</em> body</td>
 </table>
 <div class="defpackage">
 <div class="defunsignatures">
-<a id="_g2">
+<a id="_g48902">
 </a>
 <table cellpadding="0" cellspacing="0" width="100%">
 <colgroup span="3">
@@ -244,9 +244,9 @@ easy inclusion of assertions for each argument and for the function's
 </li>
 </ul>
 <p>
-See <a href="defstar.html#_g11">
+See <a href="defstar.html#_g48911">
 defun*</a>
-and <a href="defstar.html#_g14">
+and <a href="defstar.html#_g48914">
 defvar*</a>
 for a detailed 
  description of syntax. See also the examples below. 
@@ -375,8 +375,10 @@ Examples of DEFUN* and DEFMETHOD* usage: </h4>
      ;; ((var TYPE [ASSERTION]) DEFAULT [SUPPLIEDP]) 
      ;; Note that &amp;OPTIONAL arguments use the same syntax. 
      (defun* my-find (item (seq sequence) &amp;key (from-end boolean) 
-                      ((test (function (t))) nil) ((test-not (function (t))) nil) 
-                      ((key (function (t))) nil) (start fixnum) (end fixnum)) 
+                      ((test (or null (function (t)))) nil) 
+                      ((test-not (or null (function (t)))) nil) 
+                      ((key (or null (function (t)))) nil) 
+                      (start fixnum) (end fixnum)) 
         ...function body...) </pre>
 <p>
 </p>
@@ -451,7 +453,7 @@ Definitions of SETF methods cannot include return type declarations in the
 </div>
 <div class="defconstant">
 <div class="defunsignatures">
-<a id="_g6">
+<a id="_g48906">
 </a>
 <table cellpadding="0" cellspacing="0" width="100%">
 <colgroup span="3">
@@ -480,7 +482,7 @@ The symbol that separates function name from type declaration
 </div>
 <div class="defparam">
 <div class="defunsignatures">
-<a id="_g7">
+<a id="_g48907">
 </a>
 <table cellpadding="0" cellspacing="0" width="100%">
 <colgroup span="3">
@@ -523,7 +525,7 @@ In practise, essentially all modern lisps do perform type checking
 </div>
 <div class="defun">
 <div class="defunsignatures">
-<a id="_g3">
+<a id="_g48903">
 </a>
 <table cellpadding="0" cellspacing="0" width="100%">
 <colgroup span="3">
@@ -587,7 +589,7 @@ Internal utility function.
 </div>
 <div class="defun">
 <div class="defunsignatures">
-<a id="_g4">
+<a id="_g48904">
 </a>
 <table cellpadding="0" cellspacing="0" width="100%">
 <colgroup span="3">
@@ -618,7 +620,7 @@ Like MKSYMBOL, but intern the symbol in the KEYWORD package,
 </div>
 <div class="defun">
 <div class="defunsignatures">
-<a id="_g5">
+<a id="_g48905">
 </a>
 <table cellpadding="0" cellspacing="0" width="100%">
 <colgroup span="3">
@@ -647,7 +649,7 @@ Predicate. Does the symbol SYM begin with an ampersand, such as &amp;ANY,
 </div>
 <div class="defun">
 <div class="defunsignatures">
-<a id="_g8">
+<a id="_g48908">
 </a>
 <table cellpadding="0" cellspacing="0" width="100%">
 <colgroup span="3">
@@ -722,7 +724,7 @@ Four values:
 <h4>
 Description: </h4>
 <p>
-Internal function, used by <a href="defstar.html#_g11">
+Internal function, used by <a href="defstar.html#_g48911">
 defun*</a>
 to parse lambda list terms. 
  </p>
@@ -733,7 +735,7 @@ See also: </h4>
 <ul>
 <li>
 <p>
-<a href="defstar.html#_g11">
+<a href="defstar.html#_g48911">
 defun*</a>
 
  </p>
@@ -743,7 +745,7 @@ defun*</a>
 </div>
 <div class="defun">
 <div class="defunsignatures">
-<a id="_g9">
+<a id="_g48909">
 </a>
 <table cellpadding="0" cellspacing="0" width="100%">
 <colgroup span="3">
@@ -797,7 +799,7 @@ Internal function. The workhorse for the macros DEFUN*, DEFMETHOD*,
 </div>
 <div class="defun">
 <div class="defunsignatures">
-<a id="_g10">
+<a id="_g48910">
 </a>
 <table cellpadding="0" cellspacing="0" width="100%">
 <colgroup span="3">
@@ -819,7 +821,7 @@ toplevel-form-name var value <em>&amp;optional</em> docstring</td>
 </div>
 <div class="doc-body">
 <p>
-Internal macro, used by <a href="defstar.html#_g14">
+Internal macro, used by <a href="defstar.html#_g48914">
 defvar*</a>
 and 
  {defmacro defstar:defparameter*}. 
@@ -828,7 +830,7 @@ and
 </div>
 <div class="defun">
 <div class="defunsignatures">
-<a id="_g11">
+<a id="_g48911">
 </a>
 <table cellpadding="0" cellspacing="0" width="100%">
 <colgroup span="3">
@@ -1001,7 +1003,7 @@ Examples: </h4>
 </div>
 <div class="defun">
 <div class="defunsignatures">
-<a id="_g12">
+<a id="_g48912">
 </a>
 <table cellpadding="0" cellspacing="0" width="100%">
 <colgroup span="3">
@@ -1066,7 +1068,7 @@ Examples: </h4>
 </div>
 <div class="defun">
 <div class="defunsignatures">
-<a id="_g13">
+<a id="_g48913">
 </a>
 <table cellpadding="0" cellspacing="0" width="100%">
 <colgroup span="3">
@@ -1125,7 +1127,7 @@ Examples: </h4>
 </div>
 <div class="defun">
 <div class="defunsignatures">
-<a id="_g14">
+<a id="_g48914">
 </a>
 <table cellpadding="0" cellspacing="0" width="100%">
 <colgroup span="3">
@@ -1202,7 +1204,7 @@ Examples: </h4>
 </div>
 <div class="defun">
 <div class="defunsignatures">
-<a id="_g15">
+<a id="_g48915">
 </a>
 <table cellpadding="0" cellspacing="0" width="100%">
 <colgroup span="3">
@@ -1225,7 +1227,7 @@ var value <em>&amp;optional</em> docstring</td>
 <div class="doc-body">
 <p>
 Like {defmacro defstar:defvar*}, but equivalent to DEFPARAMETER rather than DEFVAR. 
- See <a href="defstar.html#_g14">
+ See <a href="defstar.html#_g48914">
 defvar*</a>
 for usage. 
  </p>
@@ -1233,7 +1235,7 @@ for usage.
 </div>
 <div class="defun">
 <div class="defunsignatures">
-<a id="_g16">
+<a id="_g48916">
 </a>
 <table cellpadding="0" cellspacing="0" width="100%">
 <colgroup span="3">
@@ -1264,7 +1266,7 @@ Like FLET, but within each clause the function name, arglist and body have the
 </div>
 <div class="defun">
 <div class="defunsignatures">
-<a id="_g17">
+<a id="_g48917">
 </a>
 <table cellpadding="0" cellspacing="0" width="100%">
 <colgroup span="3">
@@ -1295,7 +1297,7 @@ Like LABELS, but within each clause the function name, arglist and body have the
 </div>
 <div class="defun">
 <div class="defunsignatures">
-<a id="_g18">
+<a id="_g48918">
 </a>
 <table cellpadding="0" cellspacing="0" width="100%">
 <colgroup span="3">
@@ -1329,6 +1331,6 @@ Like LAMBDA, but the arglist and body have the same syntax as for {defmacro
 <div class="cludg-footer">
 Generated by&nbsp;<a href="mailto:ihatchondo@common-lisp.net" lang="en">
 CLDOC</a>
-- 2010-02-06 10:41:19</div>
+- 2010-02-07 11:56:34</div>
 </body>
 </html>

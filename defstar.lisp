@@ -4,7 +4,8 @@
 
 
 ;;; Note: documentation generated with CLDOC, using the following form:
-#-(cldoc:extract-documentation 'cldoc:html
+#|
+(cldoc:extract-documentation 'cldoc:html
       "/home/paul/lisp/defstar/html" 
       (asdf:find-system :defstar)
       :table-of-contents-title
@@ -16,7 +17,7 @@
                        "Examples of DEFVAR* and DEFPARAMETER*:"
                        "Examples of DEFUN* and DEFMETHOD* usage:"
                        "Type DECLARATION versus type CHECKING:"))
-
+|#
 
 (defpackage :defstar
   (:use :cl)
@@ -145,8 +146,10 @@ its declared type.
 ;;; ;; ((var TYPE [ASSERTION]) DEFAULT [SUPPLIEDP])
 ;;; ;; Note that &OPTIONAL arguments use the same syntax.
 ;;; (defun* my-find (item (seq sequence) &key (from-end boolean)
-;;;                  ((test (function (t))) nil) ((test-not (function (t))) nil)
-;;;                  ((key (function (t))) nil) (start fixnum) (end fixnum))
+;;;                  ((test (or null (function (t)))) nil)
+;;;                  ((test-not (or null (function (t)))) nil)
+;;;                  ((key (or null (function (t)))) nil)
+;;;                  (start fixnum) (end fixnum))
 ;;;    ...function body...)
 
 ;;; ;; Example of method definition. All the arguments in the arglist are
