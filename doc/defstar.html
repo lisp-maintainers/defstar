@@ -1,0 +1,1957 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+lang="en" xml:lang="en">
+<head>
+<title>The DEFSTAR package</title>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="generated" content="2010-02-13 10:04:30 NZDT"/>
+<meta name="author" content="Paul Sexton"/>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  html { font-family: Times, serif; font-size: 12pt; }
+  .title  { text-align: center; }
+  .todo   { color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #add8e6; font-weight:normal }
+  .target { }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  p.verse { margin-left: 3% }
+  pre {
+	border: 1pt solid #AEBDCC;
+	background-color: #F3F5F7;
+	padding: 5pt;
+	font-family: courier, monospace;
+        font-size: 90%;
+        overflow:auto;
+  }
+  table { border-collapse: collapse; }
+  td, th { vertical-align: top; }
+  dt { font-weight: bold; }
+  div.figure { padding: 0.5em; }
+  div.figure p { text-align: center; }
+  .linenr { font-size:smaller }
+  .code-highlighted {background-color:#ffff00;}
+  .org-info-js_info-navigation { border-style:none; }
+  #org-info-js_console-label { font-size:10px; font-weight:bold;
+                               white-space:nowrap; }
+  .org-info-js_search-highlight {background-color:#ffff00; color:#000000;
+                                 font-weight:bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+
+<h1 class="title">The DEFSTAR package</h1>
+
+<p><a name="defstar" id="defstar"></a>
+<a name="package==defstar" id="package==defstar"></a>
+</p>
+
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1 Internal Package: <code>defstar</code></a>
+<ul>
+<li>
+<ul>
+<li><a href="#sec-1.1">1.1 Description</a></li>
+<li><a href="#sec-1.2">1.2 Type DECLARATION versus type CHECKING</a></li>
+<li><a href="#sec-1.3">1.3 Examples of DEFUN* and DEFMETHOD* usage</a></li>
+<li><a href="#sec-1.4">1.4 Examples of DEFVAR* and DEFPARAMETER* usage</a></li>
+<li><a href="#sec-1.5">1.5 Limitations</a></li>
+</ul>
+</li>
+<li><a href="#sec-1.1">1.1 Constants</a>
+<ul>
+<li><a href="#sec-1.1.1">1.1.1 Constant: <code>+defun*-arrow-symbol+</code></a></li>
+</ul>
+</li>
+<li><a href="#sec-1.2">1.2 Global Variables</a>
+<ul>
+<li><a href="#sec-1.2.1">1.2.1 Variable: <code>*check-argument-types-explicitly?*</code></a></li>
+</ul>
+</li>
+<li><a href="#sec-1.3">1.3 Macros</a>
+<ul>
+<li><a href="#sec-1.3.1">1.3.1 Macro: <code>defgeneric*</code></a></li>
+<li><a href="#sec-1.3.2">1.3.2 Macro: <code>defmethod*</code></a></li>
+<li><a href="#sec-1.3.3">1.3.3 Macro: <code>defparameter*</code></a></li>
+<li><a href="#sec-1.3.4">1.3.4 Macro: <code>defun*</code></a></li>
+<li><a href="#sec-1.3.5">1.3.5 Macro: <code>defvar*</code></a></li>
+<li><a href="#sec-1.3.6">1.3.6 Macro: <code>defvar/param</code></a></li>
+<li><a href="#sec-1.3.7">1.3.7 Macro: <code>flet*</code></a></li>
+<li><a href="#sec-1.3.8">1.3.8 Macro: <code>labels*</code></a></li>
+<li><a href="#sec-1.3.9">1.3.9 Macro: <code>lambda*</code></a></li>
+</ul>
+</li>
+<li><a href="#sec-1.4">1.4 Functions</a>
+<ul>
+<li><a href="#sec-1.4.1">1.4.1 Function: <code>defstar/ampersand-symbol?</code></a></li>
+<li><a href="#sec-1.4.2">1.4.2 Function: <code>defstar/make-keyword</code></a></li>
+<li><a href="#sec-1.4.3">1.4.3 Function: <code>defstar/split-defun-body</code></a></li>
+<li><a href="#sec-1.4.4">1.4.4 Function: <code>defun*-term</code></a></li>
+<li><a href="#sec-1.4.5">1.4.5 Function: <code>safe-define</code></a></li>
+</ul>
+</li>
+<li><a href="#sec-1.5">1.5 Index</a>
+<ul>
+<li><a href="#sec-1.5.1">1.5.1 Nonalphabetic</a></li>
+<li><a href="#sec-1.5.2">1.5.2 D</a></li>
+<li><a href="#sec-1.5.3">1.5.3 F</a></li>
+<li><a href="#sec-1.5.4">1.5.4 L</a></li>
+<li><a href="#sec-1.5.5">1.5.5 S</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Internal Package: <code>defstar</code></h2>
+<div class="outline-text-2" id="text-1">
+
+
+<ul>
+<li>
+Uses:
+<a href="#package==common-lisp">common-lisp</a>
+</li>
+<li>
+Used by:
+None.
+</li>
+</ul>
+
+</div>
+
+<div id="outline-container-1.1" class="outline-4">
+<h4 id="sec-1.1"><span class="section-number-4">1.1</span> Description</h4>
+<div class="outline-text-4" id="text-1.1">
+
+
+
+<p>
+DEFSTAR is a collection of macros that can be used in place of <code>DEFUN, DEFMETHOD, DEFGENERIC, DEFVAR, DEFPARAMETER, FLET, LABELS</code> and <code>LAMBDA</code>. Each macro
+has the same name as the form it replaces, with a star added at the
+end (e.g. <code>DEFUN*</code>).
+</p>
+<p>
+The macros allow:
+</p><ul>
+<li>
+easy inclusion of type declarations within lambda lists
+</li>
+<li>
+easy inclusion of return type declarations in function and method definitions
+</li>
+<li>
+easy inclusion of assertions for each argument and for the function's
+return value
+
+</li>
+</ul>
+
+<p>See <a href="#defun*">defun*</a> and <a href="#defvar*">defvar*</a> for a detailed description of syntax. See also
+the examples below.
+</p>
+<p>
+DEFSTAR's home is at:
+</p><ul>
+<li>
+<a href="http://bitbucket.org/eeeickythump/defstar/">http://bitbucket.org/eeeickythump/defstar/</a>
+
+</li>
+</ul>
+
+<p>Installation requires <a href="http://common-lisp.net/project/asdf/">ASDF</a>. DEFSTAR
+does not depend on any other libraries.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1.2" class="outline-4">
+<h4 id="sec-1.2"><span class="section-number-4">1.2</span> Type DECLARATION versus type CHECKING</h4>
+<div class="outline-text-4" id="text-1.2">
+
+
+
+<p>
+Technically, <code>DECLARE</code>, <code>DECLAIM</code> and the like do not actually check that
+values stored in the associated variables conform to the declared type.
+They merely constitute a promise <i>by the programmer</i> that only values of
+the specified type will be stored there. The consequences of storing
+a string in a variable that is declared to be of type integer, are
+technically 'undefined'.
+</p>
+<p>
+In practice, most modern Common Lisp implementations perform type-checking
+based on declaration information, especially when the <code>SAFETY</code> setting is high.
+</p>
+<p>
+DEFSTAR allows you to force lisp to perform type checking based on
+declarations. If you set the global variable
+<a href="#*check-argument-types-explicitly..3f..*"><b>check-argument-types-explicitly?</b></a> to non-nil, <code>CHECK-TYPE</code> forms will
+included in the body of each function or method, causing an error to be raised
+if a value does not match its declared type.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1.3" class="outline-4">
+<h4 id="sec-1.3"><span class="section-number-4">1.3</span> Examples of DEFUN* and DEFMETHOD* usage</h4>
+<div class="outline-text-4" id="text-1.3">
+
+
+
+
+
+<pre class="src src-lisp"><span style="color: #db7093;">;; </span><span style="color: #db7093;">Define a simple function that adds two numbers, both of which
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">are declared to be real.
+</span><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun*</span> <span style="color: #1e90ff; font-weight: bold;">sum</span> <span style="color: #696969;">((</span>a <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>b <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">))</span>
+   <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">+</span> a b<span style="color: #696969;">))</span>
+
+<span style="color: #db7093;">;; </span><span style="color: #db7093;">Now also declare that the function returns a real.
+</span><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">sum</span> -&gt; <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">((</span>a <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>b <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">))</span>
+   <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">+</span> a b<span style="color: #696969;">))</span>
+
+<span style="color: #db7093;">;; </span><span style="color: #db7093;">Another way of declaring the function's return type.
+</span><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun*</span> <span style="color: #1e90ff; font-weight: bold;">sum</span> <span style="color: #696969;">((</span>a <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>b <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">))</span>
+   <span style="color: #696969;">(</span>returns <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span>
+   <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">+</span> a b<span style="color: #696969;">))</span>
+
+<span style="color: #db7093;">;; </span><span style="color: #db7093;">We want to ensure that a and b are never negative.
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">One way is to alter the type declarations:
+</span><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">sum</span> -&gt; <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">real</span> <span style="color: #2e8b57;">0</span><span style="color: #696969;">))</span> <span style="color: #696969;">((</span>a <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">real</span> <span style="color: #2e8b57;">0</span><span style="color: #696969;">))</span> <span style="color: #696969;">(</span>b <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">real</span> <span style="color: #2e8b57;">0</span><span style="color: #696969;">)))</span>
+   <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">+</span> a b<span style="color: #696969;">))</span>
+
+<span style="color: #db7093;">;; </span><span style="color: #db7093;">Another way is to define a new type:
+</span><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">deftype</span> <span style="color: #d2691e; font-weight: bold;">natural</span> <span style="color: #696969;">()</span> '<span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">real</span> <span style="color: #2e8b57;">0</span><span style="color: #696969;">))</span>
+<span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">sum</span> -&gt; natural<span style="color: #696969;">)</span> <span style="color: #696969;">((</span>a natural<span style="color: #696969;">)</span> <span style="color: #696969;">(</span>b natural<span style="color: #696969;">))</span>
+   <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">+</span> a b<span style="color: #696969;">))</span>
+
+<span style="color: #db7093;">;; </span><span style="color: #db7093;">Another way is to use assertions:
+</span><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">sum</span> -&gt; <span style="color: #1e90ff; font-weight: bold;">real</span> <span style="color: #696969;">(</span>&gt;= return-value <span style="color: #2e8b57;">0</span><span style="color: #696969;">))</span> <span style="color: #696969;">((</span>a <span style="color: #1e90ff; font-weight: bold;">real</span> <span style="color: #696969;">(</span>&gt;= a <span style="color: #2e8b57;">0</span><span style="color: #696969;">))</span> <span style="color: #696969;">(</span>b <span style="color: #1e90ff; font-weight: bold;">real</span> <span style="color: #696969;">(</span>&gt;= b <span style="color: #2e8b57;">0</span><span style="color: #696969;">)))</span>
+   <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">+</span> a b<span style="color: #696969;">))</span>
+
+<span style="color: #db7093;">;; </span><span style="color: #db7093;">Or:
+</span><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun*</span> <span style="color: #1e90ff; font-weight: bold;">sum</span> <span style="color: #696969;">((</span>a <span style="color: #1e90ff; font-weight: bold;">real</span> <span style="color: #696969;">(</span>&gt;= a <span style="color: #2e8b57;">0</span><span style="color: #696969;">))</span> <span style="color: #696969;">(</span>b <span style="color: #1e90ff; font-weight: bold;">real</span> <span style="color: #696969;">(</span>&gt;= b <span style="color: #2e8b57;">0</span><span style="color: #696969;">)))</span>
+   <span style="color: #696969;">(</span>returns <span style="color: #1e90ff; font-weight: bold;">real</span> <span style="color: #696969;">(</span>&gt;= return-value <span style="color: #2e8b57;">0</span><span style="color: #696969;">))</span>
+   <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">+</span> a b<span style="color: #696969;">))</span>
+
+<span style="color: #db7093;">;; </span><span style="color: #db7093;">Or, using the feature that the names of single-argument predicate
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">functions can be used as assertions:
+</span><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">naturalp</span> -&gt; <span style="color: #1e90ff; font-weight: bold;">boolean</span><span style="color: #696969;">)</span> <span style="color: #696969;">((</span>x <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">))</span>
+   <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">not</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">minusp</span> x<span style="color: #696969;">)))</span>
+...
+<span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">sum</span> -&gt; <span style="color: #1e90ff; font-weight: bold;">real</span> naturalp<span style="color: #696969;">)</span> <span style="color: #696969;">((</span>a <span style="color: #1e90ff; font-weight: bold;">real</span> naturalp<span style="color: #696969;">)</span> <span style="color: #696969;">(</span>b <span style="color: #1e90ff; font-weight: bold;">real</span> naturalp<span style="color: #696969;">))</span>
+   <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">+</span> a b<span style="color: #696969;">))</span>
+
+<span style="color: #db7093;">;; </span><span style="color: #db7093;">A function that returns multiple values.
+</span><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">floor</span> -&gt; <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">values</span> <span style="color: #1e90ff; font-weight: bold;">integer</span> <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">))</span> <span style="color: #696969;">((</span>n <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>d <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">))</span>
+   <span style="color: #696969;">(</span>cl:floor n d<span style="color: #696969;">))</span>
+
+<span style="color: #db7093;">;; </span><span style="color: #db7093;">It is possible to use assertions with functions that return
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">multiple values. When a function is declared to return multiple
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">values, RETURN-VALUE will be bound to a LIST of those values.
+</span><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun*</span> <span style="color: #1e90ff; font-weight: bold;">floor</span> <span style="color: #696969;">((</span>n <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>d <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">))</span>
+   <span style="color: #696969;">(</span>returns <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">values</span> <span style="color: #1e90ff; font-weight: bold;">integer</span> <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">)</span>
+            <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">&lt;</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">second</span> return-value<span style="color: #696969;">)</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">first</span> return-value<span style="color: #696969;">)))</span>
+   <span style="color: #696969;">(</span>cl:floor n d<span style="color: #696969;">))</span>
+
+<span style="color: #db7093;">;; </span><span style="color: #db7093;">To declare that a function returns an unspecified number of
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">values, of unspecified types:
+</span><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">floor</span> -&gt; <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">values</span><span style="color: #696969;">))</span> <span style="color: #696969;">((</span>n <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>d <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">))</span>
+   ...<span style="color: #696969;">)</span>
+
+<span style="color: #db7093;">;; </span><span style="color: #db7093;">The type of a &amp;REST argument can be declared. The declaration
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">refers to the types of each element in the list of arguments
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">stored in the &amp;REST argument.
+</span><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">+</span> -&gt; <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span><span style="color: #d2691e; font-weight: bold;">&amp;rest</span> <span style="color: #696969;">(</span>numbers <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">))</span>
+   <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">apply</span> #'cl:+ numbers<span style="color: #696969;">))</span>
+
+<span style="color: #db7093;">;; </span><span style="color: #db7093;">More complicated lambda list.
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">Note that the function and its first argument do not have type
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">declarations.
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">Also note the syntax of typed keyword arguments:
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">((var TYPE [ASSERTION]) DEFAULT [SUPPLIEDP])
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">Note that &amp;OPTIONAL arguments use the same syntax.
+</span><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun*</span> <span style="color: #1e90ff; font-weight: bold;">my-find</span> <span style="color: #696969;">(</span>item <span style="color: #696969;">(</span>seq <span style="color: #1e90ff; font-weight: bold;">sequence</span><span style="color: #696969;">)</span> <span style="color: #d2691e; font-weight: bold;">&amp;key</span> <span style="color: #696969;">(</span>from-end <span style="color: #1e90ff; font-weight: bold;">boolean</span><span style="color: #696969;">)</span>
+                 <span style="color: #696969;">((</span>test <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">or</span> <span style="color: #1e90ff; font-weight: bold;">null</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">function</span> <span style="color: #696969;">(</span><span style="color: #698b22; font-weight: bold;">t</span><span style="color: #696969;">))))</span> <span style="color: #698b22; font-weight: bold;">nil</span><span style="color: #696969;">)</span>
+                 <span style="color: #696969;">((</span>test-not <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">or</span> <span style="color: #1e90ff; font-weight: bold;">null</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">function</span> <span style="color: #696969;">(</span><span style="color: #698b22; font-weight: bold;">t</span><span style="color: #696969;">))))</span> <span style="color: #698b22; font-weight: bold;">nil</span><span style="color: #696969;">)</span>
+                 <span style="color: #696969;">((</span>key <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">or</span> <span style="color: #1e90ff; font-weight: bold;">null</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">function</span> <span style="color: #696969;">(</span><span style="color: #698b22; font-weight: bold;">t</span><span style="color: #696969;">))))</span> <span style="color: #698b22; font-weight: bold;">nil</span><span style="color: #696969;">)</span>
+                 <span style="color: #696969;">(</span>start <span style="color: #1e90ff; font-weight: bold;">fixnum</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>end <span style="color: #1e90ff; font-weight: bold;">fixnum</span><span style="color: #696969;">))</span>
+   ...function body...<span style="color: #696969;">)</span>
+
+<span style="color: #db7093;">;; </span><span style="color: #db7093;">Example of method definition. All the arguments in the arglist are
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">normal 'specialised' arguments like you would usually find in a
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">method definition. The form still allows you to include an assertion
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">with each argument, however ('plusp' in this case).
+</span><span style="color: #696969;">(</span>defmethod* <span style="color: #696969;">(</span>cell-value -&gt; <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span> <span style="color: #0000ff;">:around</span> <span style="color: #696969;">((</span>sheet &lt;Sheet&gt;<span style="color: #696969;">)</span>
+                                          <span style="color: #696969;">(</span>x <span style="color: #1e90ff; font-weight: bold;">integer</span> <span style="color: #1e90ff; font-weight: bold;">plusp</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>y <span style="color: #1e90ff; font-weight: bold;">integer</span> <span style="color: #1e90ff; font-weight: bold;">plusp</span><span style="color: #696969;">))</span>
+   ...<span style="color: #696969;">)</span>
+
+<span style="color: #db7093;">;; </span><span style="color: #db7093;">Note that when you declare a return type for a method, the method
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">body will perform type-checking, but no toplevel DECLAIM form will
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">be generated.
+</span>
+<span style="color: #db7093;">;; </span><span style="color: #db7093;">CLOS function dispatch based on classes is limited; you cannot specialise
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">on user-defined types unless they are proper classes, for example.
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">You may therefore sometimes want to declare that a method's argument
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">is of a particular type, as well as declaring its class for specialisation
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">as you normally would.
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">Here is an example. Note the similarity to the syntax for keyword
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">arguments.
+</span><span style="color: #696969;">(</span>defmethod* <span style="color: #696969;">(</span>cell-value -&gt; <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span> <span style="color: #0000ff;">:around</span> <span style="color: #696969;">((</span>sheet &lt;Sheet&gt;<span style="color: #696969;">)</span>
+                                          <span style="color: #696969;">((</span>x natural <span style="color: #1e90ff; font-weight: bold;">plusp</span><span style="color: #696969;">)</span> <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">)</span>
+                                          <span style="color: #696969;">((</span>y natural <span style="color: #1e90ff; font-weight: bold;">plusp</span><span style="color: #696969;">)</span> <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">))</span>
+   ...<span style="color: #696969;">)</span>
+
+<span style="color: #db7093;">;; </span><span style="color: #db7093;">Example of DEFGENERIC*, mainly useful to declare the return type
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">of a set of methods.
+</span><span style="color: #696969;">(</span>defgeneric* <span style="color: #696969;">(</span>cell-value -&gt; <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>sheet x y<span style="color: #696969;">))</span>
+
+<span style="color: #db7093;">;; </span><span style="color: #db7093;">DEFGENERIC* can also be used to declare types of arguments. Be careful
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">that these don't clash with specialisers in method definitions.
+</span><span style="color: #696969;">(</span>defgeneric* <span style="color: #696969;">(</span>cell-value -&gt; <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>sheet <span style="color: #696969;">(</span>x natural<span style="color: #696969;">)</span> <span style="color: #696969;">(</span>y natural<span style="color: #696969;">)))</span>
+</pre>
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-1.4" class="outline-4">
+<h4 id="sec-1.4"><span class="section-number-4">1.4</span> Examples of DEFVAR* and DEFPARAMETER* usage</h4>
+<div class="outline-text-4" id="text-1.4">
+
+
+
+
+
+
+<pre class="src src-lisp"><span style="color: #696969;">(</span>defvar* <span style="color: #696969;">(</span>*user-name* <span style="color: #1e90ff; font-weight: bold;">string</span><span style="color: #696969;">)</span> <span style="color: #006400;">"Bob"</span><span style="color: #696969;">)</span>
+<span style="color: #696969;">(</span>defparameter* <span style="color: #696969;">(</span>*file-position* <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">integer</span> <span style="color: #2e8b57;">0</span><span style="color: #696969;">))</span> <span style="color: #2e8b57;">0</span><span style="color: #696969;">)</span>
+</pre>
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-1.5" class="outline-4">
+<h4 id="sec-1.5"><span class="section-number-4">1.5</span> Limitations</h4>
+<div class="outline-text-4" id="text-1.5">
+
+
+<ul>
+<li>
+Definitions of <code>SETF</code> methods cannot include return type declarations in the
+method 'header'. The return type can still be declared using a <code>(RETURNS ...)</code>
+form. For example:
+
+</li>
+</ul>
+
+
+<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defmethod</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">setf</span> <span style="color: #696969;">(</span>foo -&gt; <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">))</span> <span style="color: #696969;">(</span>...args...<span style="color: #696969;">)</span>   <span style="color: #db7093;">; </span><span style="color: #db7093;">illegal
+</span>   ...<span style="color: #696969;">)</span>
+
+<span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defmethod</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">setf</span> foo<span style="color: #696969;">)</span> <span style="color: #696969;">(</span>...args...<span style="color: #696969;">)</span>
+   <span style="color: #696969;">(</span>returns <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">)</span>                  <span style="color: #db7093;">; </span><span style="color: #db7093;">legal
+</span>   ...<span style="color: #696969;">)</span>
+</pre>
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-1.1" class="outline-3">
+<h3 id="sec-1.1"><span class="section-number-3">1.1</span> Constants</h3>
+<div class="outline-text-3" id="text-1.1">
+
+
+
+<hr/>
+<p>
+<a name="..2b..defun*-arrow-symbol..2b.." id="..2b..defun*-arrow-symbol..2b.."></a>
+<a name="constant==..2b..defun*-arrow-symbol..2b.." id="constant==..2b..defun*-arrow-symbol..2b.."></a>
+</p>
+
+
+</div>
+
+<div id="outline-container-1.1.1" class="outline-4">
+<h4 id="sec-1.1.1"><span class="section-number-4">1.1.1</span> Constant: <code>+defun*-arrow-symbol+</code></h4>
+<div class="outline-text-4" id="text-1.1.1">
+
+
+
+
+</div>
+
+<div id="outline-container-1.1.1.1" class="outline-5">
+<h5 id="sec-1.1.1.1"><span class="section-number-5">1.1.1.1</span> Value</h5>
+<div class="outline-text-5" id="text-1.1.1.1">
+
+
+<pre class="example">
+DEFSTAR:-&gt;
+</pre>
+
+
+<p>
+Type: <code>symbol</code>
+</p>
+
+</div>
+
+</div>
+
+<div id="outline-container-1.1.1.2" class="outline-5">
+<h5 id="sec-1.1.1.2"><span class="section-number-5">1.1.1.2</span> Description</h5>
+<div class="outline-text-5" id="text-1.1.1.2">
+
+
+<p>
+The symbol that separates function name from type declaration
+in <code>DEFUN*</code> forms and the like. See <a href="#defun*">defun*</a>.
+</p>
+
+
+
+
+</div>
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1.2" class="outline-3">
+<h3 id="sec-1.2"><span class="section-number-3">1.2</span> Global Variables</h3>
+<div class="outline-text-3" id="text-1.2">
+
+
+
+<hr/>
+<p>
+<a name="<b>check-argument-types-explicitly..3f..</b>" id="<b>check-argument-types-explicitly..3f..</b>"></a>
+<a name="variable==*check-argument-types-explicitly..3f..*" id="variable==*check-argument-types-explicitly..3f..*"></a>
+</p>
+
+
+</div>
+
+<div id="outline-container-1.2.1" class="outline-4">
+<h4 id="sec-1.2.1"><span class="section-number-4">1.2.1</span> Variable: <code>*check-argument-types-explicitly?*</code></h4>
+<div class="outline-text-4" id="text-1.2.1">
+
+
+
+
+</div>
+
+<div id="outline-container-1.2.1.1" class="outline-5">
+<h5 id="sec-1.2.1.1"><span class="section-number-5">1.2.1.1</span> Value</h5>
+<div class="outline-text-5" id="text-1.2.1.1">
+
+
+<pre class="example">
+NIL
+</pre>
+
+
+<p>
+Type: <code>null</code>
+</p>
+
+</div>
+
+</div>
+
+<div id="outline-container-1.2.1.2" class="outline-5">
+<h5 id="sec-1.2.1.2"><span class="section-number-5">1.2.1.2</span> Description</h5>
+<div class="outline-text-5" id="text-1.2.1.2">
+
+
+<p>
+If non-nil, insert <code>CHECK-TYPE</code> clauses in the preamble of functions,
+to force the function's arguments to be explicitly type-checked.
+</p>
+<p>
+Technically, <code>DECLARE, DECLAIM</code> and the like do not actually check that
+values stored in the associated variables conform to the declared type.
+They merely constitute a promise <i>by the programmer</i> that only values of
+the specified type will be stored there. The consequences of storing
+a string in a variable that is declared to be of type integer, are
+undefined.
+</p>
+<p>
+In practise, essentially all modern lisps do perform type checking
+based on declarations, especially when the <code>SAFETY</code> setting is high. 
+</p>
+
+
+
+
+</div>
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1.3" class="outline-3">
+<h3 id="sec-1.3"><span class="section-number-3">1.3</span> Macros</h3>
+<div class="outline-text-3" id="text-1.3">
+
+
+
+<hr/>
+<p>
+<a name="defgeneric*" id="defgeneric*"></a>
+<a name="macro==defgeneric*" id="macro==defgeneric*"></a>
+</p>
+
+
+</div>
+
+<div id="outline-container-1.3.1" class="outline-4">
+<h4 id="sec-1.3.1"><span class="section-number-4">1.3.1</span> Macro: <code>defgeneric*</code></h4>
+<div class="outline-text-4" id="text-1.3.1">
+
+
+
+</div>
+
+<div id="outline-container-1.3.1.1" class="outline-5">
+<h5 id="sec-1.3.1.1"><span class="section-number-5">1.3.1.1</span> Usage</h5>
+<div class="outline-text-5" id="text-1.3.1.1">
+
+
+<pre class="example">
+(defgeneric* FNAME GENERIC-ARGLIST
+   ...body...)
+</pre>
+
+</div>
+
+</div>
+
+<div id="outline-container-1.3.1.2" class="outline-5">
+<h5 id="sec-1.3.1.2"><span class="section-number-5">1.3.1.2</span> Arguments</h5>
+<div class="outline-text-5" id="text-1.3.1.2">
+
+
+<dl>
+<dt>FNAME</dt><dd>
+Name of the generic function.
+</dd>
+<dt>GENERIC-ARGLIST</dt><dd>
+Follows the same grammar the arglist for <a href="#defun*">defun*</a>
+forms, except that <code>&amp;REST, &amp;KEY</code> and <code>&amp;OPTIONAL</code> arguments must be of the form:
+<pre class="example">
+arg =   VARNAME
+      | (VARNAME TYPE)
+</pre>
+
+
+</dd>
+</dl>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.1.3" class="outline-5">
+<h5 id="sec-1.3.1.3"><span class="section-number-5">1.3.1.3</span> Description</h5>
+<div class="outline-text-5" id="text-1.3.1.3">
+
+
+<p>
+Usage is exactly the same as <a href="#defun*">defun*</a>, except that value-checking assertions
+are ignored.
+</p>
+<p>
+Note that you can declare types for arguments in the generic function
+argument list. Be careful that these do not clash with method definitions.
+Type declarations for generic function arguments will only be used to
+make a toplevel <code>DECLAIM</code> form that will then apply to all methods of
+the generic function.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.1.4" class="outline-5">
+<h5 id="sec-1.3.1.4"><span class="section-number-5">1.3.1.4</span> Examples:</h5>
+<div class="outline-text-5" id="text-1.3.1.4">
+
+
+
+
+
+<pre class="src src-lisp"><span style="color: #696969;">(</span>defgeneric* <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">length</span> -&gt; <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>seq <span style="color: #d2691e; font-weight: bold;">&amp;key</span> start<span style="color: #696969;">)</span> ...options...<span style="color: #696969;">)</span>
+
+<span style="color: #696969;">(</span>defgeneric* <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">length</span> -&gt; <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">)</span> <span style="color: #696969;">((</span>seq <span style="color: #1e90ff; font-weight: bold;">sequence</span><span style="color: #696969;">)</span> <span style="color: #d2691e; font-weight: bold;">&amp;key</span> <span style="color: #696969;">(</span>start <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">))</span>
+   ...options...<span style="color: #696969;">)</span>
+</pre>
+
+
+
+
+
+<hr/>
+<p>
+<a name="defmethod*" id="defmethod*"></a>
+<a name="macro==defmethod*" id="macro==defmethod*"></a>
+</p>
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.2" class="outline-4">
+<h4 id="sec-1.3.2"><span class="section-number-4">1.3.2</span> Macro: <code>defmethod*</code></h4>
+<div class="outline-text-4" id="text-1.3.2">
+
+
+
+</div>
+
+<div id="outline-container-1.3.2.1" class="outline-5">
+<h5 id="sec-1.3.2.1"><span class="section-number-5">1.3.2.1</span> Usage</h5>
+<div class="outline-text-5" id="text-1.3.2.1">
+
+
+<pre class="example">
+(defmethod* FNAME METHOD-ARGLIST
+   ...body...)
+</pre>
+
+</div>
+
+</div>
+
+<div id="outline-container-1.3.2.2" class="outline-5">
+<h5 id="sec-1.3.2.2"><span class="section-number-5">1.3.2.2</span> Arguments</h5>
+<div class="outline-text-5" id="text-1.3.2.2">
+
+
+
+<p>
+Usage is exactly the same as <a href="#defun*">defun*</a>, except that within <code>METHOD-ARGLIST</code>,
+any list in a non-optional position (prior to any <code>&amp;key, &amp;rest,= or =&amp;optional</code>
+keyword) is assumed to be a specialised lambda list term of the form <code>(VARNAME CLASS [assertion])</code>, rather than a DEFUN* type-declaring term.
+</p>
+<p>
+The syntax of METHOD-ARGLIST is therefore:
+</p><pre class="example">
+arglist =   method-term*
+          | (method-term* [&amp;optional opt-term+])
+          | (method-term* [&amp;key opt-term+])
+          | (method-term* [&amp;rest rest-term])
+method-term = VARNAME
+              | (VARNAME CLASS [assertion])
+              | ((VARNAME TYPE/CLASS [assertion]) CLASS)
+</pre>
+
+<p>The rest of the syntax is the same as for DEFUN*.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.2.3" class="outline-5">
+<h5 id="sec-1.3.2.3"><span class="section-number-5">1.3.2.3</span> Description</h5>
+<div class="outline-text-5" id="text-1.3.2.3">
+
+
+<p>
+Equivalent to <code>(DEFMETHOD FNAME METHOD-ARGLIST . body)</code> with type declarations
+and assertions as per <a href="#defun*">defun*</a>.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.2.4" class="outline-5">
+<h5 id="sec-1.3.2.4"><span class="section-number-5">1.3.2.4</span> Examples</h5>
+<div class="outline-text-5" id="text-1.3.2.4">
+
+
+
+
+
+<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">deftype</span> <span style="color: #d2691e; font-weight: bold;">positive-integer</span> <span style="color: #696969;">()</span> `<span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">integer</span> <span style="color: #2e8b57;">1</span><span style="color: #696969;">))</span>
+
+<span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defmethod</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">make-coords</span> -&gt; <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">cons</span> positive-integer positive-integer<span style="color: #696969;">))</span>
+               <span style="color: #696969;">(((</span>x positive-integer<span style="color: #696969;">)</span> <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">)</span>
+                <span style="color: #696969;">((</span>y positive-integer<span style="color: #696969;">)</span> <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">))</span>
+   <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">cons</span> x y<span style="color: #696969;">))</span>
+</pre>
+
+
+
+
+
+<hr/>
+<p>
+<a name="defparameter*" id="defparameter*"></a>
+<a name="macro==defparameter*" id="macro==defparameter*"></a>
+</p>
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.3" class="outline-4">
+<h4 id="sec-1.3.3"><span class="section-number-4">1.3.3</span> Macro: <code>defparameter*</code></h4>
+<div class="outline-text-4" id="text-1.3.3">
+
+
+
+</div>
+
+<div id="outline-container-1.3.3.1" class="outline-5">
+<h5 id="sec-1.3.3.1"><span class="section-number-5">1.3.3.1</span> Usage</h5>
+<div class="outline-text-5" id="text-1.3.3.1">
+
+
+<pre class="example">
+(defvar* VAR VALUE [DOCSTRING])
+</pre>
+
+</div>
+
+</div>
+
+<div id="outline-container-1.3.3.2" class="outline-5">
+<h5 id="sec-1.3.3.2"><span class="section-number-5">1.3.3.2</span> Description</h5>
+<div class="outline-text-5" id="text-1.3.3.2">
+
+
+<p>
+Like <a href="#defvar*">defvar*</a>, but expands to <code>DEFPARAMETER</code> rather than <code>DEFVAR</code>.
+See <a href="#defvar*">defvar*</a> for more details.
+</p>
+
+
+<hr/>
+<p>
+<a name="defun*" id="defun*"></a>
+<a name="macro==defun*" id="macro==defun*"></a>
+</p>
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.4" class="outline-4">
+<h4 id="sec-1.3.4"><span class="section-number-4">1.3.4</span> Macro: <code>defun*</code></h4>
+<div class="outline-text-4" id="text-1.3.4">
+
+
+
+</div>
+
+<div id="outline-container-1.3.4.1" class="outline-5">
+<h5 id="sec-1.3.4.1"><span class="section-number-5">1.3.4.1</span> Usage</h5>
+<div class="outline-text-5" id="text-1.3.4.1">
+
+
+<pre class="example">
+(defun* FNAME ARGLIST
+   ...body...)
+</pre>
+
+</div>
+
+</div>
+
+<div id="outline-container-1.3.4.2" class="outline-5">
+<h5 id="sec-1.3.4.2"><span class="section-number-5">1.3.4.2</span> Arguments</h5>
+<div class="outline-text-5" id="text-1.3.4.2">
+
+
+<dl>
+<dt>FNAME</dt><dd>
+either the name of the function to be created, or a list with the
+following grammar:
+<pre class="example">
+fname =   FUNCTION-NAME
+        | (FUNCTION-NAME -&gt; TYPE [assertion])
+assertion =       FORM
+                | PREDICATE-SYMBOL
+</pre>
+
+<p>Where:
+</p><ul>
+<li>
+<code>TYPE</code> is any valid type specifier
+</li>
+<li>
+<code>FORM</code> is any form, which must return non-nil if the assertion is satisfied,
+nil otherwise. Within the form, the symbol <code>RETURN-VALUE</code> is bound to the
+value that is about to be returned by the function.
+</li>
+<li>
+<code>PREDICATE-SYMBOL</code> is a symbol, the name of a function that accepts a single
+argument. Equivalent to the form <code>(PREDICATE-SYMBOL RETURN-VALUE)</code>.
+
+<p>
+<i>Note:</i> if the latter (list) form for fname is used, the <code>DEFUN*</code> body may
+<i>not</i> also contain a <code>returns</code> form. Also note that the latter form cannot
+currently be used when defining a <code>(setf ...)</code> function or method.
+</p></li>
+</ul>
+</dd>
+<dt>ARGLIST</dt><dd>
+a <code>DEFUN*</code> LAMBDA LIST, which uses the following grammar:
+<pre class="example">
+arglist =   var-term*
+          | (var-term* [&amp;optional opt-term+])
+          | (var-term* [&amp;key opt-term+])
+          | (var-term* [&amp;rest rest-term])
+var-term =        VARNAME
+                | (VARNAME TYPE/CLASS [assertion])
+rest-term =       VARNAME
+                | (VARNAME ELEMENT-TYPE)
+opt-term =        VARNAME
+                | (var-term DEFAULT [SUPPLIEDP])
+</pre>
+
+<p>Where:
+</p><ul>
+<li>
+<code>VARNAME</code> is a symbol that will name the variable bound to the function
+argument.
+</li>
+<li>
+<code>TYPE/CLASS</code> and <code>ELEMENT-TYPE</code> are forms that are legal type
+declarations. For example, the name of a simple type or class, or a list if
+the type declaration is more complex.
+</li>
+<li>
+<code>DEFAULT</code> and <code>SUPPLIED-P</code> are the default value, and a variable that will
+indicate whether the argument was supplied.
+</li>
+</ul>
+</dd>
+<dt>BODY</dt><dd>
+Body of the function form. This may contain a docstring in the usual
+place, and may also a single special form beginning with <code>returns</code>:
+<pre class="example">
+returns-form = (RETURNS TYPE [assertion])
+</pre>
+
+<p>If the <code>returns</code> form contains an assertion, then within that assertion,
+the symbol <code>return-value</code> is bound to the value that the function is
+about to return.
+</p>
+</dd>
+</dl>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.4.3" class="outline-5">
+<h5 id="sec-1.3.4.3"><span class="section-number-5">1.3.4.3</span> Description</h5>
+<div class="outline-text-5" id="text-1.3.4.3">
+
+
+<p>
+Equivalent to <code>(DEFUN fname arglist . body)</code>, but:
+</p><ul>
+<li>
+All type declarations within the lambda list will be turned into <code>(DECLARE...)</code>
+forms within the function body
+</li>
+<li>
+If a return type is declared for the function itself, this will be turned
+into a global <code>DECLAIM</code> form that immediately precedes the function.
+</li>
+<li>
+All assertions within the lambda list will be checked before the function body
+is entered.
+</li>
+<li>
+Any assertion within a <code>returns</code> form will be checked before the function
+returns a value.
+
+</li>
+</ul>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.4.4" class="outline-5">
+<h5 id="sec-1.3.4.4"><span class="section-number-5">1.3.4.4</span> Examples</h5>
+<div class="outline-text-5" id="text-1.3.4.4">
+
+
+
+
+
+<pre class="src src-lisp"><span style="color: #db7093;">;; </span><span style="color: #db7093;">Very simple example
+</span><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">add</span> -&gt; <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">((</span>a <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>b <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">))</span>
+  <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">+</span> a b<span style="color: #696969;">))</span>
+</pre>
+
+
+
+
+<pre class="src src-lisp"><span style="color: #db7093;">;; </span><span style="color: #db7093;">Example with assertion for 'b' argument, checked before the
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">body of the function is entered.
+</span><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun*</span> <span style="color: #1e90ff; font-weight: bold;">div</span> <span style="color: #696969;">((</span>a <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>b <span style="color: #1e90ff; font-weight: bold;">real</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">/=</span> b <span style="color: #2e8b57;">0</span><span style="color: #696969;">)))</span>
+   <span style="color: #696969;">(</span>returns <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span>
+   <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">/</span> a b<span style="color: #696969;">))</span>
+</pre>
+
+
+
+
+<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun*</span> <span style="color: #1e90ff; font-weight: bold;">sum</span> <span style="color: #696969;">(</span><span style="color: #d2691e; font-weight: bold;">&amp;rest</span> <span style="color: #696969;">(</span>nums <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">))</span>  <span style="color: #db7093;">; </span><span style="color: #db7093;">type of 'rest' var refers to
+</span>   <span style="color: #696969;">(</span>returns <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span>                <span style="color: #db7093;">; </span><span style="color: #db7093;">the type of each list element, ie
+</span>   <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">apply</span> #'<span style="color: #1e90ff; font-weight: bold;">+</span> nums<span style="color: #696969;">))</span>             <span style="color: #db7093;">; </span><span style="color: #db7093;">nums must be a list of REALs
+</span></pre>
+
+
+
+
+<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">sum</span> -&gt; <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span><span style="color: #d2691e; font-weight: bold;">&amp;rest</span> <span style="color: #696969;">(</span>nums <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">))</span>  <span style="color: #db7093;">; </span><span style="color: #db7093;">alternative form
+</span>   <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">apply</span> #'<span style="color: #1e90ff; font-weight: bold;">+</span> nums<span style="color: #696969;">))</span>                       <span style="color: #db7093;">; </span><span style="color: #db7093;">for above example
+</span></pre>
+
+
+
+
+<pre class="src src-lisp"><span style="color: #db7093;">;; </span><span style="color: #db7093;">This function and first argument have no type declarations.
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">Keyword argument 'test' accepts a function that takes
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">two arguments of any type.
+</span><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun*</span> <span style="color: #1e90ff; font-weight: bold;">find-in-tree</span> <span style="color: #696969;">(</span>item <span style="color: #696969;">(</span>tree <span style="color: #1e90ff; font-weight: bold;">cons</span><span style="color: #696969;">)</span>
+                      <span style="color: #d2691e; font-weight: bold;">&amp;key</span> <span style="color: #696969;">((</span>test <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">function</span> <span style="color: #696969;">(</span><span style="color: #698b22; font-weight: bold;">t</span> <span style="color: #698b22; font-weight: bold;">t</span><span style="color: #696969;">)))</span> #'<span style="color: #1e90ff; font-weight: bold;">equal</span><span style="color: #696969;">))</span>
+ <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">or</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">funcall</span> test item tree<span style="color: #696969;">)</span>
+     <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">and</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">consp</span> tree<span style="color: #696969;">)</span>
+          <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">or</span> <span style="color: #696969;">(</span>find-in-tree item <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">car</span> tree<span style="color: #696969;">))</span>
+              <span style="color: #696969;">(</span>find-in-tree item <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">cdr</span> tree<span style="color: #696969;">))))))</span>
+</pre>
+
+
+
+
+
+<hr/>
+<p>
+<a name="defvar*" id="defvar*"></a>
+<a name="macro==defvar*" id="macro==defvar*"></a>
+</p>
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.5" class="outline-4">
+<h4 id="sec-1.3.5"><span class="section-number-4">1.3.5</span> Macro: <code>defvar*</code></h4>
+<div class="outline-text-4" id="text-1.3.5">
+
+
+
+</div>
+
+<div id="outline-container-1.3.5.1" class="outline-5">
+<h5 id="sec-1.3.5.1"><span class="section-number-5">1.3.5.1</span> Usage</h5>
+<div class="outline-text-5" id="text-1.3.5.1">
+
+
+<pre class="example">
+(defvar* VAR VALUE [DOCSTRING])
+</pre>
+
+</div>
+
+</div>
+
+<div id="outline-container-1.3.5.2" class="outline-5">
+<h5 id="sec-1.3.5.2"><span class="section-number-5">1.3.5.2</span> Arguments</h5>
+<div class="outline-text-5" id="text-1.3.5.2">
+
+
+<dl>
+<dt>VAR</dt><dd>
+either:
+<ol>
+<li>
+A variable name: in this case <code>DEFVAR*</code> has exactly the same effect as
+<code>DEFVAR</code>.
+</li>
+<li>
+<code>(VARNAME TYPE)</code> where <code>VARNAME</code> is a variable name and <code>TYPE</code> is a type
+declaration.
+</li>
+</ol>
+</dd>
+<dt>VALUE</dt><dd>
+A form which is evaluated when the variable is first created.
+</dd>
+<dt>DOCSTRING</dt><dd>
+Documentation string.
+
+</dd>
+</dl>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.5.3" class="outline-5">
+<h5 id="sec-1.3.5.3"><span class="section-number-5">1.3.5.3</span> Returns</h5>
+<div class="outline-text-5" id="text-1.3.5.3">
+
+
+<p>
+The name of the variable as a symbol.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.5.4" class="outline-5">
+<h5 id="sec-1.3.5.4"><span class="section-number-5">1.3.5.4</span> Description</h5>
+<div class="outline-text-5" id="text-1.3.5.4">
+
+
+<p>
+Creates the global special variable <code>VAR</code>, initialises it to <code>VALUE</code>,
+and declares it to be of type <code>TYPE</code>, if given.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.5.5" class="outline-5">
+<h5 id="sec-1.3.5.5"><span class="section-number-5">1.3.5.5</span> Examples</h5>
+<div class="outline-text-5" id="text-1.3.5.5">
+
+
+
+
+
+<pre class="src src-lisp"><span style="color: #696969;">(</span>defvar* <span style="color: #696969;">(</span>*file-name* <span style="color: #1e90ff; font-weight: bold;">string</span><span style="color: #696969;">)</span> <span style="color: #006400;">"~/log.txt"</span><span style="color: #696969;">)</span> 
+</pre>
+
+
+
+
+
+<hr/>
+<p>
+<a name="defvar..2f..param" id="defvar..2f..param"></a>
+<a name="macro==defvar..2f..param" id="macro==defvar..2f..param"></a>
+</p>
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.6" class="outline-4">
+<h4 id="sec-1.3.6"><span class="section-number-4">1.3.6</span> Macro: <code>defvar/param</code></h4>
+<div class="outline-text-4" id="text-1.3.6">
+
+
+
+</div>
+
+<div id="outline-container-1.3.6.1" class="outline-5">
+<h5 id="sec-1.3.6.1"><span class="section-number-5">1.3.6.1</span> Usage</h5>
+<div class="outline-text-5" id="text-1.3.6.1">
+
+
+<pre class="example">
+(defvar/param TOPLEVEL-FORM-NAME VAR VALUE [DOCSTRING])
+</pre>
+
+</div>
+
+</div>
+
+<div id="outline-container-1.3.6.2" class="outline-5">
+<h5 id="sec-1.3.6.2"><span class="section-number-5">1.3.6.2</span> Arguments</h5>
+<div class="outline-text-5" id="text-1.3.6.2">
+
+
+<dl>
+<dt>TOPLEVEL-FORM-NAME</dt><dd>
+Symbol denoting the type of toplevel form being defined.
+For example, ='DEFUN=.
+</dd>
+<dt>VAR</dt><dd>
+Symbol or list.
+</dd>
+<dt>VALUE</dt><dd>
+Form that will be evaluated to initialise the variable being
+defined.
+</dd>
+<dt>DOCSTRING</dt><dd>
+String used as documentation.
+</dd>
+</dl>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.6.3" class="outline-5">
+<h5 id="sec-1.3.6.3"><span class="section-number-5">1.3.6.3</span> Return Value</h5>
+<div class="outline-text-5" id="text-1.3.6.3">
+
+
+<p>
+A symbol.
+</p></div>
+
+</div>
+
+<div id="outline-container-1.3.6.4" class="outline-5">
+<h5 id="sec-1.3.6.4"><span class="section-number-5">1.3.6.4</span> Description</h5>
+<div class="outline-text-5" id="text-1.3.6.4">
+
+
+<p>
+Internal macro, used by <a href="#defvar*">defvar*</a> and
+<a href="#defparameter*">defparameter*</a>.
+</p>
+
+
+<hr/>
+<p>
+<a name="flet*" id="flet*"></a>
+<a name="macro==flet*" id="macro==flet*"></a>
+</p>
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.7" class="outline-4">
+<h4 id="sec-1.3.7"><span class="section-number-4">1.3.7</span> Macro: <code>flet*</code></h4>
+<div class="outline-text-4" id="text-1.3.7">
+
+
+
+</div>
+
+<div id="outline-container-1.3.7.1" class="outline-5">
+<h5 id="sec-1.3.7.1"><span class="section-number-5">1.3.7.1</span> Usage</h5>
+<div class="outline-text-5" id="text-1.3.7.1">
+
+
+<pre class="example">
+(flet* (CLAUSE CLAUSE...)
+   ...body...)
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-1.3.7.2" class="outline-5">
+<h5 id="sec-1.3.7.2"><span class="section-number-5">1.3.7.2</span> Arguments</h5>
+<div class="outline-text-5" id="text-1.3.7.2">
+
+
+<dl>
+<dt>CLAUSES</dt><dd>
+List of clauses. Takes the following grammar:
+<pre class="example">
+clauses = clause*
+clause  = (FNAME ARGLIST ...body...)
+</pre>
+
+<p>See <a href="#defun*">defun*</a> for a description of the grammar of <code>FNAME</code> and <code>ARGLIST</code>.
+</p></dd>
+<dt>BODY</dt><dd>
+Body of the form.
+
+</dd>
+</dl>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.7.3" class="outline-5">
+<h5 id="sec-1.3.7.3"><span class="section-number-5">1.3.7.3</span> Description</h5>
+<div class="outline-text-5" id="text-1.3.7.3">
+
+
+<p>
+Like <code>FLET</code>, but within each function-definition clause the function name,
+arglist and body have the same syntax as for <a href="#defun*">defun*</a>.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.7.4" class="outline-5">
+<h5 id="sec-1.3.7.4"><span class="section-number-5">1.3.7.4</span> Examples</h5>
+<div class="outline-text-5" id="text-1.3.7.4">
+
+
+
+
+
+<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun</span> <span style="color: #1e90ff; font-weight: bold;">foo</span> <span style="color: #696969;">(</span>name x y<span style="color: #696969;">)</span>
+   <span style="color: #696969;">(</span>flet* <span style="color: #696969;">(((</span>area -&gt; <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">)</span> <span style="color: #696969;">((</span>x <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>y <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">))</span>
+             <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">*</span> x y<span style="color: #696969;">)))</span>
+      <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">format</span> <span style="color: #698b22; font-weight: bold;">t</span> <span style="color: #006400;">"Area of ~A is ~D.~%"</span> name <span style="color: #696969;">(</span>area x y<span style="color: #696969;">))))</span>
+</pre>
+
+
+
+
+
+<hr/>
+<p>
+<a name="labels*" id="labels*"></a>
+<a name="macro==labels*" id="macro==labels*"></a>
+</p>
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.8" class="outline-4">
+<h4 id="sec-1.3.8"><span class="section-number-4">1.3.8</span> Macro: <code>labels*</code></h4>
+<div class="outline-text-4" id="text-1.3.8">
+
+
+
+</div>
+
+<div id="outline-container-1.3.8.1" class="outline-5">
+<h5 id="sec-1.3.8.1"><span class="section-number-5">1.3.8.1</span> Usage</h5>
+<div class="outline-text-5" id="text-1.3.8.1">
+
+
+<pre class="example">
+(labels* (CLAUSE CLAUSE...)
+   ...body...)
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-1.3.8.2" class="outline-5">
+<h5 id="sec-1.3.8.2"><span class="section-number-5">1.3.8.2</span> Arguments</h5>
+<div class="outline-text-5" id="text-1.3.8.2">
+
+
+<p>
+See <a href="#flet*">flet*</a>.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.8.3" class="outline-5">
+<h5 id="sec-1.3.8.3"><span class="section-number-5">1.3.8.3</span> Description</h5>
+<div class="outline-text-5" id="text-1.3.8.3">
+
+
+<p>
+Like <code>LABELS</code>, but within each clause the function name, arglist and body have
+the same syntax as for <a href="#defun*">defun*</a>.
+</p>
+<p>
+See <a href="#flet*">flet*</a> for more details.
+</p>
+
+
+<hr/>
+<p>
+<a name="lambda*" id="lambda*"></a>
+<a name="macro==lambda*" id="macro==lambda*"></a>
+</p>
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1.3.9" class="outline-4">
+<h4 id="sec-1.3.9"><span class="section-number-4">1.3.9</span> Macro: <code>lambda*</code></h4>
+<div class="outline-text-4" id="text-1.3.9">
+
+
+
+</div>
+
+<div id="outline-container-1.3.9.1" class="outline-5">
+<h5 id="sec-1.3.9.1"><span class="section-number-5">1.3.9.1</span> Usage</h5>
+<div class="outline-text-5" id="text-1.3.9.1">
+
+
+<pre class="example">
+(lambda* ARGLIST
+   ...body...)
+</pre>
+
+</div>
+
+</div>
+
+<div id="outline-container-1.3.9.2" class="outline-5">
+<h5 id="sec-1.3.9.2"><span class="section-number-5">1.3.9.2</span> Description</h5>
+<div class="outline-text-5" id="text-1.3.9.2">
+
+
+<p>
+Like <code>LAMBDA</code>, but <code>ARGLIST</code> and body have the same syntax as for <a href="#defun*">defun*</a>.
+A <code>returns</code> form can be used within the function body to
+declare its return type.
+</p>
+
+
+
+</div>
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1.4" class="outline-3">
+<h3 id="sec-1.4"><span class="section-number-3">1.4</span> Functions</h3>
+<div class="outline-text-3" id="text-1.4">
+
+
+
+<hr/>
+<p>
+<a name="defstar..2f..ampersand-symbol..3f.." id="defstar..2f..ampersand-symbol..3f.."></a>
+<a name="function==defstar..2f..ampersand-symbol..3f.." id="function==defstar..2f..ampersand-symbol..3f.."></a>
+</p>
+
+
+</div>
+
+<div id="outline-container-1.4.1" class="outline-4">
+<h4 id="sec-1.4.1"><span class="section-number-4">1.4.1</span> Function: <code>defstar/ampersand-symbol?</code></h4>
+<div class="outline-text-4" id="text-1.4.1">
+
+
+
+</div>
+
+<div id="outline-container-1.4.1.1" class="outline-5">
+<h5 id="sec-1.4.1.1"><span class="section-number-5">1.4.1.1</span> Usage</h5>
+<div class="outline-text-5" id="text-1.4.1.1">
+
+
+<pre class="example">
+(defstar/ampersand-symbol? SYM)
+</pre>
+
+</div>
+
+</div>
+
+<div id="outline-container-1.4.1.2" class="outline-5">
+<h5 id="sec-1.4.1.2"><span class="section-number-5">1.4.1.2</span> Arguments</h5>
+<div class="outline-text-5" id="text-1.4.1.2">
+
+
+<dl>
+<dt>SYM</dt><dd>
+A symbol.
+</dd>
+</dl>
+</div>
+
+</div>
+
+<div id="outline-container-1.4.1.3" class="outline-5">
+<h5 id="sec-1.4.1.3"><span class="section-number-5">1.4.1.3</span> Return Value</h5>
+<div class="outline-text-5" id="text-1.4.1.3">
+
+
+<p>
+Boolean.
+</p></div>
+
+</div>
+
+<div id="outline-container-1.4.1.4" class="outline-5">
+<h5 id="sec-1.4.1.4"><span class="section-number-5">1.4.1.4</span> Description</h5>
+<div class="outline-text-5" id="text-1.4.1.4">
+
+
+<p>
+Predicate. Does the symbol <code>SYM</code> begin with an ampersand, such as <code>&amp;ANY</code>,
+<code>&amp;REST</code> and so on?
+</p>
+
+
+<hr/>
+<p>
+<a name="defstar..2f..make-keyword" id="defstar..2f..make-keyword"></a>
+<a name="function==defstar..2f..make-keyword" id="function==defstar..2f..make-keyword"></a>
+</p>
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1.4.2" class="outline-4">
+<h4 id="sec-1.4.2"><span class="section-number-4">1.4.2</span> Function: <code>defstar/make-keyword</code></h4>
+<div class="outline-text-4" id="text-1.4.2">
+
+
+
+</div>
+
+<div id="outline-container-1.4.2.1" class="outline-5">
+<h5 id="sec-1.4.2.1"><span class="section-number-5">1.4.2.1</span> Usage</h5>
+<div class="outline-text-5" id="text-1.4.2.1">
+
+
+<pre class="example">
+(defstar/make-keyword PART [PART PART...])
+</pre>
+
+</div>
+
+</div>
+
+<div id="outline-container-1.4.2.2" class="outline-5">
+<h5 id="sec-1.4.2.2"><span class="section-number-5">1.4.2.2</span> Arguments</h5>
+<div class="outline-text-5" id="text-1.4.2.2">
+
+
+<dl>
+<dt>PART</dt><dd>
+Any lisp value; usually a string or symbol.
+
+</dd>
+</dl>
+</div>
+
+</div>
+
+<div id="outline-container-1.4.2.3" class="outline-5">
+<h5 id="sec-1.4.2.3"><span class="section-number-5">1.4.2.3</span> Return Value</h5>
+<div class="outline-text-5" id="text-1.4.2.3">
+
+
+<p>
+A keyword.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1.4.2.4" class="outline-5">
+<h5 id="sec-1.4.2.4"><span class="section-number-5">1.4.2.4</span> Description</h5>
+<div class="outline-text-5" id="text-1.4.2.4">
+
+
+<p>
+Concatenates the printed representations of <code>PARTs</code> together into a single
+string, then makes a symbol from that string, and interns the symbol in the
+<code>KEYWORD</code> package. Returns the new keyword.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1.4.2.5" class="outline-5">
+<h5 id="sec-1.4.2.5"><span class="section-number-5">1.4.2.5</span> See Also</h5>
+<div class="outline-text-5" id="text-1.4.2.5">
+
+
+<p>
+<a href="#mksymbol">mksymbol</a>
+</p>
+
+
+<hr/>
+<p>
+<a name="defstar..2f..split-defun-body" id="defstar..2f..split-defun-body"></a>
+<a name="function==defstar..2f..split-defun-body" id="function==defstar..2f..split-defun-body"></a>
+</p>
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1.4.3" class="outline-4">
+<h4 id="sec-1.4.3"><span class="section-number-4">1.4.3</span> Function: <code>defstar/split-defun-body</code></h4>
+<div class="outline-text-4" id="text-1.4.3">
+
+
+
+</div>
+
+<div id="outline-container-1.4.3.1" class="outline-5">
+<h5 id="sec-1.4.3.1"><span class="section-number-5">1.4.3.1</span> Usage</h5>
+<div class="outline-text-5" id="text-1.4.3.1">
+
+
+<pre class="example">
+(defstar/split-defun-body BODY)
+</pre>
+
+</div>
+
+</div>
+
+<div id="outline-container-1.4.3.2" class="outline-5">
+<h5 id="sec-1.4.3.2"><span class="section-number-5">1.4.3.2</span> Arguments</h5>
+<div class="outline-text-5" id="text-1.4.3.2">
+
+
+<dl>
+<dt>BODY</dt><dd>
+the body of a <code>DEFUN</code> form or similar, such as might be received
+</dd>
+</dl>
+
+<p>by a macro.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1.4.3.3" class="outline-5">
+<h5 id="sec-1.4.3.3"><span class="section-number-5">1.4.3.3</span> Returns</h5>
+<div class="outline-text-5" id="text-1.4.3.3">
+
+
+<p>
+Three values:
+</p><dl>
+<dt>PREAMBLE</dt><dd>
+list of declaration forms at the start of the body
+</dd>
+<dt>DOCSTRING</dt><dd>
+Documentation string, if present in <code>BODY</code>.
+</dd>
+<dt>TRUE-BODY</dt><dd>
+Actual function body with the above items removed.
+
+</dd>
+</dl>
+</div>
+
+</div>
+
+<div id="outline-container-1.4.3.4" class="outline-5">
+<h5 id="sec-1.4.3.4"><span class="section-number-5">1.4.3.4</span> Description</h5>
+<div class="outline-text-5" id="text-1.4.3.4">
+
+
+<p>
+Internal utility function.
+Divide the 'preamble' of a function body from its actual body.
+The preamble consists of declarations and a docstring.
+</p>
+
+
+<hr/>
+<p>
+<a name="defun*-term" id="defun*-term"></a>
+<a name="function==defun*-term" id="function==defun*-term"></a>
+</p>
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1.4.4" class="outline-4">
+<h4 id="sec-1.4.4"><span class="section-number-4">1.4.4</span> Function: <code>defun*-term</code></h4>
+<div class="outline-text-4" id="text-1.4.4">
+
+
+
+</div>
+
+<div id="outline-container-1.4.4.1" class="outline-5">
+<h5 id="sec-1.4.4.1"><span class="section-number-5">1.4.4.1</span> Usage</h5>
+<div class="outline-text-5" id="text-1.4.4.1">
+
+
+<pre class="example">
+(defun*-term TERM LAST-AMP-KWD &amp;key DEF-TYPE)
+</pre>
+
+</div>
+
+</div>
+
+<div id="outline-container-1.4.4.2" class="outline-5">
+<h5 id="sec-1.4.4.2"><span class="section-number-5">1.4.4.2</span> Arguments</h5>
+<div class="outline-text-5" id="text-1.4.4.2">
+
+
+<dl>
+<dt>TERM</dt><dd>
+any member of an ordinary lambda list.
+</dd>
+<dt>LAST-AMP-KWD</dt><dd>
+Symbol or nil.
+</dd>
+<dt>DEF-TYPE</dt><dd>
+Symbol denoting the type of toplevel form that is being created.
+</dd>
+</dl>
+
+<p>The default is ='DEFUN=.
+</p></div>
+
+</div>
+
+<div id="outline-container-1.4.4.3" class="outline-5">
+<h5 id="sec-1.4.4.3"><span class="section-number-5">1.4.4.3</span> Returns</h5>
+<div class="outline-text-5" id="text-1.4.4.3">
+
+
+<p>
+Four values:
+</p><ol>
+<li>
+The term as it should be included in the final argument list for
+the toplevel form (symbol or list)
+</li>
+<li>
+The declaration clause that should be included in the
+<code>DECLARE</code> statement within the toplevel form's body
+</li>
+<li>
+The type of the term, for inclusion in the argument-list of
+the <code>(DECLAIM (FTYPE (FUNCTION arglist RETURN-TYPE) ...))</code> form for a
+function definition.
+</li>
+<li>
+The assertion clause.
+
+</li>
+</ol>
+</div>
+
+</div>
+
+<div id="outline-container-1.4.4.4" class="outline-5">
+<h5 id="sec-1.4.4.4"><span class="section-number-5">1.4.4.4</span> Description</h5>
+<div class="outline-text-5" id="text-1.4.4.4">
+
+
+<p>
+Internal function, used by <a href="#defun*">defun*</a> to parse lambda list terms.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1.4.4.5" class="outline-5">
+<h5 id="sec-1.4.4.5"><span class="section-number-5">1.4.4.5</span> See Also</h5>
+<div class="outline-text-5" id="text-1.4.4.5">
+
+
+<ul>
+<li>
+<a href="#defun*">defun*</a>
+
+
+</li>
+</ul>
+
+
+<hr/>
+<p>
+<a name="safe-define" id="safe-define"></a>
+<a name="function==safe-define" id="function==safe-define"></a>
+</p>
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1.4.5" class="outline-4">
+<h4 id="sec-1.4.5"><span class="section-number-4">1.4.5</span> Function: <code>safe-define</code></h4>
+<div class="outline-text-4" id="text-1.4.5">
+
+
+
+</div>
+
+<div id="outline-container-1.4.5.1" class="outline-5">
+<h5 id="sec-1.4.5.1"><span class="section-number-5">1.4.5.1</span> Usage</h5>
+<div class="outline-text-5" id="text-1.4.5.1">
+
+
+<pre class="example">
+(safe-define TOPLEVEL-FORM-NAME FNAME ARGLIST BODY)
+</pre>
+
+</div>
+
+</div>
+
+<div id="outline-container-1.4.5.2" class="outline-5">
+<h5 id="sec-1.4.5.2"><span class="section-number-5">1.4.5.2</span> Arguments</h5>
+<div class="outline-text-5" id="text-1.4.5.2">
+
+
+<dl>
+<dt>TOPLEVEL-FORM-NAME</dt><dd>
+Symbol denoting the type of toplevel form being defined.
+</dd>
+</dl>
+
+<p>Currently handles ='DEFUN, 'DEFMETHOD, 'FLET, 'LABELS, 'LAMBDA, 'DEFGENERIC=.
+</p><dl>
+<dt>FNAME, ARGLIST, BODY</dt><dd>
+see <a href="#defun*">defun*</a>.
+
+</dd>
+</dl>
+</div>
+
+</div>
+
+<div id="outline-container-1.4.5.3" class="outline-5">
+<h5 id="sec-1.4.5.3"><span class="section-number-5">1.4.5.3</span> Returns</h5>
+<div class="outline-text-5" id="text-1.4.5.3">
+
+
+<p>
+A <code>defun, defmethod, defgeneric</code> or <code>lambda</code> form, or <code>flet</code> or
+<code>labels</code> subclause, containing appropriate declarations.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1.4.5.4" class="outline-5">
+<h5 id="sec-1.4.5.4"><span class="section-number-5">1.4.5.4</span> Description</h5>
+<div class="outline-text-5" id="text-1.4.5.4">
+
+
+<p>
+Internal function. The workhorse for the macros <a href="#defun*">DEFUN*</a>, <a href="#defmethod*">DEFMETHOD*</a>,
+<a href="#lambda*">LAMBDA*</a>, <a href="#flet*">FLET*</a>, and <a href="#labels*">LABELS*</a>.
+</p>
+
+
+
+</div>
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1.5" class="outline-3">
+<h3 id="sec-1.5"><span class="section-number-3">1.5</span> Index</h3>
+<div class="outline-text-3" id="text-1.5">
+
+
+<p>
+<a href="#index==NONALPHABETIC">NONALPHABETIC</a>  <a href="#index==F">F</a>  <a href="#index==D">D</a> 
+<a href="#index==L">L</a>  <a href="#index==S">S</a>  
+</p>
+
+
+</div>
+
+<div id="outline-container-1.5.1" class="outline-4">
+<h4 id="sec-1.5.1"><span class="section-number-4">1.5.1</span> Nonalphabetic</h4>
+<div class="outline-text-4" id="text-1.5.1">
+
+
+
+<p>
+<a name="index==NONALPHABETIC" id="index==NONALPHABETIC"></a>
+</p><ul>
+<li>
+<a href="#variable==*check-argument-types-explicitly..3f..*"><code>defstar:*check-argument types-explicitly?*</code></a>, Variable
+</li>
+<li>
+<a href="#constant==..2b..defun*-arrow-symbol..2b.."><code>defstar::+defun*-arrow symbol+</code></a>, Constant
+
+
+
+</li>
+</ul>
+</div>
+
+</div>
+
+<div id="outline-container-1.5.2" class="outline-4">
+<h4 id="sec-1.5.2"><span class="section-number-4">1.5.2</span> D</h4>
+<div class="outline-text-4" id="text-1.5.2">
+
+
+
+<p>
+<a name="index==D" id="index==D"></a>
+</p><ul>
+<li>
+<a href="#macro==defgeneric*"><code>defstar:defgeneric*</code></a>, Macro
+</li>
+<li>
+<a href="#macro==defmethod*"><code>defstar:defmethod*</code></a>, Macro
+</li>
+<li>
+<a href="#macro==defparameter*"><code>defstar:defparameter*</code></a>, Macro
+</li>
+<li>
+<a href="#function==defstar..2f..ampersand-symbol..3f.."><code>defstar::defstar/ampersand symbol?</code></a>, Function
+</li>
+<li>
+<a href="#function==defstar..2f..make-keyword"><code>defstar::defstar/make-keyword</code></a>,
+Function
+</li>
+<li>
+<a href="#function==defstar..2f..split-defun-body"><code>defstar::defstar/split-defun body</code></a>, Function
+</li>
+<li>
+<a href="#macro==defun*"><code>defstar:defun*</code></a>, Macro
+</li>
+<li>
+<a href="#function==defun*-term"><code>defstar::defun*-term</code></a>, Function
+</li>
+<li>
+<a href="#macro==defvar*"><code>defstar:defvar*</code></a>, Macro
+</li>
+<li>
+<a href="#macro==defvar..2f..param"><code>defstar::defvar/param</code></a>, Macro
+
+
+
+</li>
+</ul>
+</div>
+
+</div>
+
+<div id="outline-container-1.5.3" class="outline-4">
+<h4 id="sec-1.5.3"><span class="section-number-4">1.5.3</span> F</h4>
+<div class="outline-text-4" id="text-1.5.3">
+
+
+
+<p>
+<a name="index==F" id="index==F"></a>
+</p><ul>
+<li>
+<a href="#macro==flet*"><code>defstar:flet*</code></a>, Macro
+
+
+
+</li>
+</ul>
+</div>
+
+</div>
+
+<div id="outline-container-1.5.4" class="outline-4">
+<h4 id="sec-1.5.4"><span class="section-number-4">1.5.4</span> L</h4>
+<div class="outline-text-4" id="text-1.5.4">
+
+
+
+<p>
+<a name="index==L" id="index==L"></a>
+</p><ul>
+<li>
+<a href="#macro==labels*"><code>defstar:labels*</code></a>, Macro
+</li>
+<li>
+<a href="#macro==lambda*"><code>defstar:lambda*</code></a>, Macro
+
+
+
+</li>
+</ul>
+</div>
+
+</div>
+
+<div id="outline-container-1.5.5" class="outline-4">
+<h4 id="sec-1.5.5"><span class="section-number-4">1.5.5</span> S</h4>
+<div class="outline-text-4" id="text-1.5.5">
+
+
+
+<p>
+<a name="index==S" id="index==S"></a>
+</p><ul>
+<li>
+<a href="#function==safe-define"><code>defstar::safe-define</code></a>, Function
+
+
+
+
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble">
+<p class="author"> Author: Paul Sexton
+<a href="mailto:eeeickythump@gmail.com">&lt;eeeickythump@gmail.com&gt;</a>
+</p>
+<p class="date"> Date: 2010-02-13 10:04:30 NZDT</p>
+<p class="creator">HTML generated by org-mode 6.33trans in emacs 23</p>
+</div>
+</div>
+</body>
+</html>

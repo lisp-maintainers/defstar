@@ -1,23 +1,27 @@
 ;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; Base: 10 -*- ;;;;;;;;;;;;;;;;;80
+;;;;
+;;;;    This file is part of DEFSTAR, by Paul Sexton
+;;;;    Released under the Gnu Public License version 3
+;;;;
+;;;;    DEFSTAR is free software: you can redistribute it and/or modify
+;;;;    it under the terms of the GNU General Public License as published by
+;;;;    the Free Software Foundation, either version 3 of the License, or
+;;;;    (at your option) any later version.
+;;;;
+;;;;    DEFSTAR is distributed in the hope that it will be useful,
+;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;;;    GNU General Public License for more details.
+;;;;
+;;;;    You should have received a copy of the GNU General Public License
+;;;;    along with DEFSTAR.  If not, see <http://www.gnu.org/licenses/>.
+;;;;
 
 (in-package :cl-user)
 
-
-;;; Note: documentation generated with CLDOC, using the following form:
-#|
-(cldoc:extract-documentation 'cldoc:html
-      "/home/paul/lisp/defstar/html" 
-      (asdf:find-system :defstar)
-      :table-of-contents-title
-      "DEFSTAR"
-      :section-names '("Arguments:" "Returns:" "Examples:" "See Also:"
-                       "See also:"
-                       "Example:" "Examples:"  "Notes:" "Description:"
-                       "Limitations:"
-                       "Examples of DEFVAR* and DEFPARAMETER*:"
-                       "Examples of DEFUN* and DEFMETHOD* usage:"
-                       "Type DECLARATION versus type CHECKING:"))
-|#
+;;; Note: documentation generated with CLOD
+;;; [[http://bitbucket.org/eeeickythump/clod/]]
+;;; (clod:document-package :defstar "defstar-doc.org")
 
 (defpackage :defstar
   (:use :cl)
@@ -34,80 +38,80 @@
            #:*check-argument-types-explicitly?*
            #:->)
   (:documentation
-   " * Description:
+   "* Description
 
-DEFSTAR is a collection of macros that can be used in place
-of DEFUN, DEFMETHOD, DEFGENERIC, DEFVAR, DEFPARAMETER, FLET, LABELS and LAMBDA. Each
-macro has the same name as the form it replaces, with a star added at the
-end (e.g. DEFUN*).
-
-DEFSTAR's home is at:
-- {http://bitbucket.org/eeeickythump/defstar/}
-
-Installation requires ASDF. DEFSTAR does not depend on any other libraries.
+DEFSTAR is a collection of macros that can be used in place of =DEFUN,
+DEFMETHOD, DEFGENERIC, DEFVAR, DEFPARAMETER, FLET, LABELS= and =LAMBDA=. Each macro
+has the same name as the form it replaces, with a star added at the
+end (e.g. =DEFUN*=).
 
 The macros allow:
 - easy inclusion of type declarations within lambda lists
 - easy inclusion of return type declarations in function and method definitions
 - easy inclusion of assertions for each argument and for the function's
-return value
+  return value
 
-See {defmacro defstar:defun*} and {defmacro defstar:defvar*} for a detailed
-description of syntax. See also the examples below.
+See [[defun*]] and [[defvar*]] for a detailed description of syntax. See also
+the examples below.
 
-* Type DECLARATION versus type CHECKING:
+DEFSTAR's home is at:
+- [[http://bitbucket.org/eeeickythump/defstar/]]
 
-Technically, DECLARE, DECLAIM and the like do not actually check that
+Installation requires [[http://common-lisp.net/project/asdf/][ASDF]]. DEFSTAR
+does not depend on any other libraries.
+
+* Type DECLARATION versus type CHECKING
+
+Technically, =DECLARE=, =DECLAIM= and the like do not actually check that
 values stored in the associated variables conform to the declared type.
-They merely constitute a promise BY THE PROGRAMMER that only values of
+They merely constitute a promise /by the programmer/ that only values of
 the specified type will be stored there. The consequences of storing
 a string in a variable that is declared to be of type integer, are
 technically 'undefined'.
 
 In practice, most modern Common Lisp implementations perform type-checking
-based on declaration information, especially when SAFETY is high.
+based on declaration information, especially when the =SAFETY= setting is high.
 
 DEFSTAR allows you to force lisp to perform type checking based on
 declarations. If you set the global variable
-{defvar defstar:*CHECK-ARGUMENT-TYPES-EXPLICITLY?*}
-to non-nil, CHECK-TYPE forms will included in the body of each function
-or method, causing an error to be raised if a value does not match
-its declared type.
+[[*check-argument-types-explicitly?*]] to non-nil, =CHECK-TYPE= forms will
+included in the body of each function or method, causing an error to be raised
+if a value does not match its declared type.
 
-* Examples of DEFUN* and DEFMETHOD* usage:
+* Examples of DEFUN* and DEFMETHOD* usage
 ;;; ;; Define a simple function that adds two numbers, both of which
 ;;; ;; are declared to be real.
 ;;; (defun* sum ((a real) (b real))
 ;;;    (+ a b))
-
+;;;
 ;;; ;; Now also declare that the function returns a real.
 ;;; (defun* (sum -> real) ((a real) (b real))
 ;;;    (+ a b))
-
+;;;
 ;;; ;; Another way of declaring the function's return type.
 ;;; (defun* sum ((a real) (b real))
 ;;;    (returns real)
 ;;;    (+ a b))
-
+;;;
 ;;; ;; We want to ensure that a and b are never negative.
 ;;; ;; One way is to alter the type declarations:
 ;;; (defun* (sum -> (real 0)) ((a (real 0)) (b (real 0)))
 ;;;    (+ a b))
-
+;;;
 ;;; ;; Another way is to define a new type:
 ;;; (deftype natural () '(real 0))
 ;;; (defun* (sum -> natural) ((a natural) (b natural))
 ;;;    (+ a b))
-
+;;;
 ;;; ;; Another way is to use assertions:
 ;;; (defun* (sum -> real (>= return-value 0)) ((a real (>= a 0)) (b real (>= b 0)))
 ;;;    (+ a b))
-
+;;;
 ;;; ;; Or:
 ;;; (defun* sum ((a real (>= a 0)) (b real (>= b 0)))
 ;;;    (returns real (>= return-value 0))
 ;;;    (+ a b))
-
+;;;
 ;;; ;; Or, using the feature that the names of single-argument predicate
 ;;; ;; functions can be used as assertions:
 ;;; (defun* (naturalp -> boolean) ((x real))
@@ -115,11 +119,11 @@ its declared type.
 ;;; ...
 ;;; (defun* (sum -> real naturalp) ((a real naturalp) (b real naturalp))
 ;;;    (+ a b))
-
+;;;
 ;;; ;; A function that returns multiple values.
 ;;; (defun* (floor -> (values integer integer)) ((n real) (d real))
 ;;;    (cl:floor n d))
-
+;;;
 ;;; ;; It is possible to use assertions with functions that return
 ;;; ;; multiple values. When a function is declared to return multiple
 ;;; ;; values, RETURN-VALUE will be bound to a LIST of those values.
@@ -127,18 +131,18 @@ its declared type.
 ;;;    (returns (values integer integer)
 ;;;             (< (second return-value) (first return-value)))
 ;;;    (cl:floor n d))
-
+;;;
 ;;; ;; To declare that a function returns an unspecified number of
 ;;; ;; values, of unspecified types:
 ;;; (defun* (floor -> (values)) ((n real) (d real))
 ;;;    ...)
-
+;;;
 ;;; ;; The type of a &REST argument can be declared. The declaration
 ;;; ;; refers to the types of each element in the list of arguments
 ;;; ;; stored in the &REST argument.
 ;;; (defun* (+ -> real) (&rest (numbers real))
 ;;;    (apply #'cl:+ numbers))
-
+;;;
 ;;; ;; More complicated lambda list.
 ;;; ;; Note that the function and its first argument do not have type
 ;;; ;; declarations.
@@ -151,7 +155,7 @@ its declared type.
 ;;;                  ((key (or null (function (t)))) nil)
 ;;;                  (start fixnum) (end fixnum))
 ;;;    ...function body...)
-
+;;;
 ;;; ;; Example of method definition. All the arguments in the arglist are
 ;;; ;; normal 'specialised' arguments like you would usually find in a
 ;;; ;; method definition. The form still allows you to include an assertion
@@ -159,11 +163,11 @@ its declared type.
 ;;; (defmethod* (cell-value -> real) :around ((sheet <Sheet>)
 ;;;                                           (x integer plusp) (y integer plusp))
 ;;;    ...)
-
+;;;
 ;;; ;; Note that when you declare a return type for a method, the method
 ;;; ;; body will perform type-checking, but no toplevel DECLAIM form will
 ;;; ;; be generated.
-
+;;;
 ;;; ;; CLOS function dispatch based on classes is limited; you cannot specialise
 ;;; ;; on user-defined types unless they are proper classes, for example.
 ;;; ;; You may therefore sometimes want to declare that a method's argument
@@ -175,26 +179,27 @@ its declared type.
 ;;;                                           ((x natural plusp) integer)
 ;;;                                           ((y natural plusp) integer))
 ;;;    ...)
-
+;;;
 ;;; ;; Example of DEFGENERIC*, mainly useful to declare the return type
 ;;; ;; of a set of methods.
 ;;; (defgeneric* (cell-value -> real) (sheet x y))
-
+;;;
 ;;; ;; DEFGENERIC* can also be used to declare types of arguments. Be careful
 ;;; ;; that these don't clash with specialisers in method definitions.
 ;;; (defgeneric* (cell-value -> real) (sheet (x natural) (y natural)))
 
-* Examples of DEFVAR* and DEFPARAMETER*:
+* Examples of DEFVAR* and DEFPARAMETER* usage
+
 ;;; (defvar* (*user-name* string) \"Bob\")
 ;;; (defparameter* (*file-position* (integer 0)) 0)
 
-* Limitations:
-- Definitions of SETF methods cannot include return type declarations in the
-method 'header'. The return type can still be declared using a (RETURNS ...)
-form. For example:
+* Limitations
+- Definitions of =SETF= methods cannot include return type declarations in the
+  method 'header'. The return type can still be declared using a =(RETURNS ...)=
+  form. For example:
 ;;; (defmethod (setf (foo -> integer)) (...args...)   ; illegal
 ;;;    ...)
-
+;;;
 ;;; (defmethod (setf foo) (...args...)
 ;;;    (returns integer)                  ; legal
 ;;;    ...)
@@ -211,20 +216,23 @@ form. For example:
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun defstar/split-defun-body (body)
-    "* Arguments:
-- BODY: the body of a DEFUN form or similar, such as might be received
+    "* Usage
+: (defstar/split-defun-body BODY)
+* Arguments
+- BODY :: the body of a =DEFUN= form or similar, such as might be received
 by a macro.
 
-* Returns:
+* Returns
 Three values:
-- PREAMBLE: list of declaration forms at the start of the body
-- DOCSTRING: Documentation string, if present in BODY.
-- TRUE-BODY: Actual function body with the above items removed.
+- PREAMBLE :: list of declaration forms at the start of the body
+- DOCSTRING :: Documentation string, if present in =BODY=.
+- TRUE-BODY :: Actual function body with the above items removed.
 
-* Description:
+* Description
 Internal utility function.
 Divide the 'preamble' of a function body from its actual body.
-The preamble consists of declarations and a docstring."
+The preamble consists of declarations and a docstring.
+"
     (let ((docstring nil)
           (preamble nil)
           (true-body nil))
@@ -245,16 +253,36 @@ The preamble consists of declarations and a docstring."
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun defstar/make-keyword (&rest parts)
-    "Like MKSYMBOL, but intern the symbol in the KEYWORD package,
-creating a keyword called :SYMBOL."
+    "* Usage
+: (defstar/make-keyword PART [PART PART...])
+* Arguments
+- PART :: Any lisp value; usually a string or symbol.
+
+* Return Value
+A keyword.
+
+* Description
+Concatenates the printed representations of =PARTs= together into a single
+string, then makes a symbol from that string, and interns the symbol in the
+=KEYWORD= package. Returns the new keyword.
+
+* See Also
+[[mksymbol]]"
     (intern (string-upcase (format nil "~{~A~}" parts)) :keyword)))
 
 
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun defstar/ampersand-symbol? (sym)
-    "Predicate. Does the symbol SYM begin with an ampersand, such as &ANY,
-&REST and so on?"
+    "* Usage
+: (defstar/ampersand-symbol? SYM)
+* Arguments
+- SYM :: A symbol.
+* Return Value
+Boolean.
+* Description
+Predicate. Does the symbol =SYM= begin with an ampersand, such as =&ANY=,
+=&REST= and so on?"
     (and (symbolp sym)
 	 (eql #\& (char (format nil "~A" sym) 0)))))
 
@@ -265,47 +293,48 @@ creating a keyword called :SYMBOL."
 
 (defconstant +DEFUN*-ARROW-SYMBOL+ '->
   "The symbol that separates function name from type declaration
-in DEFUN* forms and the like. See {defmacro defstar:defun*}.")
+in =DEFUN*= forms and the like. See [[defun*]].")
 
 (defvar *check-argument-types-explicitly?* nil
-  "* Description:
-If non-nil, insert 'CHECK-TYPE' clauses in the preamble of functions,
-to force the function's arguments to be type-checked.
+  "If non-nil, insert =CHECK-TYPE= clauses in the preamble of functions,
+to force the function's arguments to be explicitly type-checked.
 
-Technically, DECLARE, DECLAIM and the like do not actually check that
+Technically, =DECLARE, DECLAIM= and the like do not actually check that
 values stored in the associated variables conform to the declared type.
-They merely constitute a promise BY THE PROGRAMMER that only values of
+They merely constitute a promise /by the programmer/ that only values of
 the specified type will be stored there. The consequences of storing
 a string in a variable that is declared to be of type integer, are
 undefined.
 
 In practise, essentially all modern lisps do perform type checking
-based on declarations, especially when the SAFETY setting is high. ")
+based on declarations, especially when the =SAFETY= setting is high. ")
 
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun defun*-term (term last-amp-kwd &key (def-type 'defun))
-    "* Arguments:
-- TERM: any member of an ordinary lambda list.
-- LAST-AMP-KWD: Symbol or nil.
-- DEF-TYPE: Symbol denoting the type of toplevel form that is being created.
-The default is 'DEFUN.
-* Returns:
+    "* Usage
+: (defun*-term TERM LAST-AMP-KWD &key DEF-TYPE)
+* Arguments
+- TERM :: any member of an ordinary lambda list.
+- LAST-AMP-KWD :: Symbol or nil.
+- DEF-TYPE :: Symbol denoting the type of toplevel form that is being created.
+The default is ='DEFUN=.
+* Returns
 Four values:
-- 1. The term as it should be included in the final argument list for
-the toplevel form
-- 2. The declaration clause that should be included in the
-DECLARE statement within the toplevel form's body
-- 3. The type of the term, for inclusion in the argument-list of
-the (DECLAIM (FTYPE (FUNCTION arglist RETURN-TYPE) ...)) form for a
-function definition.
-- 4. The assertion clause.
+1. The term as it should be included in the final argument list for
+   the toplevel form (symbol or list)
+2. The declaration clause that should be included in the
+   =DECLARE= statement within the toplevel form's body
+3. The type of the term, for inclusion in the argument-list of
+   the =(DECLAIM (FTYPE (FUNCTION arglist RETURN-TYPE) ...))= form for a
+   function definition.
+4. The assertion clause.
 
-* Description:
-Internal function, used by {defmacro defstar:defun*} to parse lambda list terms.
+* Description
+Internal function, used by [[defun*]] to parse lambda list terms.
 
-* See also:
-- {defmacro defstar:defun*}"
+* See Also
+- [[defun*]]"
     (flet ((check-clause (check var)
              (if (and check (symbolp check))
                  (list check var)
@@ -393,18 +422,20 @@ Internal function, used by {defmacro defstar:defun*} to parse lambda list terms.
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun safe-define (toplevel-form-name fname arglist body)
-    "* Arguments:
-- TOPLEVEL-FORM-NAME: Symbol denoting the type of toplevel form being defined.
-Currently handles 'DEFUN, 'DEFMETHOD, 'FLET, 'LABELS, 'LAMBDA, 'DEFGENERIC.
-- FNAME, ARGLIST, BODY: see DEFUN*.
+    "* Usage
+: (safe-define TOPLEVEL-FORM-NAME FNAME ARGLIST BODY)
+* Arguments
+- TOPLEVEL-FORM-NAME :: Symbol denoting the type of toplevel form being defined.
+Currently handles ='DEFUN, 'DEFMETHOD, 'FLET, 'LABELS, 'LAMBDA, 'DEFGENERIC=.
+- FNAME, ARGLIST, BODY :: see [[defun*]].
 
-* Returns:
-A `defun', `defmethod', `defgeneric' or `lambda' form, or `flet' or
-`labels' subclause, with appropriate declarations.
+* Returns
+A =defun, defmethod, defgeneric= or =lambda= form, or =flet= or
+=labels= subclause, containing appropriate declarations.
 
-* Description:
-Internal function. The workhorse for the macros DEFUN*, DEFMETHOD*,
-LAMBDA*, FLET*, and LABELS*.
+* Description
+Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
+[[LAMBDA*]], [[FLET*]], and [[LABELS*]].
 "
     (let ((method-combo-keywords nil)
           (form-args nil)
@@ -532,8 +563,20 @@ LAMBDA*, FLET*, and LABELS*.
 
 
 (defmacro defvar/param (toplevel-form-name var value &optional docstring)
-  "Internal macro, used by {defmacro defstar:defvar*} and
-{defmacro defstar:defparameter*}."
+  "* Usage
+: (defvar/param TOPLEVEL-FORM-NAME VAR VALUE [DOCSTRING])
+* Arguments
+- TOPLEVEL-FORM-NAME :: Symbol denoting the type of toplevel form being defined.
+  For example, ='DEFUN=.
+- VAR :: Symbol or list.
+- VALUE :: Form that will be evaluated to initialise the variable being
+  defined.
+- DOCSTRING :: String used as documentation.
+* Return Value
+A symbol.
+* Description
+Internal macro, used by [[defvar*]] and
+[[defparameter*]]."
   (cond
     ((listp var)
      (destructuring-bind (varname vartype) var
@@ -552,57 +595,65 @@ LAMBDA*, FLET*, and LABELS*.
 
 
 (defmacro defun* (fname arglist &body body)
-  "* Arguments:
-- FNAME: either the name of the function to be created, or a list as specified
-below:
-;;; fname =   FUNCTION-NAME
-;;;         | (FUNCTION-NAME -> TYPE [assertion])
-;;; assertion =       FORM
-;;;                 | PREDICATE-SYMBOL
-Where:
--- TYPE is any valid type specifier
--- FORM is any form, which must return non-nil if the assertion is satisfied,
-nil otherwise. Within the form, the symbol RETURN-VALUE is bound to the
-value that is about to be returned by the function.
--- PREDICATE-SYMBOL is a symbol, the name of a function that accepts a single
-arguments. Equivalent to the form `(PREDICATE-SYMBOL RETURN-VALUE)'.
+  "* Usage
+: (defun* FNAME ARGLIST
+:    ...body...)
+* Arguments
+- FNAME :: either the name of the function to be created, or a list with the
+  following grammar:
+  : fname =   FUNCTION-NAME
+  :         | (FUNCTION-NAME -> TYPE [assertion])
+  : assertion =       FORM
+  :                 | PREDICATE-SYMBOL
+  Where:
+  - =TYPE= is any valid type specifier
+  - =FORM= is any form, which must return non-nil if the assertion is satisfied,
+    nil otherwise. Within the form, the symbol =RETURN-VALUE= is bound to the
+    value that is about to be returned by the function.
+  - =PREDICATE-SYMBOL= is a symbol, the name of a function that accepts a single
+    argument. Equivalent to the form =(PREDICATE-SYMBOL RETURN-VALUE)=.
 
-Note that if the latter (list) form for fname is used, the DEFUN* body may NOT
-also contain a `returns' form. Also note that the latter form cannot currently
-be used when defining a `(setf ...)' function or method.
+    /Note:/ if the latter (list) form for fname is used, the =DEFUN*= body may
+    /not/ also contain a =returns= form. Also note that the latter form cannot
+    currently be used when defining a =(setf ...)= function or method.
+- ARGLIST :: a =DEFUN*= LAMBDA LIST, which uses the following grammar:
+  : arglist =   var-term*
+  :           | (var-term* [&optional opt-term+])
+  :           | (var-term* [&key opt-term+])
+  :           | (var-term* [&rest rest-term])
+  : var-term =        VARNAME
+  :                 | (VARNAME TYPE/CLASS [assertion])
+  : rest-term =       VARNAME
+  :                 | (VARNAME ELEMENT-TYPE)
+  : opt-term =        VARNAME
+  :                 | (var-term DEFAULT [SUPPLIEDP])
+  Where:
+  - =VARNAME= is a symbol that will name the variable bound to the function
+    argument.
+  - =TYPE/CLASS= and =ELEMENT-TYPE= are forms that are legal type
+    declarations. For example, the name of a simple type or class, or a list if
+    the type declaration is more complex.
+  - =DEFAULT= and =SUPPLIED-P= are the default value, and a variable that will
+    indicate whether the argument was supplied.
+- BODY :: Body of the function form. This may contain a docstring in the usual
+  place, and may also a single special form beginning with =returns=:
+  : returns-form = (RETURNS TYPE [assertion])
+  If the =returns= form contains an assertion, then within that assertion,
+  the symbol =return-value= is bound to the value that the function is
+  about to return.
 
-- ARGLIST: a DEFUN* LAMBDA LIST, which takes the form:
-;;; arglist =   var-term*
-;;;           | (var-term* [&optional opt-term+])
-;;;           | (var-term* [&key opt-term+])
-;;;           | (var-term* [&rest rest-term])
-;;; var-term =        VARNAME
-;;;                 | (VARNAME TYPE/CLASS [assertion])
-;;; rest-term =       VARNAME
-;;;                 | (VARNAME ELEMENT-TYPE)
-;;; opt-term =        VARNAME
-;;;                 | (var-term DEFAULT [SUPPLIEDP])
-
-- BODY: Body of the function form. This may contain a docstring in the usual
-place, and may also a single special form beginning with `returns':
-
-;;; returns-form = (RETURNS TYPE [assertion])
-If the `returns' form contains an assertion, then within that assertion,
-the symbol `RETURN-VALUE' is bound to the value that the function is
-about to return.
-
-* Description:
-Equivalent to (DEFUN fname arglist . body), but:
-- All type declarations within the lambda list will be turned into (DECLARE...)
-forms within the function body
+* Description
+Equivalent to =(DEFUN fname arglist . body)=, but:
+- All type declarations within the lambda list will be turned into =(DECLARE...)=
+  forms within the function body
 - If a return type is declared for the function itself, this will be turned
-into a global DECLAIM form that precedes the function
+  into a global =DECLAIM= form that immediately precedes the function.
 - All assertions within the lambda list will be checked before the function body
-is entered.
-- Any assertion within a `returns' form will be checked before the function
-returns a value.
+  is entered.
+- Any assertion within a =returns= form will be checked before the function
+  returns a value.
 
-* Examples:
+* Examples
 ;;; ;; Very simple example
 ;;; (defun* (add -> real) ((a real) (b real))
 ;;;   (+ a b))
@@ -634,29 +685,33 @@ returns a value.
 
 
 (defmacro defmethod* (fname method-arglist &body body)
-  "* Arguments:
+  "* Usage
+: (defmethod* FNAME METHOD-ARGLIST
+:    ...body...)
+* Arguments
 
-Usage is exactly the same as {defmacro defstar:defun*}, except that within
-METHOD-ARGLIST, any list in a non-optional position is assumed to be a
-specialised lambda list term of the form (VARNAME CLASS [assertion]), rather than a
-DEFUN* type-declaring term.
+Usage is exactly the same as [[defun*]], except that within =METHOD-ARGLIST=,
+any list in a non-optional position (prior to any =&key, &rest,= or =&optional=
+keyword) is assumed to be a specialised lambda list term of the form =(VARNAME
+CLASS [assertion])=, rather than a DEFUN* type-declaring term.
 
 The syntax of METHOD-ARGLIST is therefore:
-;;; arglist =   method-term*
-;;;           | (method-term* [&optional opt-term+])
-;;;           | (method-term* [&key opt-term+])
-;;;           | (method-term* [&rest rest-term])
-;;; method-term = VARNAME
-;;;               | (VARNAME CLASS [assertion])
-;;;               | ((VARNAME TYPE/CLASS [assertion]) CLASS)
+: arglist =   method-term*
+:           | (method-term* [&optional opt-term+])
+:           | (method-term* [&key opt-term+])
+:           | (method-term* [&rest rest-term])
+: method-term = VARNAME
+:               | (VARNAME CLASS [assertion])
+:               | ((VARNAME TYPE/CLASS [assertion]) CLASS)
 The rest of the syntax is the same as for DEFUN*.
 
-* Description:
-Equivalent to (DEFMETHOD FNAME METHOD-ARGLIST . body) with type declarations
-and assertions as per {defmacro defstar:defun*}.
+* Description
+Equivalent to =(DEFMETHOD FNAME METHOD-ARGLIST . body)= with type declarations
+and assertions as per [[defun*]].
 
-* Examples:
+* Examples
 ;;; (deftype positive-integer () `(integer 1))
+;;;
 ;;; (defmethod (make-coords -> (cons positive-integer positive-integer))
 ;;;                (((x positive-integer) integer)
 ;;;                 ((y positive-integer) integer))
@@ -666,21 +721,29 @@ and assertions as per {defmacro defstar:defun*}.
 
 
 (defmacro defgeneric* (fname generic-arglist &body options)
-  "* Arguments:
-Usage is exactly the same as {defmacro defstar:defun*}, except that:
-- Assertions are ignored.
-- &REST, &KEY and &OPTIONAL arguments must be of the form:
-;;; arg =   VARNAME
-;;;       | (VARNAME TYPE)
+  "* Usage
+: (defgeneric* FNAME GENERIC-ARGLIST
+:    ...body...)
+* Arguments
+- FNAME :: Name of the generic function.
+- GENERIC-ARGLIST :: Follows the same grammar the arglist for [[defun*]]
+  forms, except that =&REST, &KEY= and =&OPTIONAL= arguments must be of the form:
+  : arg =   VARNAME
+  :       | (VARNAME TYPE)
+
+* Description
+Usage is exactly the same as [[defun*]], except that value-checking assertions
+are ignored.
+
+Note that you can declare types for arguments in the generic function
+argument list. Be careful that these do not clash with method definitions.
+Type declarations for generic function arguments will only be used to
+make a toplevel =DECLAIM= form that will then apply to all methods of
+the generic function.
 
 * Examples:
 ;;; (defgeneric* (length -> integer) (seq &key start) ...options...)
-
-;;; ;; Note that you can declare types for arguments in the generic function
-;;; ;; argument list. Be careful that these do not clash with method definitions.
-;;; ;; Type declarations for generic function arguments will only be used to
-;;; ;; make a toplevel DECLAIM form that will then apply to all methods of
-;;; ;; the generic function.
+;;;
 ;;; (defgeneric* (length -> integer) ((seq sequence) &key (start integer))
 ;;;    ...options...)
 "
@@ -688,36 +751,60 @@ Usage is exactly the same as {defmacro defstar:defun*}, except that:
 
 
 (defmacro defvar* (var value &optional docstring)
-  "* Arguments:
-- VAR can be either:
--- 1. A variable name: in this case DEFVAR* has exactly the same effect as
-DEFVAR.
--- 2. (VARNAME TYPE) where VARNAME is a variable name and TYPE is a type
-declaration.
-- VALUE: A form which is evaluated when the variable is first created.
-- DOCSTRING: Documentation.
+  "* Usage
+: (defvar* VAR VALUE [DOCSTRING])
+* Arguments
+- VAR :: either:
+  1. A variable name: in this case =DEFVAR*= has exactly the same effect as
+     =DEFVAR=.
+  2. =(VARNAME TYPE)= where =VARNAME= is a variable name and =TYPE= is a type
+     declaration.
+- VALUE :: A form which is evaluated when the variable is first created.
+- DOCSTRING :: Documentation string.
 
-* Returns: The name of the variable as a symbol.
+* Returns
+The name of the variable as a symbol.
 
-* Description:
-Creates the global special variable VAR, initialises it to VALUE,
-and declares it to be of type TYPE, if given.
+* Description
+Creates the global special variable =VAR=, initialises it to =VALUE=,
+and declares it to be of type =TYPE=, if given.
 
-* Examples:
+* Examples
 ;;; (defvar* (*file-name* string) \"~/log.txt\") "
   `(defvar/param defvar ,var ,value ,docstring))
 
 
 (defmacro defparameter* (var value &optional docstring)
-  "Like {defmacro defstar:defvar*}, but equivalent to DEFPARAMETER rather than DEFVAR.
-See {defmacro defstar:defvar*} for usage."
+  "* Usage
+: (defvar* VAR VALUE [DOCSTRING])
+* Description
+Like [[defvar*]], but expands to =DEFPARAMETER= rather than =DEFVAR=.
+See [[defvar*]] for more details."
   `(defvar/param defparameter ,var ,value ,docstring))
 
 
 (defmacro flet* (clauses &body body)
-  "* Description:
-Like FLET, but within each clause the function name, arglist and body have the
-same syntax as for {defmacro defstar:defun*}."
+  "* Usage
+: (flet* (CLAUSE CLAUSE...)
+:    ...body...)
+
+* Arguments
+- CLAUSES :: List of clauses. Takes the following grammar:
+  : clauses = clause*
+  : clause  = (FNAME ARGLIST ...body...)
+  See [[defun*]] for a description of the grammar of =FNAME= and =ARGLIST=.
+- BODY :: Body of the form.
+
+* Description
+Like =FLET=, but within each function-definition clause the function name,
+arglist and body have the same syntax as for [[defun*]].
+
+* Examples
+;;; (defun foo (name x y)
+;;;    (flet* (((area -> integer) ((x integer) (y integer))
+;;;              (* x y)))
+;;;       (format t \"Area of ~A is ~D.~%\" name (area x y))))
+"
   `(flet ,(mapcar
            #'(lambda (clause)
                (destructuring-bind (fname arglist &rest clause-body) clause
@@ -727,9 +814,18 @@ same syntax as for {defmacro defstar:defun*}."
 
 
 (defmacro labels* (clauses &body body)
-  "* Description:
-Like LABELS, but within each clause the function name, arglist and body have the
-same syntax as for {defmacro defstar:defun*}."
+  "* Usage
+: (labels* (CLAUSE CLAUSE...)
+:    ...body...)
+
+* Arguments
+See [[flet*]].
+
+* Description
+Like =LABELS=, but within each clause the function name, arglist and body have
+the same syntax as for [[defun*]].
+
+See [[flet*]] for more details."
   `(labels ,(mapcar
              #'(lambda (clause)
                  (destructuring-bind (fname arglist &rest clause-body) clause
@@ -740,10 +836,12 @@ same syntax as for {defmacro defstar:defun*}."
 
 
 (defmacro lambda* (arglist &body body)
-  "* Description:
-
-Like LAMBDA, but the arglist and body have the same syntax as for {defmacro
-defstar:defun*}.  A `returns' form can be used within the function body to
+  "* Usage
+: (lambda* ARGLIST
+:    ...body...)
+* Description
+Like =LAMBDA=, but =ARGLIST= and body have the same syntax as for [[defun*]].
+ A =returns= form can be used within the function body to
 declare its return type."
   (safe-define 'lambda nil arglist body))
 
