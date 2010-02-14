@@ -581,7 +581,7 @@ Internal macro, used by [[defvar*]] and
     ((listp var)
      (destructuring-bind (varname vartype) var
        `(progn
-          (declaim (type ,vartype) ,varname)
+          (declaim (type ,vartype ,varname))
           (,toplevel-form-name ,varname ,value
                                ,@(if docstring (list docstring) nil)))))
     (t
