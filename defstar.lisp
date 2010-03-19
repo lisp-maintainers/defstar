@@ -33,6 +33,7 @@
            #:flet*
            #:labels*
            #:lambda*
+           #:*let
            #:returns
            #:return-value
            #:*check-argument-types-explicitly?*
@@ -41,9 +42,9 @@
    "* Description
 
 DEFSTAR is a collection of macros that can be used in place of =DEFUN,
-DEFMETHOD, DEFGENERIC, DEFVAR, DEFPARAMETER, FLET, LABELS= and =LAMBDA=. Each macro
-has the same name as the form it replaces, with a star added at the
-end (e.g. =DEFUN*=).
+DEFMETHOD, DEFGENERIC, DEFVAR, DEFPARAMETER, FLET, LABELS= and =LAMBDA=. Each
+macro has the same name as the form it replaces, with a star added at the end,
+e.g. =DEFUN*=.
 
 The macros allow:
 - easy inclusion of type declarations within lambda lists
@@ -203,6 +204,31 @@ if a value does not match its declared type.
 ;;; (defmethod (setf foo) (...args...)
 ;;;    (returns integer)                  ; legal
 ;;;    ...)
+
+* Syntax highlighting of DEFSTAR macros in Emacs
+
+Put the following code in your =.emacs= if you want =DEFVAR*= and other 
+forms to appear in the same face as their normal counterparts, and if 
+you want their docstrings to also be correctly identified as docstrings
+rather than normal strings.
+
+;;; ;; fontify doc strings in correct face
+;;; ;; lisp-mode already fontifies 'defun*' correctly
+;;; (put 'defvar*   'doc-string-elt 3)
+;;; (put 'defparameter*   'doc-string-elt 3)
+;;; (put 'lambda*   'doc-string-elt 2)
+;;; 
+;;; (defvar *lisp-special-forms*
+;;;       (regexp-opt '(\"defvar*\"
+;;;                     \"defconstant*\"
+;;;                     \"defparameter*\"
+;;;                     \"defgeneric*\"
+;;;                     \"defmethod*\"
+;;;                     \"lambda*\"
+;;;                     \"flet*\"
+;;;                     \"labels*\") 'words))
+;;; (font-lock-add-keywords 'lisp-mode
+;;;  `((,*lisp-special-forms* . font-lock-keyword-face)))
 "))
 
 (in-package :defstar)
@@ -216,9 +242,7 @@ if a value does not match its declared type.
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun defstar/split-defun-body (body)
-    "* Usage
-: (defstar/split-defun-body BODY)
-* Arguments
+    "* Arguments
 - BODY :: the body of a =DEFUN= form or similar, such as might be received
 by a macro.
 
@@ -253,9 +277,7 @@ The preamble consists of declarations and a docstring.
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun defstar/make-keyword (&rest parts)
-    "* Usage
-: (defstar/make-keyword PART [PART PART...])
-* Arguments
+    "* Arguments
 - PART :: Any lisp value; usually a string or symbol.
 
 * Return Value
@@ -274,9 +296,7 @@ string, then makes a symbol from that string, and interns the symbol in the
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun defstar/ampersand-symbol? (sym)
-    "* Usage
-: (defstar/ampersand-symbol? SYM)
-* Arguments
+    "* Arguments
 - SYM :: A symbol.
 * Return Value
 Boolean.
@@ -312,9 +332,7 @@ based on declarations, especially when the =SAFETY= setting is high. ")
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun defun*-term (term last-amp-kwd &key (def-type 'defun))
-    "* Usage
-: (defun*-term TERM LAST-AMP-KWD &key DEF-TYPE)
-* Arguments
+    "* Arguments
 - TERM :: any member of an ordinary lambda list.
 - LAST-AMP-KWD :: Symbol or nil.
 - DEF-TYPE :: Symbol denoting the type of toplevel form that is being created.
@@ -422,9 +440,7 @@ Internal function, used by [[defun*]] to parse lambda list terms.
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun safe-define (toplevel-form-name fname arglist body)
-    "* Usage
-: (safe-define TOPLEVEL-FORM-NAME FNAME ARGLIST BODY)
-* Arguments
+    "* Arguments
 - TOPLEVEL-FORM-NAME :: Symbol denoting the type of toplevel form being defined.
 Currently handles ='DEFUN, 'DEFMETHOD, 'FLET, 'LABELS, 'LAMBDA, 'DEFGENERIC=.
 - FNAME, ARGLIST, BODY :: see [[defun*]].
@@ -563,9 +579,7 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
 
 
 (defmacro defvar/param (toplevel-form-name var value &optional docstring)
-  "* Usage
-: (defvar/param TOPLEVEL-FORM-NAME VAR VALUE [DOCSTRING])
-* Arguments
+  "* Arguments
 - TOPLEVEL-FORM-NAME :: Symbol denoting the type of toplevel form being defined.
   For example, ='DEFUN=.
 - VAR :: Symbol or list.
@@ -594,11 +608,9 @@ Internal macro, used by [[defvar*]] and
 ;;;; (@> "Exported macros") ===================================================
 
 
+;;; <<defun*>>
 (defmacro defun* (fname arglist &body body)
-  "* Usage
-: (defun* FNAME ARGLIST
-:    ...body...)
-* Arguments
+  "* Arguments
 - FNAME :: either the name of the function to be created, or a list with the
   following grammar:
   : fname =   FUNCTION-NAME
@@ -684,11 +696,9 @@ Equivalent to =(DEFUN fname arglist . body)=, but:
   (safe-define 'defun fname arglist body))
 
 
+;;; <<defmethod*>>
 (defmacro defmethod* (fname method-arglist &body body)
-  "* Usage
-: (defmethod* FNAME METHOD-ARGLIST
-:    ...body...)
-* Arguments
+  "* Arguments
 
 Usage is exactly the same as [[defun*]], except that within =METHOD-ARGLIST=,
 any list in a non-optional position (prior to any =&key, &rest,= or =&optional=
@@ -720,11 +730,9 @@ and assertions as per [[defun*]].
   (safe-define 'defmethod fname method-arglist body))
 
 
+;;; <<defgeneric*>>
 (defmacro defgeneric* (fname generic-arglist &body options)
-  "* Usage
-: (defgeneric* FNAME GENERIC-ARGLIST
-:    ...body...)
-* Arguments
+  "* Arguments
 - FNAME :: Name of the generic function.
 - GENERIC-ARGLIST :: Follows the same grammar the arglist for [[defun*]]
   forms, except that =&REST, &KEY= and =&OPTIONAL= arguments must be of the form:
@@ -750,10 +758,9 @@ the generic function.
   (safe-define 'defgeneric fname generic-arglist options))
 
 
+;;; <<defvar*>>
 (defmacro defvar* (var value &optional docstring)
-  "* Usage
-: (defvar* VAR VALUE [DOCSTRING])
-* Arguments
+  "* Arguments
 - VAR :: either:
   1. A variable name: in this case =DEFVAR*= has exactly the same effect as
      =DEFVAR=.
@@ -774,21 +781,17 @@ and declares it to be of type =TYPE=, if given.
   `(defvar/param defvar ,var ,value ,docstring))
 
 
+;;; <<defparameter*>>
 (defmacro defparameter* (var value &optional docstring)
-  "* Usage
-: (defvar* VAR VALUE [DOCSTRING])
-* Description
+  "* Description
 Like [[defvar*]], but expands to =DEFPARAMETER= rather than =DEFVAR=.
 See [[defvar*]] for more details."
   `(defvar/param defparameter ,var ,value ,docstring))
 
 
+;;; <<flet*>>
 (defmacro flet* (clauses &body body)
-  "* Usage
-: (flet* (CLAUSE CLAUSE...)
-:    ...body...)
-
-* Arguments
+  "* Arguments
 - CLAUSES :: List of clauses. Takes the following grammar:
   : clauses = clause*
   : clause  = (FNAME ARGLIST ...body...)
@@ -813,12 +816,9 @@ arglist and body have the same syntax as for [[defun*]].
      ,@body))
 
 
+;;; <<labels*>>
 (defmacro labels* (clauses &body body)
-  "* Usage
-: (labels* (CLAUSE CLAUSE...)
-:    ...body...)
-
-* Arguments
+  "* Arguments
 See [[flet*]].
 
 * Description
@@ -834,15 +834,54 @@ See [[flet*]] for more details."
      ,@body))
 
 
-
+;;; <<lambda*>>
 (defmacro lambda* (arglist &body body)
-  "* Usage
-: (lambda* ARGLIST
-:    ...body...)
-* Description
+  "* Description
 Like =LAMBDA=, but =ARGLIST= and body have the same syntax as for [[defun*]].
  A =returns= form can be used within the function body to
 declare its return type."
   (safe-define 'lambda nil arglist body))
+
+
+
+;; Future ideas for *let:
+;; ((a . b) FORM)  ;; destructuring
+;; (#(a b) FORM)   ;; destructuring a vector
+;; ((:values a b) FORM)  ;; mvbind
+;; _ or nil = 'ignored' variable
+
+;;; <<let*>>
+(defmacro *let (clauses &body body)
+  "* Arguments
+- CLAUSES :: A series of zero or more clauses taking the form:
+: clause =   VARNAME
+:          | (VARNAME FORM)
+:          | (VARNAME TYPE FORM)
+- BODY :: The body of the form (implicit =progn=).
+* Description
+Expands to a =LET*= form, but if any clauses contain type information,
+that information is moved into a declaration at the beginning of the
+form's body.
+* Example
+;;; (*let ((name \"Bob\")
+;;;        (age integer 40)
+;;;        (sex (member :male :female) :male))
+;;;    ...body...)
+"
+  (let ((plain-clauses nil)
+        (declarations nil))
+    (dolist (clause clauses)
+      (cond
+        ((or (atom clause) (<= 2 (length clause)))
+         (push clause plain-clauses))
+        (t
+         (push `(,(car clause) (the ,(second clause) ,(third clause)))
+               plain-clauses)
+         (push `(,(second clause) ,(car clause)) declarations))))
+    `(let* ,(reverse plain-clauses)
+       ,@(if declarations `((declare ,@declarations)) (list nil))
+       ,@body)))
+
+
 
 ;;;; End of DEFSTAR

@@ -4,10 +4,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 lang="en" xml:lang="en">
 <head>
-<title>The DEFSTAR package</title>
+<title>DEFSTAR</title>
 <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2010-02-13 10:04:30 NZDT"/>
+<meta name="generated" content="2010-03-19 16:13:59 "/>
 <meta name="author" content="Paul Sexton"/>
 <meta name="description" content=""/>
 <meta name="keywords" content=""/>
@@ -35,6 +35,7 @@ lang="en" xml:lang="en">
   dt { font-weight: bold; }
   div.figure { padding: 0.5em; }
   div.figure p { text-align: center; }
+  textarea { overflow-x: auto; }
   .linenr { font-size:smaller }
   .code-highlighted {background-color:#ffff00;}
   .org-info-js_info-navigation { border-style:none; }
@@ -70,7 +71,7 @@ lang="en" xml:lang="en">
 <body>
 <div id="content">
 
-<h1 class="title">The DEFSTAR package</h1>
+<h1 class="title">DEFSTAR</h1>
 
 <p><a name="defstar" id="defstar"></a>
 <a name="package==defstar" id="package==defstar"></a>
@@ -83,58 +84,43 @@ lang="en" xml:lang="en">
 <ul>
 <li><a href="#sec-1">1 Internal Package: <code>defstar</code></a>
 <ul>
-<li>
-<ul>
 <li><a href="#sec-1.1">1.1 Description</a></li>
 <li><a href="#sec-1.2">1.2 Type DECLARATION versus type CHECKING</a></li>
 <li><a href="#sec-1.3">1.3 Examples of DEFUN* and DEFMETHOD* usage</a></li>
 <li><a href="#sec-1.4">1.4 Examples of DEFVAR* and DEFPARAMETER* usage</a></li>
 <li><a href="#sec-1.5">1.5 Limitations</a></li>
-</ul>
-</li>
-<li><a href="#sec-1.1">1.1 Constants</a>
+<li><a href="#sec-1.6">1.6 Syntax highlighting of DEFSTAR macros in Emacs</a></li>
+<li><a href="#sec-1.7">1.7 External Symbols</a>
 <ul>
-<li><a href="#sec-1.1.1">1.1.1 Constant: <code>+defun*-arrow-symbol+</code></a></li>
-</ul>
-</li>
-<li><a href="#sec-1.2">1.2 Global Variables</a>
+<li><a href="#sec-1.7.1">1.7.1 External Global Variables</a>
 <ul>
-<li><a href="#sec-1.2.1">1.2.1 Variable: <code>*check-argument-types-explicitly?*</code></a></li>
+<li><a href="#sec-1.7.1.1">1.7.1.1 External Variable: <code>*check-argument-types-explicitly?*</code></a></li>
 </ul>
 </li>
-<li><a href="#sec-1.3">1.3 Macros</a>
+<li><a href="#sec-1.7.2">1.7.2 External Macros</a>
 <ul>
-<li><a href="#sec-1.3.1">1.3.1 Macro: <code>defgeneric*</code></a></li>
-<li><a href="#sec-1.3.2">1.3.2 Macro: <code>defmethod*</code></a></li>
-<li><a href="#sec-1.3.3">1.3.3 Macro: <code>defparameter*</code></a></li>
-<li><a href="#sec-1.3.4">1.3.4 Macro: <code>defun*</code></a></li>
-<li><a href="#sec-1.3.5">1.3.5 Macro: <code>defvar*</code></a></li>
-<li><a href="#sec-1.3.6">1.3.6 Macro: <code>defvar/param</code></a></li>
-<li><a href="#sec-1.3.7">1.3.7 Macro: <code>flet*</code></a></li>
-<li><a href="#sec-1.3.8">1.3.8 Macro: <code>labels*</code></a></li>
-<li><a href="#sec-1.3.9">1.3.9 Macro: <code>lambda*</code></a></li>
+<li><a href="#sec-1.7.2.1">1.7.2.1 External Macro: <code>*let</code></a></li>
+<li><a href="#sec-1.7.2.2">1.7.2.2 External Macro: <code>defgeneric*</code></a></li>
+<li><a href="#sec-1.7.2.3">1.7.2.3 External Macro: <code>defmethod*</code></a></li>
+<li><a href="#sec-1.7.2.4">1.7.2.4 External Macro: <code>defparameter*</code></a></li>
+<li><a href="#sec-1.7.2.5">1.7.2.5 External Macro: <code>defun*</code></a></li>
+<li><a href="#sec-1.7.2.6">1.7.2.6 External Macro: <code>defvar*</code></a></li>
+<li><a href="#sec-1.7.2.7">1.7.2.7 External Macro: <code>flet*</code></a></li>
+<li><a href="#sec-1.7.2.8">1.7.2.8 External Macro: <code>labels*</code></a></li>
+<li><a href="#sec-1.7.2.9">1.7.2.9 External Macro: <code>lambda*</code></a></li>
+</ul></li>
 </ul>
 </li>
-<li><a href="#sec-1.4">1.4 Functions</a>
+<li><a href="#sec-1.8">1.8 Index</a>
 <ul>
-<li><a href="#sec-1.4.1">1.4.1 Function: <code>defstar/ampersand-symbol?</code></a></li>
-<li><a href="#sec-1.4.2">1.4.2 Function: <code>defstar/make-keyword</code></a></li>
-<li><a href="#sec-1.4.3">1.4.3 Function: <code>defstar/split-defun-body</code></a></li>
-<li><a href="#sec-1.4.4">1.4.4 Function: <code>defun*-term</code></a></li>
-<li><a href="#sec-1.4.5">1.4.5 Function: <code>safe-define</code></a></li>
+<li><a href="#sec-1.8.1">1.8.1 Nonalphabetic</a></li>
+<li><a href="#sec-1.8.2">1.8.2 D</a></li>
+<li><a href="#sec-1.8.3">1.8.3 F</a></li>
+<li><a href="#sec-1.8.4">1.8.4 L</a></li>
+</ul></li>
 </ul>
 </li>
-<li><a href="#sec-1.5">1.5 Index</a>
-<ul>
-<li><a href="#sec-1.5.1">1.5.1 Nonalphabetic</a></li>
-<li><a href="#sec-1.5.2">1.5.2 D</a></li>
-<li><a href="#sec-1.5.3">1.5.3 F</a></li>
-<li><a href="#sec-1.5.4">1.5.4 L</a></li>
-<li><a href="#sec-1.5.5">1.5.5 S</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><a href="#sec-2">2 Colophon</a></li>
 </ul>
 </div>
 </div>
@@ -148,25 +134,22 @@ lang="en" xml:lang="en">
 <li>
 Uses:
 <a href="#package==common-lisp">common-lisp</a>
-</li>
-<li>
-Used by:
-None.
+
 </li>
 </ul>
 
 </div>
 
-<div id="outline-container-1.1" class="outline-4">
-<h4 id="sec-1.1"><span class="section-number-4">1.1</span> Description</h4>
-<div class="outline-text-4" id="text-1.1">
+<div id="outline-container-1.1" class="outline-3">
+<h3 id="sec-1.1"><span class="section-number-3">1.1</span> Description</h3>
+<div class="outline-text-3" id="text-1.1">
 
 
 
 <p>
-DEFSTAR is a collection of macros that can be used in place of <code>DEFUN, DEFMETHOD, DEFGENERIC, DEFVAR, DEFPARAMETER, FLET, LABELS</code> and <code>LAMBDA</code>. Each macro
-has the same name as the form it replaces, with a star added at the
-end (e.g. <code>DEFUN*</code>).
+DEFSTAR is a collection of macros that can be used in place of <code>DEFUN, DEFMETHOD, DEFGENERIC, DEFVAR, DEFPARAMETER, FLET, LABELS</code> and <code>LAMBDA</code>. Each
+macro has the same name as the form it replaces, with a star added at the end,
+e.g. <code>DEFUN*</code>.
 </p>
 <p>
 The macros allow:
@@ -203,9 +186,9 @@ does not depend on any other libraries.
 
 </div>
 
-<div id="outline-container-1.2" class="outline-4">
-<h4 id="sec-1.2"><span class="section-number-4">1.2</span> Type DECLARATION versus type CHECKING</h4>
-<div class="outline-text-4" id="text-1.2">
+<div id="outline-container-1.2" class="outline-3">
+<h3 id="sec-1.2"><span class="section-number-3">1.2</span> Type DECLARATION versus type CHECKING</h3>
+<div class="outline-text-3" id="text-1.2">
 
 
 
@@ -232,9 +215,9 @@ if a value does not match its declared type.
 
 </div>
 
-<div id="outline-container-1.3" class="outline-4">
-<h4 id="sec-1.3"><span class="section-number-4">1.3</span> Examples of DEFUN* and DEFMETHOD* usage</h4>
-<div class="outline-text-4" id="text-1.3">
+<div id="outline-container-1.3" class="outline-3">
+<h3 id="sec-1.3"><span class="section-number-3">1.3</span> Examples of DEFUN* and DEFMETHOD* usage</h3>
+<div class="outline-text-3" id="text-1.3">
 
 
 
@@ -321,7 +304,7 @@ if a value does not match its declared type.
 </span><span style="color: #db7093;">;; </span><span style="color: #db7093;">normal 'specialised' arguments like you would usually find in a
 </span><span style="color: #db7093;">;; </span><span style="color: #db7093;">method definition. The form still allows you to include an assertion
 </span><span style="color: #db7093;">;; </span><span style="color: #db7093;">with each argument, however ('plusp' in this case).
-</span><span style="color: #696969;">(</span>defmethod* <span style="color: #696969;">(</span>cell-value -&gt; <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span> <span style="color: #0000ff;">:around</span> <span style="color: #696969;">((</span>sheet &lt;Sheet&gt;<span style="color: #696969;">)</span>
+</span><span style="color: #696969;">(</span>defmethod* <span style="color: #696969;">(</span>cell-value -&gt; <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span> <span style="color: #4169e1;">:around</span> <span style="color: #696969;">((</span>sheet &lt;Sheet&gt;<span style="color: #696969;">)</span>
                                           <span style="color: #696969;">(</span>x <span style="color: #1e90ff; font-weight: bold;">integer</span> <span style="color: #1e90ff; font-weight: bold;">plusp</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>y <span style="color: #1e90ff; font-weight: bold;">integer</span> <span style="color: #1e90ff; font-weight: bold;">plusp</span><span style="color: #696969;">))</span>
    ...<span style="color: #696969;">)</span>
 
@@ -336,7 +319,7 @@ if a value does not match its declared type.
 </span><span style="color: #db7093;">;; </span><span style="color: #db7093;">as you normally would.
 </span><span style="color: #db7093;">;; </span><span style="color: #db7093;">Here is an example. Note the similarity to the syntax for keyword
 </span><span style="color: #db7093;">;; </span><span style="color: #db7093;">arguments.
-</span><span style="color: #696969;">(</span>defmethod* <span style="color: #696969;">(</span>cell-value -&gt; <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span> <span style="color: #0000ff;">:around</span> <span style="color: #696969;">((</span>sheet &lt;Sheet&gt;<span style="color: #696969;">)</span>
+</span><span style="color: #696969;">(</span>defmethod* <span style="color: #696969;">(</span>cell-value -&gt; <span style="color: #1e90ff; font-weight: bold;">real</span><span style="color: #696969;">)</span> <span style="color: #4169e1;">:around</span> <span style="color: #696969;">((</span>sheet &lt;Sheet&gt;<span style="color: #696969;">)</span>
                                           <span style="color: #696969;">((</span>x natural <span style="color: #1e90ff; font-weight: bold;">plusp</span><span style="color: #696969;">)</span> <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">)</span>
                                           <span style="color: #696969;">((</span>y natural <span style="color: #1e90ff; font-weight: bold;">plusp</span><span style="color: #696969;">)</span> <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">))</span>
    ...<span style="color: #696969;">)</span>
@@ -356,17 +339,17 @@ if a value does not match its declared type.
 
 </div>
 
-<div id="outline-container-1.4" class="outline-4">
-<h4 id="sec-1.4"><span class="section-number-4">1.4</span> Examples of DEFVAR* and DEFPARAMETER* usage</h4>
-<div class="outline-text-4" id="text-1.4">
+<div id="outline-container-1.4" class="outline-3">
+<h3 id="sec-1.4"><span class="section-number-3">1.4</span> Examples of DEFVAR* and DEFPARAMETER* usage</h3>
+<div class="outline-text-3" id="text-1.4">
 
 
 
 
 
 
-<pre class="src src-lisp"><span style="color: #696969;">(</span>defvar* <span style="color: #696969;">(</span>*user-name* <span style="color: #1e90ff; font-weight: bold;">string</span><span style="color: #696969;">)</span> <span style="color: #006400;">"Bob"</span><span style="color: #696969;">)</span>
-<span style="color: #696969;">(</span>defparameter* <span style="color: #696969;">(</span>*file-position* <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">integer</span> <span style="color: #2e8b57;">0</span><span style="color: #696969;">))</span> <span style="color: #2e8b57;">0</span><span style="color: #696969;">)</span>
+<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defvar*</span> <span style="color: #696969;">(</span><span style="color: #00c5cd;">*user-name*</span> <span style="color: #1e90ff; font-weight: bold;">string</span><span style="color: #696969;">)</span> <span style="color: #008b00;">"Bob"</span><span style="color: #696969;">)</span>
+<span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defparameter*</span> <span style="color: #696969;">(</span><span style="color: #00c5cd;">*file-position*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">integer</span> <span style="color: #2e8b57;">0</span><span style="color: #696969;">))</span> <span style="color: #2e8b57;">0</span><span style="color: #696969;">)</span>
 </pre>
 
 
@@ -375,9 +358,9 @@ if a value does not match its declared type.
 
 </div>
 
-<div id="outline-container-1.5" class="outline-4">
-<h4 id="sec-1.5"><span class="section-number-4">1.5</span> Limitations</h4>
-<div class="outline-text-4" id="text-1.5">
+<div id="outline-container-1.5" class="outline-3">
+<h3 id="sec-1.5"><span class="section-number-3">1.5</span> Limitations</h3>
+<div class="outline-text-3" id="text-1.5">
 
 
 <ul>
@@ -404,74 +387,65 @@ form. For example:
 
 </div>
 
-<div id="outline-container-1.1" class="outline-3">
-<h3 id="sec-1.1"><span class="section-number-3">1.1</span> Constants</h3>
-<div class="outline-text-3" id="text-1.1">
+<div id="outline-container-1.6" class="outline-3">
+<h3 id="sec-1.6"><span class="section-number-3">1.6</span> Syntax highlighting of DEFSTAR macros in Emacs</h3>
+<div class="outline-text-3" id="text-1.6">
 
 
 
-<hr/>
 <p>
-<a name="..2b..defun*-arrow-symbol..2b.." id="..2b..defun*-arrow-symbol..2b.."></a>
-<a name="constant==..2b..defun*-arrow-symbol..2b.." id="constant==..2b..defun*-arrow-symbol..2b.."></a>
+Put the following code in your <code>.emacs</code> if you want <code>DEFVAR*</code> and other 
+forms to appear in the same face as their normal counterparts, and if 
+you want their docstrings to also be correctly identified as docstrings
+rather than normal strings.
 </p>
 
 
-</div>
 
-<div id="outline-container-1.1.1" class="outline-4">
-<h4 id="sec-1.1.1"><span class="section-number-4">1.1.1</span> Constant: <code>+defun*-arrow-symbol+</code></h4>
-<div class="outline-text-4" id="text-1.1.1">
+<pre class="src src-lisp"><span style="color: #db7093;">;; </span><span style="color: #db7093;">fontify doc strings in correct face
+</span><span style="color: #db7093;">;; </span><span style="color: #db7093;">lisp-mode already fontifies 'defun*' correctly
+</span><span style="color: #696969;">(</span>put '<span style="color: #8b4789; font-weight: bold;">defvar*</span>   'doc-string-elt <span style="color: #2e8b57;">3</span><span style="color: #696969;">)</span>
+<span style="color: #696969;">(</span>put '<span style="color: #8b4789; font-weight: bold;">defparameter*</span>   'doc-string-elt <span style="color: #2e8b57;">3</span><span style="color: #696969;">)</span>
+<span style="color: #696969;">(</span>put '<span style="color: #8b4789; font-weight: bold;">lambda*</span>   'doc-string-elt <span style="color: #2e8b57;">2</span><span style="color: #696969;">)</span>
 
-
-
-
-</div>
-
-<div id="outline-container-1.1.1.1" class="outline-5">
-<h5 id="sec-1.1.1.1"><span class="section-number-5">1.1.1.1</span> Value</h5>
-<div class="outline-text-5" id="text-1.1.1.1">
-
-
-<pre class="example">
-DEFSTAR:-&gt;
+<span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defvar</span> <span style="color: #00868b; font-weight: bold;">*lisp-special-forms*</span>
+      <span style="color: #696969;">(</span>regexp-opt '<span style="color: #696969;">(</span><span style="color: #008b00;">"defvar*"</span>
+                    <span style="color: #008b00;">"defconstant*"</span>
+                    <span style="color: #008b00;">"defparameter*"</span>
+                    <span style="color: #008b00;">"defgeneric*"</span>
+                    <span style="color: #008b00;">"defmethod*"</span>
+                    <span style="color: #008b00;">"lambda*"</span>
+                    <span style="color: #008b00;">"flet*"</span>
+                    <span style="color: #008b00;">"labels*"</span><span style="color: #696969;">)</span> 'words<span style="color: #696969;">))</span>
+<span style="color: #696969;">(</span>font-lock-add-keywords 'lisp-mode
+ `<span style="color: #696969;">((</span>,<span style="color: #00c5cd;">*lisp-special-forms*</span> . font-lock-keyword-face<span style="color: #696969;">)))</span>
 </pre>
 
 
-<p>
-Type: <code>symbol</code>
-</p>
 
 </div>
 
 </div>
 
-<div id="outline-container-1.1.1.2" class="outline-5">
-<h5 id="sec-1.1.1.2"><span class="section-number-5">1.1.1.2</span> Description</h5>
-<div class="outline-text-5" id="text-1.1.1.2">
+<div id="outline-container-1.7" class="outline-3">
+<h3 id="sec-1.7"><span class="section-number-3">1.7</span> External Symbols</h3>
+<div class="outline-text-3" id="text-1.7">
 
 
-<p>
-The symbol that separates function name from type declaration
-in <code>DEFUN*</code> forms and the like. See <a href="#defun*">defun*</a>.
-</p>
 
 
 
 
 </div>
-</div>
-</div>
 
-</div>
-
-<div id="outline-container-1.2" class="outline-3">
-<h3 id="sec-1.2"><span class="section-number-3">1.2</span> Global Variables</h3>
-<div class="outline-text-3" id="text-1.2">
+<div id="outline-container-1.7.1" class="outline-4">
+<h4 id="sec-1.7.1"><span class="section-number-4">1.7.1</span> External Global Variables</h4>
+<div class="outline-text-4" id="text-1.7.1">
 
 
 
 <hr/>
+
 <p>
 <a name="<b>check-argument-types-explicitly..3f..</b>" id="<b>check-argument-types-explicitly..3f..</b>"></a>
 <a name="variable==*check-argument-types-explicitly..3f..*" id="variable==*check-argument-types-explicitly..3f..*"></a>
@@ -480,36 +454,36 @@ in <code>DEFUN*</code> forms and the like. See <a href="#defun*">defun*</a>.
 
 </div>
 
-<div id="outline-container-1.2.1" class="outline-4">
-<h4 id="sec-1.2.1"><span class="section-number-4">1.2.1</span> Variable: <code>*check-argument-types-explicitly?*</code></h4>
-<div class="outline-text-4" id="text-1.2.1">
+<div id="outline-container-1.7.1.1" class="outline-5">
+<h5 id="sec-1.7.1.1"><span class="section-number-5">1.7.1.1</span> External Variable: <code>*check-argument-types-explicitly?*</code></h5>
+<div class="outline-text-5" id="text-1.7.1.1">
 
 
 
 
 </div>
 
-<div id="outline-container-1.2.1.1" class="outline-5">
-<h5 id="sec-1.2.1.1"><span class="section-number-5">1.2.1.1</span> Value</h5>
-<div class="outline-text-5" id="text-1.2.1.1">
+<div id="outline-container-1.7.1.1.1" class="outline-6">
+<h6 id="sec-1.7.1.1.1"><span class="section-number-6">1.7.1.1.1</span> Value</h6>
+<div class="outline-text-6" id="text-1.7.1.1.1">
 
 
 <pre class="example">
-NIL
+T
 </pre>
 
 
 <p>
-Type: <code>null</code>
+Type: <code>boolean</code>
 </p>
 
 </div>
 
 </div>
 
-<div id="outline-container-1.2.1.2" class="outline-5">
-<h5 id="sec-1.2.1.2"><span class="section-number-5">1.2.1.2</span> Description</h5>
-<div class="outline-text-5" id="text-1.2.1.2">
+<div id="outline-container-1.7.1.1.2" class="outline-6">
+<h6 id="sec-1.7.1.1.2"><span class="section-number-6">1.7.1.1.2</span> Description</h6>
+<div class="outline-text-6" id="text-1.7.1.1.2">
 
 
 <p>
@@ -538,46 +512,143 @@ based on declarations, especially when the <code>SAFETY</code> setting is high.
 
 </div>
 
-<div id="outline-container-1.3" class="outline-3">
-<h3 id="sec-1.3"><span class="section-number-3">1.3</span> Macros</h3>
-<div class="outline-text-3" id="text-1.3">
+<div id="outline-container-1.7.2" class="outline-4">
+<h4 id="sec-1.7.2"><span class="section-number-4">1.7.2</span> External Macros</h4>
+<div class="outline-text-4" id="text-1.7.2">
 
 
 
 <hr/>
+
 <p>
-<a name="defgeneric*" id="defgeneric*"></a>
-<a name="macro==defgeneric*" id="macro==defgeneric*"></a>
+<a name="*let" id="*let"></a>
+<a name="macro==*let" id="macro==*let"></a>
 </p>
 
 
 </div>
 
-<div id="outline-container-1.3.1" class="outline-4">
-<h4 id="sec-1.3.1"><span class="section-number-4">1.3.1</span> Macro: <code>defgeneric*</code></h4>
-<div class="outline-text-4" id="text-1.3.1">
+<div id="outline-container-1.7.2.1" class="outline-5">
+<h5 id="sec-1.7.2.1"><span class="section-number-5">1.7.2.1</span> External Macro: <code>*let</code></h5>
+<div class="outline-text-5" id="text-1.7.2.1">
+
 
 
 
 </div>
 
-<div id="outline-container-1.3.1.1" class="outline-5">
-<h5 id="sec-1.3.1.1"><span class="section-number-5">1.3.1.1</span> Usage</h5>
-<div class="outline-text-5" id="text-1.3.1.1">
+<div id="outline-container-1.7.2.1.1" class="outline-6">
+<h6 id="sec-1.7.2.1.1"><span class="section-number-6">1.7.2.1.1</span> Syntax</h6>
+<div class="outline-text-6" id="text-1.7.2.1.1">
 
 
-<pre class="example">
-(defgeneric* FNAME GENERIC-ARGLIST
-   ...body...)
+
+
+
+<pre class="src src-lisp"><span style="color: #696969;">(</span>*let CLAUSES <span style="color: #d2691e; font-weight: bold;">&amp;body</span> BODY<span style="color: #696969;">)</span>
 </pre>
 
+
+
+</div>
+
+</div>
+
+<div id="outline-container-1.7.2.1.2" class="outline-6">
+<h6 id="sec-1.7.2.1.2"><span class="section-number-6">1.7.2.1.2</span> Arguments</h6>
+<div class="outline-text-6" id="text-1.7.2.1.2">
+
+
+<dl>
+<dt>CLAUSES</dt><dd>
+A series of zero or more clauses taking the form:
+<pre class="example">
+clause =   VARNAME
+         | (VARNAME FORM)
+         | (VARNAME TYPE FORM)
+</pre>
+
+</dd>
+<dt>BODY</dt><dd>
+The body of the form (implicit <code>progn</code>).
+</dd>
+</dl>
 </div>
 
 </div>
 
-<div id="outline-container-1.3.1.2" class="outline-5">
-<h5 id="sec-1.3.1.2"><span class="section-number-5">1.3.1.2</span> Arguments</h5>
-<div class="outline-text-5" id="text-1.3.1.2">
+<div id="outline-container-1.7.2.1.3" class="outline-6">
+<h6 id="sec-1.7.2.1.3"><span class="section-number-6">1.7.2.1.3</span> Description</h6>
+<div class="outline-text-6" id="text-1.7.2.1.3">
+
+
+<p>
+Expands to a <code>LET*</code> form, but if any clauses contain type information,
+that information is moved into a declaration at the beginning of the
+form's body.
+</p></div>
+
+</div>
+
+<div id="outline-container-1.7.2.1.4" class="outline-6">
+<h6 id="sec-1.7.2.1.4"><span class="section-number-6">1.7.2.1.4</span> Example</h6>
+<div class="outline-text-6" id="text-1.7.2.1.4">
+
+
+
+
+
+<pre class="src src-lisp"><span style="color: #696969;">(</span>*let <span style="color: #696969;">((</span>name <span style="color: #008b00;">"Bob"</span><span style="color: #696969;">)</span>
+       <span style="color: #696969;">(</span>age <span style="color: #1e90ff; font-weight: bold;">integer</span> <span style="color: #2e8b57;">40</span><span style="color: #696969;">)</span>
+       <span style="color: #696969;">(</span>sex <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">member</span> <span style="color: #4169e1;">:male</span> <span style="color: #4169e1;">:female</span><span style="color: #696969;">)</span> <span style="color: #4169e1;">:male</span><span style="color: #696969;">))</span>
+   ...body...<span style="color: #696969;">)</span>
+</pre>
+
+
+
+
+
+<hr/>
+
+<p>
+<a name="defgeneric*" id="defgeneric*"></a>
+<a name="macro==defgeneric*" id="macro==defgeneric*"></a>
+</p>
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1.7.2.2" class="outline-5">
+<h5 id="sec-1.7.2.2"><span class="section-number-5">1.7.2.2</span> External Macro: <code>defgeneric*</code></h5>
+<div class="outline-text-5" id="text-1.7.2.2">
+
+
+
+
+</div>
+
+<div id="outline-container-1.7.2.2.1" class="outline-6">
+<h6 id="sec-1.7.2.2.1"><span class="section-number-6">1.7.2.2.1</span> Syntax</h6>
+<div class="outline-text-6" id="text-1.7.2.2.1">
+
+
+
+
+
+<pre class="src src-lisp"><span style="color: #696969;">(</span>defgeneric* FNAME GENERIC-ARGLIST <span style="color: #d2691e; font-weight: bold;">&amp;body</span> OPTIONS<span style="color: #696969;">)</span>
+</pre>
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-1.7.2.2.2" class="outline-6">
+<h6 id="sec-1.7.2.2.2"><span class="section-number-6">1.7.2.2.2</span> Arguments</h6>
+<div class="outline-text-6" id="text-1.7.2.2.2">
 
 
 <dl>
@@ -599,9 +670,9 @@ arg =   VARNAME
 
 </div>
 
-<div id="outline-container-1.3.1.3" class="outline-5">
-<h5 id="sec-1.3.1.3"><span class="section-number-5">1.3.1.3</span> Description</h5>
-<div class="outline-text-5" id="text-1.3.1.3">
+<div id="outline-container-1.7.2.2.3" class="outline-6">
+<h6 id="sec-1.7.2.2.3"><span class="section-number-6">1.7.2.2.3</span> Description</h6>
+<div class="outline-text-6" id="text-1.7.2.2.3">
 
 
 <p>
@@ -619,9 +690,9 @@ the generic function.
 
 </div>
 
-<div id="outline-container-1.3.1.4" class="outline-5">
-<h5 id="sec-1.3.1.4"><span class="section-number-5">1.3.1.4</span> Examples:</h5>
-<div class="outline-text-5" id="text-1.3.1.4">
+<div id="outline-container-1.7.2.2.4" class="outline-6">
+<h6 id="sec-1.7.2.2.4"><span class="section-number-6">1.7.2.2.4</span> Examples:</h6>
+<div class="outline-text-6" id="text-1.7.2.2.4">
 
 
 
@@ -638,6 +709,7 @@ the generic function.
 
 
 <hr/>
+
 <p>
 <a name="defmethod*" id="defmethod*"></a>
 <a name="macro==defmethod*" id="macro==defmethod*"></a>
@@ -648,31 +720,35 @@ the generic function.
 
 </div>
 
-<div id="outline-container-1.3.2" class="outline-4">
-<h4 id="sec-1.3.2"><span class="section-number-4">1.3.2</span> Macro: <code>defmethod*</code></h4>
-<div class="outline-text-4" id="text-1.3.2">
+<div id="outline-container-1.7.2.3" class="outline-5">
+<h5 id="sec-1.7.2.3"><span class="section-number-5">1.7.2.3</span> External Macro: <code>defmethod*</code></h5>
+<div class="outline-text-5" id="text-1.7.2.3">
+
 
 
 
 </div>
 
-<div id="outline-container-1.3.2.1" class="outline-5">
-<h5 id="sec-1.3.2.1"><span class="section-number-5">1.3.2.1</span> Usage</h5>
-<div class="outline-text-5" id="text-1.3.2.1">
+<div id="outline-container-1.7.2.3.1" class="outline-6">
+<h6 id="sec-1.7.2.3.1"><span class="section-number-6">1.7.2.3.1</span> Syntax</h6>
+<div class="outline-text-6" id="text-1.7.2.3.1">
 
 
-<pre class="example">
-(defmethod* FNAME METHOD-ARGLIST
-   ...body...)
+
+
+
+<pre class="src src-lisp"><span style="color: #696969;">(</span>defmethod* FNAME METHOD-ARGLIST <span style="color: #d2691e; font-weight: bold;">&amp;body</span> BODY<span style="color: #696969;">)</span>
 </pre>
 
-</div>
+
 
 </div>
 
-<div id="outline-container-1.3.2.2" class="outline-5">
-<h5 id="sec-1.3.2.2"><span class="section-number-5">1.3.2.2</span> Arguments</h5>
-<div class="outline-text-5" id="text-1.3.2.2">
+</div>
+
+<div id="outline-container-1.7.2.3.2" class="outline-6">
+<h6 id="sec-1.7.2.3.2"><span class="section-number-6">1.7.2.3.2</span> Arguments</h6>
+<div class="outline-text-6" id="text-1.7.2.3.2">
 
 
 
@@ -699,9 +775,9 @@ method-term = VARNAME
 
 </div>
 
-<div id="outline-container-1.3.2.3" class="outline-5">
-<h5 id="sec-1.3.2.3"><span class="section-number-5">1.3.2.3</span> Description</h5>
-<div class="outline-text-5" id="text-1.3.2.3">
+<div id="outline-container-1.7.2.3.3" class="outline-6">
+<h6 id="sec-1.7.2.3.3"><span class="section-number-6">1.7.2.3.3</span> Description</h6>
+<div class="outline-text-6" id="text-1.7.2.3.3">
 
 
 <p>
@@ -712,9 +788,9 @@ and assertions as per <a href="#defun*">defun*</a>.
 
 </div>
 
-<div id="outline-container-1.3.2.4" class="outline-5">
-<h5 id="sec-1.3.2.4"><span class="section-number-5">1.3.2.4</span> Examples</h5>
-<div class="outline-text-5" id="text-1.3.2.4">
+<div id="outline-container-1.7.2.3.4" class="outline-6">
+<h6 id="sec-1.7.2.3.4"><span class="section-number-6">1.7.2.3.4</span> Examples</h6>
+<div class="outline-text-6" id="text-1.7.2.3.4">
 
 
 
@@ -733,6 +809,7 @@ and assertions as per <a href="#defun*">defun*</a>.
 
 
 <hr/>
+
 <p>
 <a name="defparameter*" id="defparameter*"></a>
 <a name="macro==defparameter*" id="macro==defparameter*"></a>
@@ -743,30 +820,35 @@ and assertions as per <a href="#defun*">defun*</a>.
 
 </div>
 
-<div id="outline-container-1.3.3" class="outline-4">
-<h4 id="sec-1.3.3"><span class="section-number-4">1.3.3</span> Macro: <code>defparameter*</code></h4>
-<div class="outline-text-4" id="text-1.3.3">
+<div id="outline-container-1.7.2.4" class="outline-5">
+<h5 id="sec-1.7.2.4"><span class="section-number-5">1.7.2.4</span> External Macro: <code>defparameter*</code></h5>
+<div class="outline-text-5" id="text-1.7.2.4">
+
 
 
 
 </div>
 
-<div id="outline-container-1.3.3.1" class="outline-5">
-<h5 id="sec-1.3.3.1"><span class="section-number-5">1.3.3.1</span> Usage</h5>
-<div class="outline-text-5" id="text-1.3.3.1">
+<div id="outline-container-1.7.2.4.1" class="outline-6">
+<h6 id="sec-1.7.2.4.1"><span class="section-number-6">1.7.2.4.1</span> Syntax</h6>
+<div class="outline-text-6" id="text-1.7.2.4.1">
 
 
-<pre class="example">
-(defvar* VAR VALUE [DOCSTRING])
+
+
+
+<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defparameter*</span> VAR VALUE <span style="color: #d2691e; font-weight: bold;">&amp;optional</span> DOCSTRING<span style="color: #696969;">)</span>
 </pre>
 
-</div>
+
 
 </div>
 
-<div id="outline-container-1.3.3.2" class="outline-5">
-<h5 id="sec-1.3.3.2"><span class="section-number-5">1.3.3.2</span> Description</h5>
-<div class="outline-text-5" id="text-1.3.3.2">
+</div>
+
+<div id="outline-container-1.7.2.4.2" class="outline-6">
+<h6 id="sec-1.7.2.4.2"><span class="section-number-6">1.7.2.4.2</span> Description</h6>
+<div class="outline-text-6" id="text-1.7.2.4.2">
 
 
 <p>
@@ -776,6 +858,7 @@ See <a href="#defvar*">defvar*</a> for more details.
 
 
 <hr/>
+
 <p>
 <a name="defun*" id="defun*"></a>
 <a name="macro==defun*" id="macro==defun*"></a>
@@ -786,31 +869,35 @@ See <a href="#defvar*">defvar*</a> for more details.
 
 </div>
 
-<div id="outline-container-1.3.4" class="outline-4">
-<h4 id="sec-1.3.4"><span class="section-number-4">1.3.4</span> Macro: <code>defun*</code></h4>
-<div class="outline-text-4" id="text-1.3.4">
+<div id="outline-container-1.7.2.5" class="outline-5">
+<h5 id="sec-1.7.2.5"><span class="section-number-5">1.7.2.5</span> External Macro: <code>defun*</code></h5>
+<div class="outline-text-5" id="text-1.7.2.5">
+
 
 
 
 </div>
 
-<div id="outline-container-1.3.4.1" class="outline-5">
-<h5 id="sec-1.3.4.1"><span class="section-number-5">1.3.4.1</span> Usage</h5>
-<div class="outline-text-5" id="text-1.3.4.1">
+<div id="outline-container-1.7.2.5.1" class="outline-6">
+<h6 id="sec-1.7.2.5.1"><span class="section-number-6">1.7.2.5.1</span> Syntax</h6>
+<div class="outline-text-6" id="text-1.7.2.5.1">
 
 
-<pre class="example">
-(defun* FNAME ARGLIST
-   ...body...)
+
+
+
+<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun*</span> <span style="color: #1e90ff; font-weight: bold;">FNAME</span> ARGLIST <span style="color: #d2691e; font-weight: bold;">&amp;body</span> BODY<span style="color: #696969;">)</span>
 </pre>
 
-</div>
+
 
 </div>
 
-<div id="outline-container-1.3.4.2" class="outline-5">
-<h5 id="sec-1.3.4.2"><span class="section-number-5">1.3.4.2</span> Arguments</h5>
-<div class="outline-text-5" id="text-1.3.4.2">
+</div>
+
+<div id="outline-container-1.7.2.5.2" class="outline-6">
+<h6 id="sec-1.7.2.5.2"><span class="section-number-6">1.7.2.5.2</span> Arguments</h6>
+<div class="outline-text-6" id="text-1.7.2.5.2">
 
 
 <dl>
@@ -894,9 +981,9 @@ about to return.
 
 </div>
 
-<div id="outline-container-1.3.4.3" class="outline-5">
-<h5 id="sec-1.3.4.3"><span class="section-number-5">1.3.4.3</span> Description</h5>
-<div class="outline-text-5" id="text-1.3.4.3">
+<div id="outline-container-1.7.2.5.3" class="outline-6">
+<h6 id="sec-1.7.2.5.3"><span class="section-number-6">1.7.2.5.3</span> Description</h6>
+<div class="outline-text-6" id="text-1.7.2.5.3">
 
 
 <p>
@@ -924,9 +1011,9 @@ returns a value.
 
 </div>
 
-<div id="outline-container-1.3.4.4" class="outline-5">
-<h5 id="sec-1.3.4.4"><span class="section-number-5">1.3.4.4</span> Examples</h5>
-<div class="outline-text-5" id="text-1.3.4.4">
+<div id="outline-container-1.7.2.5.4" class="outline-6">
+<h6 id="sec-1.7.2.5.4"><span class="section-number-6">1.7.2.5.4</span> Examples</h6>
+<div class="outline-text-6" id="text-1.7.2.5.4">
 
 
 
@@ -981,6 +1068,7 @@ returns a value.
 
 
 <hr/>
+
 <p>
 <a name="defvar*" id="defvar*"></a>
 <a name="macro==defvar*" id="macro==defvar*"></a>
@@ -991,30 +1079,35 @@ returns a value.
 
 </div>
 
-<div id="outline-container-1.3.5" class="outline-4">
-<h4 id="sec-1.3.5"><span class="section-number-4">1.3.5</span> Macro: <code>defvar*</code></h4>
-<div class="outline-text-4" id="text-1.3.5">
+<div id="outline-container-1.7.2.6" class="outline-5">
+<h5 id="sec-1.7.2.6"><span class="section-number-5">1.7.2.6</span> External Macro: <code>defvar*</code></h5>
+<div class="outline-text-5" id="text-1.7.2.6">
+
 
 
 
 </div>
 
-<div id="outline-container-1.3.5.1" class="outline-5">
-<h5 id="sec-1.3.5.1"><span class="section-number-5">1.3.5.1</span> Usage</h5>
-<div class="outline-text-5" id="text-1.3.5.1">
+<div id="outline-container-1.7.2.6.1" class="outline-6">
+<h6 id="sec-1.7.2.6.1"><span class="section-number-6">1.7.2.6.1</span> Syntax</h6>
+<div class="outline-text-6" id="text-1.7.2.6.1">
 
 
-<pre class="example">
-(defvar* VAR VALUE [DOCSTRING])
+
+
+
+<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defvar*</span> VAR VALUE <span style="color: #d2691e; font-weight: bold;">&amp;optional</span> DOCSTRING<span style="color: #696969;">)</span>
 </pre>
 
-</div>
+
 
 </div>
 
-<div id="outline-container-1.3.5.2" class="outline-5">
-<h5 id="sec-1.3.5.2"><span class="section-number-5">1.3.5.2</span> Arguments</h5>
-<div class="outline-text-5" id="text-1.3.5.2">
+</div>
+
+<div id="outline-container-1.7.2.6.2" class="outline-6">
+<h6 id="sec-1.7.2.6.2"><span class="section-number-6">1.7.2.6.2</span> Arguments</h6>
+<div class="outline-text-6" id="text-1.7.2.6.2">
 
 
 <dl>
@@ -1043,9 +1136,9 @@ Documentation string.
 
 </div>
 
-<div id="outline-container-1.3.5.3" class="outline-5">
-<h5 id="sec-1.3.5.3"><span class="section-number-5">1.3.5.3</span> Returns</h5>
-<div class="outline-text-5" id="text-1.3.5.3">
+<div id="outline-container-1.7.2.6.3" class="outline-6">
+<h6 id="sec-1.7.2.6.3"><span class="section-number-6">1.7.2.6.3</span> Returns</h6>
+<div class="outline-text-6" id="text-1.7.2.6.3">
 
 
 <p>
@@ -1055,9 +1148,9 @@ The name of the variable as a symbol.
 
 </div>
 
-<div id="outline-container-1.3.5.4" class="outline-5">
-<h5 id="sec-1.3.5.4"><span class="section-number-5">1.3.5.4</span> Description</h5>
-<div class="outline-text-5" id="text-1.3.5.4">
+<div id="outline-container-1.7.2.6.4" class="outline-6">
+<h6 id="sec-1.7.2.6.4"><span class="section-number-6">1.7.2.6.4</span> Description</h6>
+<div class="outline-text-6" id="text-1.7.2.6.4">
 
 
 <p>
@@ -1068,15 +1161,15 @@ and declares it to be of type <code>TYPE</code>, if given.
 
 </div>
 
-<div id="outline-container-1.3.5.5" class="outline-5">
-<h5 id="sec-1.3.5.5"><span class="section-number-5">1.3.5.5</span> Examples</h5>
-<div class="outline-text-5" id="text-1.3.5.5">
+<div id="outline-container-1.7.2.6.5" class="outline-6">
+<h6 id="sec-1.7.2.6.5"><span class="section-number-6">1.7.2.6.5</span> Examples</h6>
+<div class="outline-text-6" id="text-1.7.2.6.5">
 
 
 
 
 
-<pre class="src src-lisp"><span style="color: #696969;">(</span>defvar* <span style="color: #696969;">(</span>*file-name* <span style="color: #1e90ff; font-weight: bold;">string</span><span style="color: #696969;">)</span> <span style="color: #006400;">"~/log.txt"</span><span style="color: #696969;">)</span> 
+<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defvar*</span> <span style="color: #696969;">(</span><span style="color: #00c5cd;">*file-name*</span> <span style="color: #1e90ff; font-weight: bold;">string</span><span style="color: #696969;">)</span> <span style="color: #008b00;">"~/log.txt"</span><span style="color: #696969;">)</span> 
 </pre>
 
 
@@ -1084,85 +1177,7 @@ and declares it to be of type <code>TYPE</code>, if given.
 
 
 <hr/>
-<p>
-<a name="defvar..2f..param" id="defvar..2f..param"></a>
-<a name="macro==defvar..2f..param" id="macro==defvar..2f..param"></a>
-</p>
 
-</div>
-</div>
-
-</div>
-
-<div id="outline-container-1.3.6" class="outline-4">
-<h4 id="sec-1.3.6"><span class="section-number-4">1.3.6</span> Macro: <code>defvar/param</code></h4>
-<div class="outline-text-4" id="text-1.3.6">
-
-
-
-</div>
-
-<div id="outline-container-1.3.6.1" class="outline-5">
-<h5 id="sec-1.3.6.1"><span class="section-number-5">1.3.6.1</span> Usage</h5>
-<div class="outline-text-5" id="text-1.3.6.1">
-
-
-<pre class="example">
-(defvar/param TOPLEVEL-FORM-NAME VAR VALUE [DOCSTRING])
-</pre>
-
-</div>
-
-</div>
-
-<div id="outline-container-1.3.6.2" class="outline-5">
-<h5 id="sec-1.3.6.2"><span class="section-number-5">1.3.6.2</span> Arguments</h5>
-<div class="outline-text-5" id="text-1.3.6.2">
-
-
-<dl>
-<dt>TOPLEVEL-FORM-NAME</dt><dd>
-Symbol denoting the type of toplevel form being defined.
-For example, ='DEFUN=.
-</dd>
-<dt>VAR</dt><dd>
-Symbol or list.
-</dd>
-<dt>VALUE</dt><dd>
-Form that will be evaluated to initialise the variable being
-defined.
-</dd>
-<dt>DOCSTRING</dt><dd>
-String used as documentation.
-</dd>
-</dl>
-</div>
-
-</div>
-
-<div id="outline-container-1.3.6.3" class="outline-5">
-<h5 id="sec-1.3.6.3"><span class="section-number-5">1.3.6.3</span> Return Value</h5>
-<div class="outline-text-5" id="text-1.3.6.3">
-
-
-<p>
-A symbol.
-</p></div>
-
-</div>
-
-<div id="outline-container-1.3.6.4" class="outline-5">
-<h5 id="sec-1.3.6.4"><span class="section-number-5">1.3.6.4</span> Description</h5>
-<div class="outline-text-5" id="text-1.3.6.4">
-
-
-<p>
-Internal macro, used by <a href="#defvar*">defvar*</a> and
-<a href="#defparameter*">defparameter*</a>.
-</p>
-
-
-<hr/>
 <p>
 <a name="flet*" id="flet*"></a>
 <a name="macro==flet*" id="macro==flet*"></a>
@@ -1173,32 +1188,35 @@ Internal macro, used by <a href="#defvar*">defvar*</a> and
 
 </div>
 
-<div id="outline-container-1.3.7" class="outline-4">
-<h4 id="sec-1.3.7"><span class="section-number-4">1.3.7</span> Macro: <code>flet*</code></h4>
-<div class="outline-text-4" id="text-1.3.7">
+<div id="outline-container-1.7.2.7" class="outline-5">
+<h5 id="sec-1.7.2.7"><span class="section-number-5">1.7.2.7</span> External Macro: <code>flet*</code></h5>
+<div class="outline-text-5" id="text-1.7.2.7">
+
 
 
 
 </div>
 
-<div id="outline-container-1.3.7.1" class="outline-5">
-<h5 id="sec-1.3.7.1"><span class="section-number-5">1.3.7.1</span> Usage</h5>
-<div class="outline-text-5" id="text-1.3.7.1">
+<div id="outline-container-1.7.2.7.1" class="outline-6">
+<h6 id="sec-1.7.2.7.1"><span class="section-number-6">1.7.2.7.1</span> Syntax</h6>
+<div class="outline-text-6" id="text-1.7.2.7.1">
 
 
-<pre class="example">
-(flet* (CLAUSE CLAUSE...)
-   ...body...)
+
+
+
+<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">flet*</span> CLAUSES <span style="color: #d2691e; font-weight: bold;">&amp;body</span> BODY<span style="color: #696969;">)</span>
 </pre>
 
 
-</div>
 
 </div>
 
-<div id="outline-container-1.3.7.2" class="outline-5">
-<h5 id="sec-1.3.7.2"><span class="section-number-5">1.3.7.2</span> Arguments</h5>
-<div class="outline-text-5" id="text-1.3.7.2">
+</div>
+
+<div id="outline-container-1.7.2.7.2" class="outline-6">
+<h6 id="sec-1.7.2.7.2"><span class="section-number-6">1.7.2.7.2</span> Arguments</h6>
+<div class="outline-text-6" id="text-1.7.2.7.2">
 
 
 <dl>
@@ -1220,9 +1238,9 @@ Body of the form.
 
 </div>
 
-<div id="outline-container-1.3.7.3" class="outline-5">
-<h5 id="sec-1.3.7.3"><span class="section-number-5">1.3.7.3</span> Description</h5>
-<div class="outline-text-5" id="text-1.3.7.3">
+<div id="outline-container-1.7.2.7.3" class="outline-6">
+<h6 id="sec-1.7.2.7.3"><span class="section-number-6">1.7.2.7.3</span> Description</h6>
+<div class="outline-text-6" id="text-1.7.2.7.3">
 
 
 <p>
@@ -1233,18 +1251,18 @@ arglist and body have the same syntax as for <a href="#defun*">defun*</a>.
 
 </div>
 
-<div id="outline-container-1.3.7.4" class="outline-5">
-<h5 id="sec-1.3.7.4"><span class="section-number-5">1.3.7.4</span> Examples</h5>
-<div class="outline-text-5" id="text-1.3.7.4">
+<div id="outline-container-1.7.2.7.4" class="outline-6">
+<h6 id="sec-1.7.2.7.4"><span class="section-number-6">1.7.2.7.4</span> Examples</h6>
+<div class="outline-text-6" id="text-1.7.2.7.4">
 
 
 
 
 
 <pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">defun</span> <span style="color: #1e90ff; font-weight: bold;">foo</span> <span style="color: #696969;">(</span>name x y<span style="color: #696969;">)</span>
-   <span style="color: #696969;">(</span>flet* <span style="color: #696969;">(((</span>area -&gt; <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">)</span> <span style="color: #696969;">((</span>x <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>y <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">))</span>
+   <span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">flet*</span> <span style="color: #696969;">(((</span>area -&gt; <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">)</span> <span style="color: #696969;">((</span>x <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>y <span style="color: #1e90ff; font-weight: bold;">integer</span><span style="color: #696969;">))</span>
              <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">*</span> x y<span style="color: #696969;">)))</span>
-      <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">format</span> <span style="color: #698b22; font-weight: bold;">t</span> <span style="color: #006400;">"Area of ~A is ~D.~%"</span> name <span style="color: #696969;">(</span>area x y<span style="color: #696969;">))))</span>
+      <span style="color: #696969;">(</span><span style="color: #1e90ff; font-weight: bold;">format</span> <span style="color: #698b22; font-weight: bold;">t</span> <span style="color: #008b00;">"Area of ~A is ~D.~%"</span> name <span style="color: #696969;">(</span>area x y<span style="color: #696969;">))))</span>
 </pre>
 
 
@@ -1252,6 +1270,7 @@ arglist and body have the same syntax as for <a href="#defun*">defun*</a>.
 
 
 <hr/>
+
 <p>
 <a name="labels*" id="labels*"></a>
 <a name="macro==labels*" id="macro==labels*"></a>
@@ -1262,32 +1281,35 @@ arglist and body have the same syntax as for <a href="#defun*">defun*</a>.
 
 </div>
 
-<div id="outline-container-1.3.8" class="outline-4">
-<h4 id="sec-1.3.8"><span class="section-number-4">1.3.8</span> Macro: <code>labels*</code></h4>
-<div class="outline-text-4" id="text-1.3.8">
+<div id="outline-container-1.7.2.8" class="outline-5">
+<h5 id="sec-1.7.2.8"><span class="section-number-5">1.7.2.8</span> External Macro: <code>labels*</code></h5>
+<div class="outline-text-5" id="text-1.7.2.8">
+
 
 
 
 </div>
 
-<div id="outline-container-1.3.8.1" class="outline-5">
-<h5 id="sec-1.3.8.1"><span class="section-number-5">1.3.8.1</span> Usage</h5>
-<div class="outline-text-5" id="text-1.3.8.1">
+<div id="outline-container-1.7.2.8.1" class="outline-6">
+<h6 id="sec-1.7.2.8.1"><span class="section-number-6">1.7.2.8.1</span> Syntax</h6>
+<div class="outline-text-6" id="text-1.7.2.8.1">
 
 
-<pre class="example">
-(labels* (CLAUSE CLAUSE...)
-   ...body...)
+
+
+
+<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">labels*</span> CLAUSES <span style="color: #d2691e; font-weight: bold;">&amp;body</span> BODY<span style="color: #696969;">)</span>
 </pre>
 
 
-</div>
 
 </div>
 
-<div id="outline-container-1.3.8.2" class="outline-5">
-<h5 id="sec-1.3.8.2"><span class="section-number-5">1.3.8.2</span> Arguments</h5>
-<div class="outline-text-5" id="text-1.3.8.2">
+</div>
+
+<div id="outline-container-1.7.2.8.2" class="outline-6">
+<h6 id="sec-1.7.2.8.2"><span class="section-number-6">1.7.2.8.2</span> Arguments</h6>
+<div class="outline-text-6" id="text-1.7.2.8.2">
 
 
 <p>
@@ -1297,9 +1319,9 @@ See <a href="#flet*">flet*</a>.
 
 </div>
 
-<div id="outline-container-1.3.8.3" class="outline-5">
-<h5 id="sec-1.3.8.3"><span class="section-number-5">1.3.8.3</span> Description</h5>
-<div class="outline-text-5" id="text-1.3.8.3">
+<div id="outline-container-1.7.2.8.3" class="outline-6">
+<h6 id="sec-1.7.2.8.3"><span class="section-number-6">1.7.2.8.3</span> Description</h6>
+<div class="outline-text-6" id="text-1.7.2.8.3">
 
 
 <p>
@@ -1312,6 +1334,7 @@ See <a href="#flet*">flet*</a> for more details.
 
 
 <hr/>
+
 <p>
 <a name="lambda*" id="lambda*"></a>
 <a name="macro==lambda*" id="macro==lambda*"></a>
@@ -1322,31 +1345,35 @@ See <a href="#flet*">flet*</a> for more details.
 
 </div>
 
-<div id="outline-container-1.3.9" class="outline-4">
-<h4 id="sec-1.3.9"><span class="section-number-4">1.3.9</span> Macro: <code>lambda*</code></h4>
-<div class="outline-text-4" id="text-1.3.9">
+<div id="outline-container-1.7.2.9" class="outline-5">
+<h5 id="sec-1.7.2.9"><span class="section-number-5">1.7.2.9</span> External Macro: <code>lambda*</code></h5>
+<div class="outline-text-5" id="text-1.7.2.9">
+
 
 
 
 </div>
 
-<div id="outline-container-1.3.9.1" class="outline-5">
-<h5 id="sec-1.3.9.1"><span class="section-number-5">1.3.9.1</span> Usage</h5>
-<div class="outline-text-5" id="text-1.3.9.1">
+<div id="outline-container-1.7.2.9.1" class="outline-6">
+<h6 id="sec-1.7.2.9.1"><span class="section-number-6">1.7.2.9.1</span> Syntax</h6>
+<div class="outline-text-6" id="text-1.7.2.9.1">
 
 
-<pre class="example">
-(lambda* ARGLIST
-   ...body...)
+
+
+
+<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789; font-weight: bold;">lambda*</span> ARGLIST <span style="color: #d2691e; font-weight: bold;">&amp;body</span> BODY<span style="color: #696969;">)</span>
 </pre>
 
-</div>
+
 
 </div>
 
-<div id="outline-container-1.3.9.2" class="outline-5">
-<h5 id="sec-1.3.9.2"><span class="section-number-5">1.3.9.2</span> Description</h5>
-<div class="outline-text-5" id="text-1.3.9.2">
+</div>
+
+<div id="outline-container-1.7.2.9.2" class="outline-6">
+<h6 id="sec-1.7.2.9.2"><span class="section-number-6">1.7.2.9.2</span> Description</h6>
+<div class="outline-text-6" id="text-1.7.2.9.2">
 
 
 <p>
@@ -1357,462 +1384,29 @@ declare its return type.
 
 
 
+
+</div>
 </div>
 </div>
 </div>
 
 </div>
 
-<div id="outline-container-1.4" class="outline-3">
-<h3 id="sec-1.4"><span class="section-number-3">1.4</span> Functions</h3>
-<div class="outline-text-3" id="text-1.4">
+<div id="outline-container-1.8" class="outline-3">
+<h3 id="sec-1.8"><span class="section-number-3">1.8</span> Index</h3>
+<div class="outline-text-3" id="text-1.8">
 
 
-
-<hr/>
 <p>
-<a name="defstar..2f..ampersand-symbol..3f.." id="defstar..2f..ampersand-symbol..3f.."></a>
-<a name="function==defstar..2f..ampersand-symbol..3f.." id="function==defstar..2f..ampersand-symbol..3f.."></a>
+<a href="#index==D">D</a>  <a href="#index==F">F</a>  <a href="#index==L">L</a>  <a href="#index==NONALPHABETIC">NONALPHABETIC</a>  
 </p>
 
 
 </div>
 
-<div id="outline-container-1.4.1" class="outline-4">
-<h4 id="sec-1.4.1"><span class="section-number-4">1.4.1</span> Function: <code>defstar/ampersand-symbol?</code></h4>
-<div class="outline-text-4" id="text-1.4.1">
-
-
-
-</div>
-
-<div id="outline-container-1.4.1.1" class="outline-5">
-<h5 id="sec-1.4.1.1"><span class="section-number-5">1.4.1.1</span> Usage</h5>
-<div class="outline-text-5" id="text-1.4.1.1">
-
-
-<pre class="example">
-(defstar/ampersand-symbol? SYM)
-</pre>
-
-</div>
-
-</div>
-
-<div id="outline-container-1.4.1.2" class="outline-5">
-<h5 id="sec-1.4.1.2"><span class="section-number-5">1.4.1.2</span> Arguments</h5>
-<div class="outline-text-5" id="text-1.4.1.2">
-
-
-<dl>
-<dt>SYM</dt><dd>
-A symbol.
-</dd>
-</dl>
-</div>
-
-</div>
-
-<div id="outline-container-1.4.1.3" class="outline-5">
-<h5 id="sec-1.4.1.3"><span class="section-number-5">1.4.1.3</span> Return Value</h5>
-<div class="outline-text-5" id="text-1.4.1.3">
-
-
-<p>
-Boolean.
-</p></div>
-
-</div>
-
-<div id="outline-container-1.4.1.4" class="outline-5">
-<h5 id="sec-1.4.1.4"><span class="section-number-5">1.4.1.4</span> Description</h5>
-<div class="outline-text-5" id="text-1.4.1.4">
-
-
-<p>
-Predicate. Does the symbol <code>SYM</code> begin with an ampersand, such as <code>&amp;ANY</code>,
-<code>&amp;REST</code> and so on?
-</p>
-
-
-<hr/>
-<p>
-<a name="defstar..2f..make-keyword" id="defstar..2f..make-keyword"></a>
-<a name="function==defstar..2f..make-keyword" id="function==defstar..2f..make-keyword"></a>
-</p>
-
-</div>
-</div>
-
-</div>
-
-<div id="outline-container-1.4.2" class="outline-4">
-<h4 id="sec-1.4.2"><span class="section-number-4">1.4.2</span> Function: <code>defstar/make-keyword</code></h4>
-<div class="outline-text-4" id="text-1.4.2">
-
-
-
-</div>
-
-<div id="outline-container-1.4.2.1" class="outline-5">
-<h5 id="sec-1.4.2.1"><span class="section-number-5">1.4.2.1</span> Usage</h5>
-<div class="outline-text-5" id="text-1.4.2.1">
-
-
-<pre class="example">
-(defstar/make-keyword PART [PART PART...])
-</pre>
-
-</div>
-
-</div>
-
-<div id="outline-container-1.4.2.2" class="outline-5">
-<h5 id="sec-1.4.2.2"><span class="section-number-5">1.4.2.2</span> Arguments</h5>
-<div class="outline-text-5" id="text-1.4.2.2">
-
-
-<dl>
-<dt>PART</dt><dd>
-Any lisp value; usually a string or symbol.
-
-</dd>
-</dl>
-</div>
-
-</div>
-
-<div id="outline-container-1.4.2.3" class="outline-5">
-<h5 id="sec-1.4.2.3"><span class="section-number-5">1.4.2.3</span> Return Value</h5>
-<div class="outline-text-5" id="text-1.4.2.3">
-
-
-<p>
-A keyword.
-</p>
-</div>
-
-</div>
-
-<div id="outline-container-1.4.2.4" class="outline-5">
-<h5 id="sec-1.4.2.4"><span class="section-number-5">1.4.2.4</span> Description</h5>
-<div class="outline-text-5" id="text-1.4.2.4">
-
-
-<p>
-Concatenates the printed representations of <code>PARTs</code> together into a single
-string, then makes a symbol from that string, and interns the symbol in the
-<code>KEYWORD</code> package. Returns the new keyword.
-</p>
-</div>
-
-</div>
-
-<div id="outline-container-1.4.2.5" class="outline-5">
-<h5 id="sec-1.4.2.5"><span class="section-number-5">1.4.2.5</span> See Also</h5>
-<div class="outline-text-5" id="text-1.4.2.5">
-
-
-<p>
-<a href="#mksymbol">mksymbol</a>
-</p>
-
-
-<hr/>
-<p>
-<a name="defstar..2f..split-defun-body" id="defstar..2f..split-defun-body"></a>
-<a name="function==defstar..2f..split-defun-body" id="function==defstar..2f..split-defun-body"></a>
-</p>
-
-</div>
-</div>
-
-</div>
-
-<div id="outline-container-1.4.3" class="outline-4">
-<h4 id="sec-1.4.3"><span class="section-number-4">1.4.3</span> Function: <code>defstar/split-defun-body</code></h4>
-<div class="outline-text-4" id="text-1.4.3">
-
-
-
-</div>
-
-<div id="outline-container-1.4.3.1" class="outline-5">
-<h5 id="sec-1.4.3.1"><span class="section-number-5">1.4.3.1</span> Usage</h5>
-<div class="outline-text-5" id="text-1.4.3.1">
-
-
-<pre class="example">
-(defstar/split-defun-body BODY)
-</pre>
-
-</div>
-
-</div>
-
-<div id="outline-container-1.4.3.2" class="outline-5">
-<h5 id="sec-1.4.3.2"><span class="section-number-5">1.4.3.2</span> Arguments</h5>
-<div class="outline-text-5" id="text-1.4.3.2">
-
-
-<dl>
-<dt>BODY</dt><dd>
-the body of a <code>DEFUN</code> form or similar, such as might be received
-</dd>
-</dl>
-
-<p>by a macro.
-</p>
-</div>
-
-</div>
-
-<div id="outline-container-1.4.3.3" class="outline-5">
-<h5 id="sec-1.4.3.3"><span class="section-number-5">1.4.3.3</span> Returns</h5>
-<div class="outline-text-5" id="text-1.4.3.3">
-
-
-<p>
-Three values:
-</p><dl>
-<dt>PREAMBLE</dt><dd>
-list of declaration forms at the start of the body
-</dd>
-<dt>DOCSTRING</dt><dd>
-Documentation string, if present in <code>BODY</code>.
-</dd>
-<dt>TRUE-BODY</dt><dd>
-Actual function body with the above items removed.
-
-</dd>
-</dl>
-</div>
-
-</div>
-
-<div id="outline-container-1.4.3.4" class="outline-5">
-<h5 id="sec-1.4.3.4"><span class="section-number-5">1.4.3.4</span> Description</h5>
-<div class="outline-text-5" id="text-1.4.3.4">
-
-
-<p>
-Internal utility function.
-Divide the 'preamble' of a function body from its actual body.
-The preamble consists of declarations and a docstring.
-</p>
-
-
-<hr/>
-<p>
-<a name="defun*-term" id="defun*-term"></a>
-<a name="function==defun*-term" id="function==defun*-term"></a>
-</p>
-
-</div>
-</div>
-
-</div>
-
-<div id="outline-container-1.4.4" class="outline-4">
-<h4 id="sec-1.4.4"><span class="section-number-4">1.4.4</span> Function: <code>defun*-term</code></h4>
-<div class="outline-text-4" id="text-1.4.4">
-
-
-
-</div>
-
-<div id="outline-container-1.4.4.1" class="outline-5">
-<h5 id="sec-1.4.4.1"><span class="section-number-5">1.4.4.1</span> Usage</h5>
-<div class="outline-text-5" id="text-1.4.4.1">
-
-
-<pre class="example">
-(defun*-term TERM LAST-AMP-KWD &amp;key DEF-TYPE)
-</pre>
-
-</div>
-
-</div>
-
-<div id="outline-container-1.4.4.2" class="outline-5">
-<h5 id="sec-1.4.4.2"><span class="section-number-5">1.4.4.2</span> Arguments</h5>
-<div class="outline-text-5" id="text-1.4.4.2">
-
-
-<dl>
-<dt>TERM</dt><dd>
-any member of an ordinary lambda list.
-</dd>
-<dt>LAST-AMP-KWD</dt><dd>
-Symbol or nil.
-</dd>
-<dt>DEF-TYPE</dt><dd>
-Symbol denoting the type of toplevel form that is being created.
-</dd>
-</dl>
-
-<p>The default is ='DEFUN=.
-</p></div>
-
-</div>
-
-<div id="outline-container-1.4.4.3" class="outline-5">
-<h5 id="sec-1.4.4.3"><span class="section-number-5">1.4.4.3</span> Returns</h5>
-<div class="outline-text-5" id="text-1.4.4.3">
-
-
-<p>
-Four values:
-</p><ol>
-<li>
-The term as it should be included in the final argument list for
-the toplevel form (symbol or list)
-</li>
-<li>
-The declaration clause that should be included in the
-<code>DECLARE</code> statement within the toplevel form's body
-</li>
-<li>
-The type of the term, for inclusion in the argument-list of
-the <code>(DECLAIM (FTYPE (FUNCTION arglist RETURN-TYPE) ...))</code> form for a
-function definition.
-</li>
-<li>
-The assertion clause.
-
-</li>
-</ol>
-</div>
-
-</div>
-
-<div id="outline-container-1.4.4.4" class="outline-5">
-<h5 id="sec-1.4.4.4"><span class="section-number-5">1.4.4.4</span> Description</h5>
-<div class="outline-text-5" id="text-1.4.4.4">
-
-
-<p>
-Internal function, used by <a href="#defun*">defun*</a> to parse lambda list terms.
-</p>
-</div>
-
-</div>
-
-<div id="outline-container-1.4.4.5" class="outline-5">
-<h5 id="sec-1.4.4.5"><span class="section-number-5">1.4.4.5</span> See Also</h5>
-<div class="outline-text-5" id="text-1.4.4.5">
-
-
-<ul>
-<li>
-<a href="#defun*">defun*</a>
-
-
-</li>
-</ul>
-
-
-<hr/>
-<p>
-<a name="safe-define" id="safe-define"></a>
-<a name="function==safe-define" id="function==safe-define"></a>
-</p>
-
-</div>
-</div>
-
-</div>
-
-<div id="outline-container-1.4.5" class="outline-4">
-<h4 id="sec-1.4.5"><span class="section-number-4">1.4.5</span> Function: <code>safe-define</code></h4>
-<div class="outline-text-4" id="text-1.4.5">
-
-
-
-</div>
-
-<div id="outline-container-1.4.5.1" class="outline-5">
-<h5 id="sec-1.4.5.1"><span class="section-number-5">1.4.5.1</span> Usage</h5>
-<div class="outline-text-5" id="text-1.4.5.1">
-
-
-<pre class="example">
-(safe-define TOPLEVEL-FORM-NAME FNAME ARGLIST BODY)
-</pre>
-
-</div>
-
-</div>
-
-<div id="outline-container-1.4.5.2" class="outline-5">
-<h5 id="sec-1.4.5.2"><span class="section-number-5">1.4.5.2</span> Arguments</h5>
-<div class="outline-text-5" id="text-1.4.5.2">
-
-
-<dl>
-<dt>TOPLEVEL-FORM-NAME</dt><dd>
-Symbol denoting the type of toplevel form being defined.
-</dd>
-</dl>
-
-<p>Currently handles ='DEFUN, 'DEFMETHOD, 'FLET, 'LABELS, 'LAMBDA, 'DEFGENERIC=.
-</p><dl>
-<dt>FNAME, ARGLIST, BODY</dt><dd>
-see <a href="#defun*">defun*</a>.
-
-</dd>
-</dl>
-</div>
-
-</div>
-
-<div id="outline-container-1.4.5.3" class="outline-5">
-<h5 id="sec-1.4.5.3"><span class="section-number-5">1.4.5.3</span> Returns</h5>
-<div class="outline-text-5" id="text-1.4.5.3">
-
-
-<p>
-A <code>defun, defmethod, defgeneric</code> or <code>lambda</code> form, or <code>flet</code> or
-<code>labels</code> subclause, containing appropriate declarations.
-</p>
-</div>
-
-</div>
-
-<div id="outline-container-1.4.5.4" class="outline-5">
-<h5 id="sec-1.4.5.4"><span class="section-number-5">1.4.5.4</span> Description</h5>
-<div class="outline-text-5" id="text-1.4.5.4">
-
-
-<p>
-Internal function. The workhorse for the macros <a href="#defun*">DEFUN*</a>, <a href="#defmethod*">DEFMETHOD*</a>,
-<a href="#lambda*">LAMBDA*</a>, <a href="#flet*">FLET*</a>, and <a href="#labels*">LABELS*</a>.
-</p>
-
-
-
-</div>
-</div>
-</div>
-
-</div>
-
-<div id="outline-container-1.5" class="outline-3">
-<h3 id="sec-1.5"><span class="section-number-3">1.5</span> Index</h3>
-<div class="outline-text-3" id="text-1.5">
-
-
-<p>
-<a href="#index==NONALPHABETIC">NONALPHABETIC</a>  <a href="#index==F">F</a>  <a href="#index==D">D</a> 
-<a href="#index==L">L</a>  <a href="#index==S">S</a>  
-</p>
-
-
-</div>
-
-<div id="outline-container-1.5.1" class="outline-4">
-<h4 id="sec-1.5.1"><span class="section-number-4">1.5.1</span> Nonalphabetic</h4>
-<div class="outline-text-4" id="text-1.5.1">
+<div id="outline-container-1.8.1" class="outline-4">
+<h4 id="sec-1.8.1"><span class="section-number-4">1.8.1</span> Nonalphabetic</h4>
+<div class="outline-text-4" id="text-1.8.1">
 
 
 
@@ -1820,10 +1414,10 @@ Internal function. The workhorse for the macros <a href="#defun*">DEFUN*</a>, <a
 <a name="index==NONALPHABETIC" id="index==NONALPHABETIC"></a>
 </p><ul>
 <li>
-<a href="#variable==*check-argument-types-explicitly..3f..*"><code>defstar:*check-argument types-explicitly?*</code></a>, Variable
+<a href="#variable==*check-argument-types-explicitly..3f..*"><code>*check-argument-types explicitly?*</code></a>, Variable
 </li>
 <li>
-<a href="#constant==..2b..defun*-arrow-symbol..2b.."><code>defstar::+defun*-arrow symbol+</code></a>, Constant
+<a href="#macro==*let"><code>*let</code></a>, Macro
 
 
 
@@ -1833,9 +1427,9 @@ Internal function. The workhorse for the macros <a href="#defun*">DEFUN*</a>, <a
 
 </div>
 
-<div id="outline-container-1.5.2" class="outline-4">
-<h4 id="sec-1.5.2"><span class="section-number-4">1.5.2</span> D</h4>
-<div class="outline-text-4" id="text-1.5.2">
+<div id="outline-container-1.8.2" class="outline-4">
+<h4 id="sec-1.8.2"><span class="section-number-4">1.8.2</span> D</h4>
+<div class="outline-text-4" id="text-1.8.2">
 
 
 
@@ -1843,35 +1437,19 @@ Internal function. The workhorse for the macros <a href="#defun*">DEFUN*</a>, <a
 <a name="index==D" id="index==D"></a>
 </p><ul>
 <li>
-<a href="#macro==defgeneric*"><code>defstar:defgeneric*</code></a>, Macro
+<a href="#macro==defgeneric*"><code>defgeneric*</code></a>, Macro
 </li>
 <li>
-<a href="#macro==defmethod*"><code>defstar:defmethod*</code></a>, Macro
+<a href="#macro==defmethod*"><code>defmethod*</code></a>, Macro
 </li>
 <li>
-<a href="#macro==defparameter*"><code>defstar:defparameter*</code></a>, Macro
+<a href="#macro==defparameter*"><code>defparameter*</code></a>, Macro
 </li>
 <li>
-<a href="#function==defstar..2f..ampersand-symbol..3f.."><code>defstar::defstar/ampersand symbol?</code></a>, Function
+<a href="#macro==defun*"><code>defun*</code></a>, Macro
 </li>
 <li>
-<a href="#function==defstar..2f..make-keyword"><code>defstar::defstar/make-keyword</code></a>,
-Function
-</li>
-<li>
-<a href="#function==defstar..2f..split-defun-body"><code>defstar::defstar/split-defun body</code></a>, Function
-</li>
-<li>
-<a href="#macro==defun*"><code>defstar:defun*</code></a>, Macro
-</li>
-<li>
-<a href="#function==defun*-term"><code>defstar::defun*-term</code></a>, Function
-</li>
-<li>
-<a href="#macro==defvar*"><code>defstar:defvar*</code></a>, Macro
-</li>
-<li>
-<a href="#macro==defvar..2f..param"><code>defstar::defvar/param</code></a>, Macro
+<a href="#macro==defvar*"><code>defvar*</code></a>, Macro
 
 
 
@@ -1881,9 +1459,9 @@ Function
 
 </div>
 
-<div id="outline-container-1.5.3" class="outline-4">
-<h4 id="sec-1.5.3"><span class="section-number-4">1.5.3</span> F</h4>
-<div class="outline-text-4" id="text-1.5.3">
+<div id="outline-container-1.8.3" class="outline-4">
+<h4 id="sec-1.8.3"><span class="section-number-4">1.8.3</span> F</h4>
+<div class="outline-text-4" id="text-1.8.3">
 
 
 
@@ -1891,7 +1469,7 @@ Function
 <a name="index==F" id="index==F"></a>
 </p><ul>
 <li>
-<a href="#macro==flet*"><code>defstar:flet*</code></a>, Macro
+<a href="#macro==flet*"><code>flet*</code></a>, Macro
 
 
 
@@ -1901,9 +1479,9 @@ Function
 
 </div>
 
-<div id="outline-container-1.5.4" class="outline-4">
-<h4 id="sec-1.5.4"><span class="section-number-4">1.5.4</span> L</h4>
-<div class="outline-text-4" id="text-1.5.4">
+<div id="outline-container-1.8.4" class="outline-4">
+<h4 id="sec-1.8.4"><span class="section-number-4">1.8.4</span> L</h4>
+<div class="outline-text-4" id="text-1.8.4">
 
 
 
@@ -1911,46 +1489,39 @@ Function
 <a name="index==L" id="index==L"></a>
 </p><ul>
 <li>
-<a href="#macro==labels*"><code>defstar:labels*</code></a>, Macro
+<a href="#macro==labels*"><code>labels*</code></a>, Macro
 </li>
 <li>
-<a href="#macro==lambda*"><code>defstar:lambda*</code></a>, Macro
+<a href="#macro==lambda*"><code>lambda*</code></a>, Macro
+
+
 
 
 
 </li>
 </ul>
 </div>
+</div>
+</div>
 
 </div>
 
-<div id="outline-container-1.5.5" class="outline-4">
-<h4 id="sec-1.5.5"><span class="section-number-4">1.5.5</span> S</h4>
-<div class="outline-text-4" id="text-1.5.5">
-
+<div id="outline-container-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Colophon</h2>
+<div class="outline-text-2" id="text-2">
 
 
 <p>
-<a name="index==S" id="index==S"></a>
-</p><ul>
-<li>
-<a href="#function==safe-define"><code>defstar::safe-define</code></a>, Function
-
-
-
-
-</li>
-</ul>
-</div>
-</div>
-</div>
+This documentation was generated from Common Lisp source code using CLOD, version 1.0.
+The latest version of CLOD is available <a href="http://bitbucket.org/eeeickythump/clod/">here</a>.
+</p></div>
 </div>
 <div id="postamble">
 <p class="author"> Author: Paul Sexton
 <a href="mailto:eeeickythump@gmail.com">&lt;eeeickythump@gmail.com&gt;</a>
 </p>
-<p class="date"> Date: 2010-02-13 10:04:30 NZDT</p>
-<p class="creator">HTML generated by org-mode 6.33trans in emacs 23</p>
+<p class="date"> Date: 2010-03-19 16:13:59 </p>
+<p class="creator">HTML generated by org-mode 6.34trans in emacs 23</p>
 </div>
 </div>
 </body>

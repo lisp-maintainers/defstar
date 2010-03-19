@@ -1,9 +1,9 @@
-#+TITLE: The DEFSTAR package
+#+TITLE: DEFSTAR
 #+AUTHOR: Paul Sexton
 #+EMAIL: eeeickythump@gmail.com
 #+LINK: hs http://www.lispworks.com/reference/HyperSpec//%s
 #+STARTUP: showall
-#+OPTIONS: toc:3 H:10 @:t tags:nil
+#+OPTIONS: toc:4 H:10 @:t tags:nil
 
 # link target 2: <<defstar>>
 # link target: <<package defstar>>
@@ -13,15 +13,14 @@
 
 - Uses:
     [[package common-lisp][common-lisp]]
-- Used by:
-    None.
-*** Description
+
+** Description
 
 
 DEFSTAR is a collection of macros that can be used in place of =DEFUN,
-DEFMETHOD, DEFGENERIC, DEFVAR, DEFPARAMETER, FLET, LABELS= and =LAMBDA=. Each macro
-has the same name as the form it replaces, with a star added at the
-end (e.g. =DEFUN*=).
+DEFMETHOD, DEFGENERIC, DEFVAR, DEFPARAMETER, FLET, LABELS= and =LAMBDA=. Each
+macro has the same name as the form it replaces, with a star added at the end,
+e.g. =DEFUN*=.
 
 The macros allow:
 - easy inclusion of type declarations within lambda lists
@@ -38,7 +37,7 @@ DEFSTAR's home is at:
 Installation requires [[http://common-lisp.net/project/asdf/][ASDF]]. DEFSTAR
 does not depend on any other libraries.
 
-*** Type DECLARATION versus type CHECKING
+** Type DECLARATION versus type CHECKING
 
 
 Technically, =DECLARE=, =DECLAIM= and the like do not actually check that
@@ -57,7 +56,7 @@ declarations. If you set the global variable
 included in the body of each function or method, causing an error to be raised
 if a value does not match its declared type.
 
-*** Examples of DEFUN* and DEFMETHOD* usage
+** Examples of DEFUN* and DEFMETHOD* usage
 
 #+BEGIN_SRC lisp
  ;; Define a simple function that adds two numbers, both of which
@@ -170,7 +169,7 @@ if a value does not match its declared type.
  (defgeneric* (cell-value -> real) (sheet (x natural) (y natural)))
 #+END_SRC
 
-*** Examples of DEFVAR* and DEFPARAMETER* usage
+** Examples of DEFVAR* and DEFPARAMETER* usage
 
 
 #+BEGIN_SRC lisp
@@ -178,7 +177,7 @@ if a value does not match its declared type.
  (defparameter* (*file-position* (integer 0)) 0)
 #+END_SRC
 
-*** Limitations
+** Limitations
 
 - Definitions of =SETF= methods cannot include return type declarations in the
   method 'header'. The return type can still be declared using a =(RETURNS ...)=
@@ -192,50 +191,58 @@ if a value does not match its declared type.
     ...)
 #+END_SRC
 
-** Constants
+** Syntax highlighting of DEFSTAR macros in Emacs
+
+
+Put the following code in your =.emacs= if you want =DEFVAR*= and other 
+forms to appear in the same face as their normal counterparts, and if 
+you want their docstrings to also be correctly identified as docstrings
+rather than normal strings.
+
+#+BEGIN_SRC lisp
+ ;; fontify doc strings in correct face
+ ;; lisp-mode already fontifies 'defun*' correctly
+ (put 'defvar*   'doc-string-elt 3)
+ (put 'defparameter*   'doc-string-elt 3)
+ (put 'lambda*   'doc-string-elt 2)
+ 
+ (defvar *lisp-special-forms*
+       (regexp-opt '("defvar*"
+                     "defconstant*"
+                     "defparameter*"
+                     "defgeneric*"
+                     "defmethod*"
+                     "lambda*"
+                     "flet*"
+                     "labels*") 'words))
+ (font-lock-add-keywords 'lisp-mode
+  `((,*lisp-special-forms* . font-lock-keyword-face)))
+#+END_SRC
+
+** External Symbols
+
+
+
+
+*** External Global Variables
 
 -----
-# link target 2: <<..2b..defun*-arrow-symbol..2b..>>
-# link target: <<constant ..2b..defun*-arrow-symbol..2b..>>
 
-
-*** Constant: =+defun*-arrow-symbol+=                                     :constant:
-
-
-**** Value
-
-: DEFSTAR:->
-
-Type: =symbol=
-
-
-**** Description
-
-The symbol that separates function name from type declaration
-in =DEFUN*= forms and the like. See [[defun*]].
-
-
-
-
-
-** Global Variables
-
------
 # link target 2: <<*check-argument-types-explicitly..3f..*>>
 # link target: <<variable *check-argument-types-explicitly..3f..*>>
 
 
-*** Variable: =*check-argument-types-explicitly?*=                        :variable:
+**** External Variable: =*check-argument-types-explicitly?*=               :variable:
 
 
-**** Value
+***** Value
 
-: NIL
+: T
 
-Type: =null=
+Type: =boolean=
 
 
-**** Description
+***** Description
 
 If non-nil, insert =CHECK-TYPE= clauses in the preamble of functions,
 to force the function's arguments to be explicitly type-checked.
@@ -254,20 +261,61 @@ based on declarations, especially when the =SAFETY= setting is high.
 
 
 
-** Macros
+*** External Macros
 
 -----
+
+# link target 2: <<*let>>
+# link target: <<macro *let>>
+
+
+**** External Macro: =*let=                                                   :macro:
+
+
+***** Syntax
+
+#+BEGIN_SRC lisp
+(*let CLAUSES &body BODY)
+#+END_SRC
+
+***** Arguments
+
+- CLAUSES :: A series of zero or more clauses taking the form:
+: clause =   VARNAME
+:          | (VARNAME FORM)
+:          | (VARNAME TYPE FORM)
+- BODY :: The body of the form (implicit =progn=).
+***** Description
+
+Expands to a =LET*= form, but if any clauses contain type information,
+that information is moved into a declaration at the beginning of the
+form's body.
+***** Example
+
+#+BEGIN_SRC lisp
+ (*let ((name "Bob")
+        (age integer 40)
+        (sex (member :male :female) :male))
+    ...body...)
+#+END_SRC
+
+
+-----
+
 # link target 2: <<defgeneric*>>
 # link target: <<macro defgeneric*>>
 
 
-*** Macro: =defgeneric*=                                                     :macro:
+**** External Macro: =defgeneric*=                                            :macro:
 
-**** Usage
 
-: (defgeneric* FNAME GENERIC-ARGLIST
-:    ...body...)
-**** Arguments
+***** Syntax
+
+#+BEGIN_SRC lisp
+(defgeneric* FNAME GENERIC-ARGLIST &body OPTIONS)
+#+END_SRC
+
+***** Arguments
 
 - FNAME :: Name of the generic function.
 - GENERIC-ARGLIST :: Follows the same grammar the arglist for [[defun*]]
@@ -275,7 +323,7 @@ based on declarations, especially when the =SAFETY= setting is high.
   : arg =   VARNAME
   :       | (VARNAME TYPE)
 
-**** Description
+***** Description
 
 Usage is exactly the same as [[defun*]], except that value-checking assertions
 are ignored.
@@ -286,7 +334,7 @@ Type declarations for generic function arguments will only be used to
 make a toplevel =DECLAIM= form that will then apply to all methods of
 the generic function.
 
-**** Examples:
+***** Examples:
 
 #+BEGIN_SRC lisp
  (defgeneric* (length -> integer) (seq &key start) ...options...)
@@ -297,17 +345,21 @@ the generic function.
 
 
 -----
+
 # link target 2: <<defmethod*>>
 # link target: <<macro defmethod*>>
 
 
-*** Macro: =defmethod*=                                                      :macro:
+**** External Macro: =defmethod*=                                             :macro:
 
-**** Usage
 
-: (defmethod* FNAME METHOD-ARGLIST
-:    ...body...)
-**** Arguments
+***** Syntax
+
+#+BEGIN_SRC lisp
+(defmethod* FNAME METHOD-ARGLIST &body BODY)
+#+END_SRC
+
+***** Arguments
 
 
 Usage is exactly the same as [[defun*]], except that within =METHOD-ARGLIST=,
@@ -325,12 +377,12 @@ The syntax of METHOD-ARGLIST is therefore:
 :               | ((VARNAME TYPE/CLASS [assertion]) CLASS)
 The rest of the syntax is the same as for DEFUN*.
 
-**** Description
+***** Description
 
 Equivalent to =(DEFMETHOD FNAME METHOD-ARGLIST . body)= with type declarations
 and assertions as per [[defun*]].
 
-**** Examples
+***** Examples
 
 #+BEGIN_SRC lisp
  (deftype positive-integer () `(integer 1))
@@ -343,33 +395,42 @@ and assertions as per [[defun*]].
 
 
 -----
+
 # link target 2: <<defparameter*>>
 # link target: <<macro defparameter*>>
 
 
-*** Macro: =defparameter*=                                                   :macro:
+**** External Macro: =defparameter*=                                          :macro:
 
-**** Usage
 
-: (defvar* VAR VALUE [DOCSTRING])
-**** Description
+***** Syntax
+
+#+BEGIN_SRC lisp
+(defparameter* VAR VALUE &optional DOCSTRING)
+#+END_SRC
+
+***** Description
 
 Like [[defvar*]], but expands to =DEFPARAMETER= rather than =DEFVAR=.
 See [[defvar*]] for more details.
 
 
 -----
+
 # link target 2: <<defun*>>
 # link target: <<macro defun*>>
 
 
-*** Macro: =defun*=                                                          :macro:
+**** External Macro: =defun*=                                                 :macro:
 
-**** Usage
 
-: (defun* FNAME ARGLIST
-:    ...body...)
-**** Arguments
+***** Syntax
+
+#+BEGIN_SRC lisp
+(defun* FNAME ARGLIST &body BODY)
+#+END_SRC
+
+***** Arguments
 
 - FNAME :: either the name of the function to be created, or a list with the
   following grammar:
@@ -414,7 +475,7 @@ See [[defvar*]] for more details.
   the symbol =return-value= is bound to the value that the function is
   about to return.
 
-**** Description
+***** Description
 
 Equivalent to =(DEFUN fname arglist . body)=, but:
 - All type declarations within the lambda list will be turned into =(DECLARE...)=
@@ -426,7 +487,7 @@ Equivalent to =(DEFUN fname arglist . body)=, but:
 - Any assertion within a =returns= form will be checked before the function
   returns a value.
 
-**** Examples
+***** Examples
 
 #+BEGIN_SRC lisp
  ;; Very simple example
@@ -467,16 +528,21 @@ Equivalent to =(DEFUN fname arglist . body)=, but:
 
 
 -----
+
 # link target 2: <<defvar*>>
 # link target: <<macro defvar*>>
 
 
-*** Macro: =defvar*=                                                         :macro:
+**** External Macro: =defvar*=                                                :macro:
 
-**** Usage
 
-: (defvar* VAR VALUE [DOCSTRING])
-**** Arguments
+***** Syntax
+
+#+BEGIN_SRC lisp
+(defvar* VAR VALUE &optional DOCSTRING)
+#+END_SRC
+
+***** Arguments
 
 - VAR :: either:
   1. A variable name: in this case =DEFVAR*= has exactly the same effect as
@@ -486,16 +552,16 @@ Equivalent to =(DEFUN fname arglist . body)=, but:
 - VALUE :: A form which is evaluated when the variable is first created.
 - DOCSTRING :: Documentation string.
 
-**** Returns
+***** Returns
 
 The name of the variable as a symbol.
 
-**** Description
+***** Description
 
 Creates the global special variable =VAR=, initialises it to =VALUE=,
 and declares it to be of type =TYPE=, if given.
 
-**** Examples
+***** Examples
 
 #+BEGIN_SRC lisp
  (defvar* (*file-name* string) "~/log.txt") 
@@ -503,45 +569,21 @@ and declares it to be of type =TYPE=, if given.
 
 
 -----
-# link target 2: <<defvar..2f..param>>
-# link target: <<macro defvar..2f..param>>
 
-
-*** Macro: =defvar/param=                                                    :macro:
-
-**** Usage
-
-: (defvar/param TOPLEVEL-FORM-NAME VAR VALUE [DOCSTRING])
-**** Arguments
-
-- TOPLEVEL-FORM-NAME :: Symbol denoting the type of toplevel form being defined.
-  For example, ='DEFUN=.
-- VAR :: Symbol or list.
-- VALUE :: Form that will be evaluated to initialise the variable being
-  defined.
-- DOCSTRING :: String used as documentation.
-**** Return Value
-
-A symbol.
-**** Description
-
-Internal macro, used by [[defvar*]] and
-[[defparameter*]].
-
-
------
 # link target 2: <<flet*>>
 # link target: <<macro flet*>>
 
 
-*** Macro: =flet*=                                                           :macro:
+**** External Macro: =flet*=                                                  :macro:
 
-**** Usage
 
-: (flet* (CLAUSE CLAUSE...)
-:    ...body...)
+***** Syntax
 
-**** Arguments
+#+BEGIN_SRC lisp
+(flet* CLAUSES &body BODY)
+#+END_SRC
+
+***** Arguments
 
 - CLAUSES :: List of clauses. Takes the following grammar:
   : clauses = clause*
@@ -549,12 +591,12 @@ Internal macro, used by [[defvar*]] and
   See [[defun*]] for a description of the grammar of =FNAME= and =ARGLIST=.
 - BODY :: Body of the form.
 
-**** Description
+***** Description
 
 Like =FLET=, but within each function-definition clause the function name,
 arglist and body have the same syntax as for [[defun*]].
 
-**** Examples
+***** Examples
 
 #+BEGIN_SRC lisp
  (defun foo (name x y)
@@ -565,22 +607,25 @@ arglist and body have the same syntax as for [[defun*]].
 
 
 -----
+
 # link target 2: <<labels*>>
 # link target: <<macro labels*>>
 
 
-*** Macro: =labels*=                                                         :macro:
+**** External Macro: =labels*=                                                :macro:
 
-**** Usage
 
-: (labels* (CLAUSE CLAUSE...)
-:    ...body...)
+***** Syntax
 
-**** Arguments
+#+BEGIN_SRC lisp
+(labels* CLAUSES &body BODY)
+#+END_SRC
+
+***** Arguments
 
 See [[flet*]].
 
-**** Description
+***** Description
 
 Like =LABELS=, but within each clause the function name, arglist and body have
 the same syntax as for [[defun*]].
@@ -589,17 +634,21 @@ See [[flet*]] for more details.
 
 
 -----
+
 # link target 2: <<lambda*>>
 # link target: <<macro lambda*>>
 
 
-*** Macro: =lambda*=                                                         :macro:
+**** External Macro: =lambda*=                                                :macro:
 
-**** Usage
 
-: (lambda* ARGLIST
-:    ...body...)
-**** Description
+***** Syntax
+
+#+BEGIN_SRC lisp
+(lambda* ARGLIST &body BODY)
+#+END_SRC
+
+***** Description
 
 Like =LAMBDA=, but =ARGLIST= and body have the same syntax as for [[defun*]].
  A =returns= form can be used within the function body to
@@ -608,168 +657,20 @@ declare its return type.
 
 
 
-** Functions
-
------
-# link target 2: <<defstar..2f..ampersand-symbol..3f..>>
-# link target: <<function defstar..2f..ampersand-symbol..3f..>>
-
-
-*** Function: =defstar/ampersand-symbol?=                                 :function:
-
-**** Usage
-
-: (defstar/ampersand-symbol? SYM)
-**** Arguments
-
-- SYM :: A symbol.
-**** Return Value
-
-Boolean.
-**** Description
-
-Predicate. Does the symbol =SYM= begin with an ampersand, such as =&ANY=,
-=&REST= and so on?
-
-
------
-# link target 2: <<defstar..2f..make-keyword>>
-# link target: <<function defstar..2f..make-keyword>>
-
-
-*** Function: =defstar/make-keyword=                                      :function:
-
-**** Usage
-
-: (defstar/make-keyword PART [PART PART...])
-**** Arguments
-
-- PART :: Any lisp value; usually a string or symbol.
-
-**** Return Value
-
-A keyword.
-
-**** Description
-
-Concatenates the printed representations of =PARTs= together into a single
-string, then makes a symbol from that string, and interns the symbol in the
-=KEYWORD= package. Returns the new keyword.
-
-**** See Also
-
-[[mksymbol]]
-
-
------
-# link target 2: <<defstar..2f..split-defun-body>>
-# link target: <<function defstar..2f..split-defun-body>>
-
-
-*** Function: =defstar/split-defun-body=                                  :function:
-
-**** Usage
-
-: (defstar/split-defun-body BODY)
-**** Arguments
-
-- BODY :: the body of a =DEFUN= form or similar, such as might be received
-by a macro.
-
-**** Returns
-
-Three values:
-- PREAMBLE :: list of declaration forms at the start of the body
-- DOCSTRING :: Documentation string, if present in =BODY=.
-- TRUE-BODY :: Actual function body with the above items removed.
-
-**** Description
-
-Internal utility function.
-Divide the 'preamble' of a function body from its actual body.
-The preamble consists of declarations and a docstring.
-
-
------
-# link target 2: <<defun*-term>>
-# link target: <<function defun*-term>>
-
-
-*** Function: =defun*-term=                                               :function:
-
-**** Usage
-
-: (defun*-term TERM LAST-AMP-KWD &key DEF-TYPE)
-**** Arguments
-
-- TERM :: any member of an ordinary lambda list.
-- LAST-AMP-KWD :: Symbol or nil.
-- DEF-TYPE :: Symbol denoting the type of toplevel form that is being created.
-The default is ='DEFUN=.
-**** Returns
-
-Four values:
-1. The term as it should be included in the final argument list for
-   the toplevel form (symbol or list)
-2. The declaration clause that should be included in the
-   =DECLARE= statement within the toplevel form's body
-3. The type of the term, for inclusion in the argument-list of
-   the =(DECLAIM (FTYPE (FUNCTION arglist RETURN-TYPE) ...))= form for a
-   function definition.
-4. The assertion clause.
-
-**** Description
-
-Internal function, used by [[defun*]] to parse lambda list terms.
-
-**** See Also
-
-- [[defun*]]
-
-
------
-# link target 2: <<safe-define>>
-# link target: <<function safe-define>>
-
-
-*** Function: =safe-define=                                               :function:
-
-**** Usage
-
-: (safe-define TOPLEVEL-FORM-NAME FNAME ARGLIST BODY)
-**** Arguments
-
-- TOPLEVEL-FORM-NAME :: Symbol denoting the type of toplevel form being defined.
-Currently handles ='DEFUN, 'DEFMETHOD, 'FLET, 'LABELS, 'LAMBDA, 'DEFGENERIC=.
-- FNAME, ARGLIST, BODY :: see [[defun*]].
-
-**** Returns
-
-A =defun, defmethod, defgeneric= or =lambda= form, or =flet= or
-=labels= subclause, containing appropriate declarations.
-
-**** Description
-
-Internal function. The workhorse for the macros [[defun*][DEFUN*]], [[defmethod*][DEFMETHOD*]],
-[[lambda*][LAMBDA*]], [[flet*][FLET*]], and [[labels*][LABELS*]].
-
-
-
 
 ** Index
 
- [[index NONALPHABETIC][NONALPHABETIC]]  [[index F][F]]  [[index D][D]] 
-[[index L][L]]  [[index S][S]]  
+ [[index D][D]]  [[index F][F]]  [[index L][L]]  [[index
+NONALPHABETIC][NONALPHABETIC]]  
 
 
 *** Nonalphabetic
 
 
 # link target: <<index NONALPHABETIC>>
-- [[variable *check-argument-types-explicitly..3f..*][=defstar:*check-argument
-  types-explicitly?*=]], Variable
-- [[constant ..2b..defun*-arrow-symbol..2b..][=defstar::+defun*-arrow
-  symbol+=]], Constant
+- [[variable *check-argument-types-explicitly..3f..*][=*check-argument-types
+  explicitly?*=]], Variable
+- [[macro *let][=*let=]], Macro
 
 
 
@@ -777,19 +678,11 @@ Internal function. The workhorse for the macros [[defun*][DEFUN*]], [[defmethod*
 
 
 # link target: <<index D>>
-- [[macro defgeneric*][=defstar:defgeneric*=]], Macro
-- [[macro defmethod*][=defstar:defmethod*=]], Macro
-- [[macro defparameter*][=defstar:defparameter*=]], Macro
-- [[function defstar..2f..ampersand-symbol..3f..][=defstar::defstar/ampersand
-  symbol?=]], Function
-- [[function defstar..2f..make-keyword][=defstar::defstar/make-keyword=]],
-  Function
-- [[function defstar..2f..split-defun-body][=defstar::defstar/split-defun
-  body=]], Function
-- [[macro defun*][=defstar:defun*=]], Macro
-- [[function defun*-term][=defstar::defun*-term=]], Function
-- [[macro defvar*][=defstar:defvar*=]], Macro
-- [[macro defvar..2f..param][=defstar::defvar/param=]], Macro
+- [[macro defgeneric*][=defgeneric*=]], Macro
+- [[macro defmethod*][=defmethod*=]], Macro
+- [[macro defparameter*][=defparameter*=]], Macro
+- [[macro defun*][=defun*=]], Macro
+- [[macro defvar*][=defvar*=]], Macro
 
 
 
@@ -797,7 +690,7 @@ Internal function. The workhorse for the macros [[defun*][DEFUN*]], [[defmethod*
 
 
 # link target: <<index F>>
-- [[macro flet*][=defstar:flet*=]], Macro
+- [[macro flet*][=flet*=]], Macro
 
 
 
@@ -805,17 +698,14 @@ Internal function. The workhorse for the macros [[defun*][DEFUN*]], [[defmethod*
 
 
 # link target: <<index L>>
-- [[macro labels*][=defstar:labels*=]], Macro
-- [[macro lambda*][=defstar:lambda*=]], Macro
-
-
-
-*** S
-
-
-# link target: <<index S>>
-- [[function safe-define][=defstar::safe-define=]], Function
+- [[macro labels*][=labels*=]], Macro
+- [[macro lambda*][=lambda*=]], Macro
 
 
 
 
+
+* Colophon
+
+This documentation was generated from Common Lisp source code using CLOD, version 1.0.
+The latest version of CLOD is available [[http://bitbucket.org/eeeickythump/clod/][here]].
