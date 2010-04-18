@@ -182,8 +182,10 @@ if a value does not match its declared type.
 ;;;    ...)
 ;;;
 ;;; ;; Example of DEFGENERIC*, mainly useful to declare the return type
-;;; ;; of a set of methods.
-;;; (defgeneric* (cell-value -> real) (sheet x y))
+;;; ;; of a set of methods. Note the documentation string can appear after
+;;; ;; the argument list, similar to DEFUN.
+;;; (defgeneric* (cell-value -> real) (sheet x y)
+;;;   \"Return the value of the cell at coordinates X,Y in SHEET.\")
 ;;;
 ;;; ;; DEFGENERIC* can also be used to declare types of arguments. Be careful
 ;;; ;; that these don't clash with specialisers in method definitions.
@@ -537,7 +539,14 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
               `(,toplevel-form-name ,@(if fname (list fname) nil)
                                     ,@method-combo-keywords
                                     ,form-args
-                                    ,@(if docstring (list docstring) nil)
+                                    ,@(cond
+                                       ((and docstring
+                                             (eql 'defgeneric
+                                                  toplevel-form-name))
+                                        `((:documentation ,docstring)))
+                                       (docstring
+                                        (list docstring))
+                                       (t nil))
                                     ,@(if (eql 'defgeneric toplevel-form-name)
                                           nil preamble)
                                     ,@(cond
@@ -738,6 +747,8 @@ and assertions as per [[defun*]].
   forms, except that =&REST, &KEY= and =&OPTIONAL= arguments must be of the form:
   : arg =   VARNAME
   :       | (VARNAME TYPE)
+- OPTIONS :: Options to DEFGENERIC. The first of these may be a simple string,
+  which will be treated as equivalent to =(:documentation STRING)=.
 
 * Description
 Usage is exactly the same as [[defun*]], except that value-checking assertions
@@ -750,7 +761,9 @@ make a toplevel =DECLAIM= form that will then apply to all methods of
 the generic function.
 
 * Examples:
-;;; (defgeneric* (length -> integer) (seq &key start) ...options...)
+;;; (defgeneric* (length -> integer) (seq &key start)
+;;;    \"Return the length of the sequence SEQ.\"
+;;;    ...options...)
 ;;;
 ;;; (defgeneric* (length -> integer) ((seq sequence) &key (start integer))
 ;;;    ...options...)
@@ -872,7 +885,7 @@ form's body.
         (declarations nil))
     (dolist (clause clauses)
       (cond
-        ((or (atom clause) (<= 2 (length clause)))
+        ((or (atom clause) (<= (length clause) 2))
          (push clause plain-clauses))
         (t
          (push `(,(car clause) (the ,(second clause) ,(third clause)))
