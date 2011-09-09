@@ -1,4 +1,4 @@
-;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; Base: 10 -*- ;;;;;;;;;;;;;;;;;80
+;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; coding: utf-8-unix -*- ;;;;;;;;80
 ;;;;
 ;;;;    This file is part of DEFSTAR, by Paul Sexton
 ;;;;    Released under the Gnu Public License version 3
@@ -21,7 +21,9 @@
 
 ;;; Note: documentation generated with CLOD
 ;;; [[http://bitbucket.org/eeeickythump/clod/]]
-;;; (clod:document-package :defstar "defstar-doc.org")
+;;; (clod:document-package :defstar "doc/defstar.org"
+;;;                        :internal-symbols? nil :author "Paul Sexton"
+;;;                        :email "eeeickythump@gmail.com")
 
 (defpackage :defstar
   (:use :cl)
@@ -34,23 +36,26 @@
            #:labels*
            #:lambda*
            #:*let
-           #:returns
-           #:return-value
+           ;;#:returns
+           #:result
            #:*check-argument-types-explicitly?*
            #:->)
   (:documentation
    "* Description
 
 DEFSTAR is a collection of macros that can be used in place of =DEFUN,
-DEFMETHOD, DEFGENERIC, DEFVAR, DEFPARAMETER, FLET, LABELS= and =LAMBDA=. Each
-macro has the same name as the form it replaces, with a star added at the end,
-e.g. =DEFUN*=.
+DEFMETHOD, DEFGENERIC, DEFVAR, DEFPARAMETER, FLET, =LABELS=, =LET*= and =LAMBDA=.
+Each macro has the same name as the form it replaces, with a star added at the
+end, e.g. =DEFUN*=. (The exception is the =LET*= replacement, which is called
+=*LET=).
 
 The macros allow:
 - easy inclusion of type declarations within lambda lists
 - easy inclusion of return type declarations in function and method definitions
+- easy declaration of variables as 'ignored', by the use of '_' as a placeholder
+  in argument lists.
 - easy inclusion of assertions for each argument and for the function's
-  return value
+  return value, thus allowing simple programming by contract.
 
 See [[defun*]] and [[defvar*]] for a detailed description of syntax. See also
 the examples below.
@@ -60,24 +65,6 @@ DEFSTAR's home is at:
 
 Installation requires [[http://common-lisp.net/project/asdf/][ASDF]]. DEFSTAR
 does not depend on any other libraries.
-
-* Type DECLARATION versus type CHECKING
-
-Technically, =DECLARE=, =DECLAIM= and the like do not actually check that
-values stored in the associated variables conform to the declared type.
-They merely constitute a promise /by the programmer/ that only values of
-the specified type will be stored there. The consequences of storing
-a string in a variable that is declared to be of type integer, are
-technically 'undefined'.
-
-In practice, most modern Common Lisp implementations perform type-checking
-based on declaration information, especially when the =SAFETY= setting is high.
-
-DEFSTAR allows you to force lisp to perform type checking based on
-declarations. If you set the global variable
-[[*check-argument-types-explicitly?*]] to non-nil, =CHECK-TYPE= forms will
-included in the body of each function or method, causing an error to be raised
-if a value does not match its declared type.
 
 * Examples of DEFUN* and DEFMETHOD* usage
 ;;; ;; Define a simple function that adds two numbers, both of which
@@ -91,7 +78,7 @@ if a value does not match its declared type.
 ;;;
 ;;; ;; Another way of declaring the function's return type.
 ;;; (defun* sum ((a real) (b real))
-;;;    (returns real)
+;;;    (:returns real)
 ;;;    (+ a b))
 ;;;
 ;;; ;; We want to ensure that a and b are never negative.
@@ -105,12 +92,12 @@ if a value does not match its declared type.
 ;;;    (+ a b))
 ;;;
 ;;; ;; Another way is to use assertions:
-;;; (defun* (sum -> real (>= return-value 0)) ((a real (>= a 0)) (b real (>= b 0)))
+;;; (defun* (sum -> real (>= result 0)) ((a real (>= a 0)) (b real (>= b 0)))
 ;;;    (+ a b))
 ;;;
 ;;; ;; Or:
 ;;; (defun* sum ((a real (>= a 0)) (b real (>= b 0)))
-;;;    (returns real (>= return-value 0))
+;;;    (:returns real (>= result 0))
 ;;;    (+ a b))
 ;;;
 ;;; ;; Or, using the feature that the names of single-argument predicate
@@ -121,16 +108,29 @@ if a value does not match its declared type.
 ;;; (defun* (sum -> real naturalp) ((a real naturalp) (b real naturalp))
 ;;;    (+ a b))
 ;;;
+;;; ;; Another approach is to use :pre and :post clauses. Each contains one
+;;; ;; more forms, ALL of which must evaluate to non-nil. Within :post
+;;; ;; forms, result is bound to the value that the function or form
+;;; ;; is about to return.
+;;; (defun* (sum -> real) ((a real) (b real))
+;;;    (:pre (>= a 0) (>= b 0))
+;;;    (:post (>= result 0))
+;;;    (+ a b))
+;;;
 ;;; ;; A function that returns multiple values.
 ;;; (defun* (floor -> (values integer integer)) ((n real) (d real))
 ;;;    (cl:floor n d))
 ;;;
+;;; ;; Example of ignoring arguments
+;;; (*let (((top . _) list))
+;;;    (print top))
+;;;
 ;;; ;; It is possible to use assertions with functions that return
 ;;; ;; multiple values. When a function is declared to return multiple
-;;; ;; values, RETURN-VALUE will be bound to a LIST of those values.
+;;; ;; values, RESULT will be bound to a LIST of those values.
 ;;; (defun* floor ((n real) (d real))
-;;;    (returns (values integer integer)
-;;;             (< (second return-value) (first return-value)))
+;;;    (:returns (values integer integer)
+;;;             (< (second result) (first result)))
 ;;;    (cl:floor n d))
 ;;;
 ;;; ;; To declare that a function returns an unspecified number of
@@ -196,21 +196,40 @@ if a value does not match its declared type.
 ;;; (defvar* (*user-name* string) \"Bob\")
 ;;; (defparameter* (*file-position* (integer 0)) 0)
 
+* Type DECLARATION versus type CHECKING
+
+Technically, =DECLARE=, =DECLAIM= and the like do not actually check that
+values stored in the associated variables conform to the declared type.
+They merely constitute a promise /by the programmer/ that only values of
+the specified type will be stored there. The consequences of storing
+a string in a variable that is declared to be of type integer, are
+technically 'undefined'.
+
+In practice, most modern Common Lisp implementations perform type-checking
+based on declaration information, especially when the =SAFETY= setting is high.
+
+DEFSTAR allows you to force lisp to perform type checking based on
+declarations. If you set the global variable
+[[*check-argument-types-explicitly?*]] to non-nil, =CHECK-TYPE= forms will
+included in the body of each function or method, causing an error to be raised
+if a value does not match its declared type.
+
 * Limitations
+
 - Definitions of =SETF= methods cannot include return type declarations in the
-  method 'header'. The return type can still be declared using a =(RETURNS ...)=
+  method 'header'. The return type can still be declared using a =(:RETURNS ...)=
   form. For example:
 ;;; (defmethod (setf (foo -> integer)) (...args...)   ; illegal
 ;;;    ...)
 ;;;
 ;;; (defmethod (setf foo) (...args...)
-;;;    (returns integer)                  ; legal
+;;;    (:returns integer)                  ; legal
 ;;;    ...)
 
 * Syntax highlighting of DEFSTAR macros in Emacs
 
-Put the following code in your =.emacs= if you want =DEFVAR*= and other 
-forms to appear in the same face as their normal counterparts, and if 
+Put the following code in your =.emacs= if you want =DEFVAR*= and other
+forms to appear in the same face as their normal counterparts, and if
 you want their docstrings to also be correctly identified as docstrings
 rather than normal strings.
 
@@ -219,7 +238,7 @@ rather than normal strings.
 ;;; (put 'defvar*   'doc-string-elt 3)
 ;;; (put 'defparameter*   'doc-string-elt 3)
 ;;; (put 'lambda*   'doc-string-elt 2)
-;;; 
+;;;
 ;;; (defvar *lisp-special-forms*
 ;;;       (regexp-opt '(\"defvar*\"
 ;;;                     \"defconstant*\"
@@ -239,14 +258,17 @@ rather than normal strings.
 (declaim (optimize (speed 0) (safety 3) (debug 3)))
 
 
-;;;; (@> "Utility functions") =================================================
+;;;; <<Utility functions>> ====================================================
 
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (defun defstar/split-defun-body (body)
+  (defun defstar/split-defun-body (body &optional (force-docstring? nil))
     "* Arguments
 - BODY :: the body of a =DEFUN= form or similar, such as might be received
-by a macro.
+  by a macro.
+- FORCE-DOCSTRING? :: if true, and the body is a list whose only element is
+  a string, that string will still be interpreted as a docstring rather
+  than a constant return value for the body.
 
 * Returns
 Three values:
@@ -269,7 +291,7 @@ The preamble consists of declarations and a docstring.
               (push (car form) preamble))
              ((and (stringp (car form))
                    (null docstring)
-                   (cdr form))
+                   (or (cdr form) force-docstring?))
               (setf docstring (car form)))
              (t
               (setf true-body form)
@@ -309,8 +331,42 @@ Predicate. Does the symbol =SYM= begin with an ampersand, such as =&ANY=,
 	 (eql #\& (char (format nil "~A" sym) 0)))))
 
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun defstar/varnames-in-arglist (arglist)
+    (loop for arg in arglist
+       when (and (symbolp arg) (not (defstar/ampersand-symbol? arg)))
+       collect arg
+       when (listp arg)
+       collect (car arg))))
 
-;;;; (@> "Internal functions and macros") =====================================
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun ignored-variable? (var)
+    (and (symbolp var)
+         (string= (string var) "_"))))
+
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun map-tree (fn tree)
+    "Like MAPCAR but operates on a tree. FN must take one argument. It is called
+for every atom in TREE; a structural copy of TREE is returned in which every atom
+is replaced by the value of (FN ATOM)."
+    (cond
+      ((null tree) nil)
+      ((and (consp tree)
+            (null (car tree)))
+       ;; Special case where node is actually NIL.
+       (cons (funcall fn (car tree))
+             (map-tree fn (cdr tree))))
+      ((consp tree)
+       (cons (map-tree fn (car tree))
+	     (map-tree fn (cdr tree))))
+      (t
+       (funcall fn tree)))))
+
+
+
+;;;; <<Internal functions and macros>> ========================================
 
 
 (defconstant +DEFUN*-ARROW-SYMBOL+ '->
@@ -330,6 +386,28 @@ undefined.
 
 In practise, essentially all modern lisps do perform type checking
 based on declarations, especially when the =SAFETY= setting is high. ")
+
+
+(defun assert-precondition (fname clause varnames)
+  (let* ((fname (or fname "anonymous function"))
+         (msg (with-output-to-string (s)
+                (format s "A call to ~A violated the precondition: ~A.~%"
+                        fname clause)
+                (dolist (var-name varnames)
+                  (format s "~&~A = ~~S" var-name)))))
+    `(assert ,clause ,varnames ,msg ,@varnames)))
+
+
+(defun assert-postcondition (fname clause varnames)
+  (let* ((fname (or fname "anonymous function"))
+         (msg (with-output-to-string (s)
+                (format s "When returning from ~A postcondition violated: ~A.~%"
+                        fname clause)
+                (format s "Return value: ~~S~%")
+                (dolist (var-name varnames)
+                  (format s "~&~A = ~~S" var-name)))))
+    `(assert ,clause (result) ,msg result ,@varnames)))
+
 
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -368,7 +446,7 @@ Internal function, used by [[defun*]] to parse lambda list terms.
                     (listp (car term)))
                (destructuring-bind ((var vartype &optional check) varclass) term
                  (values (list var varclass) (list 'type vartype var) varclass
-                         (check-clause check var))))               
+                         (check-clause check var))))
               ((eql 'defmethod def-type)
                (destructuring-bind (var varclass &optional check) term
                  (values (list var varclass) nil varclass
@@ -392,7 +470,7 @@ Internal function, used by [[defun*]] to parse lambda list terms.
             (values term nil t nil))))
         ((or (eql '&optional last-amp-kwd)
              (eql '&key last-amp-kwd))
-         (cond  
+         (cond
            ((and (listp term)
                  (eql 'defgeneric def-type))
             (destructuring-bind (var vartype) term
@@ -423,7 +501,7 @@ Internal function, used by [[defun*]] to parse lambda list terms.
                                  t)
                     nil))))
         ((eql '&aux last-amp-kwd)
-         (cond  
+         (cond
            ((and (listp term) (listp (car term)))
             (destructuring-bind ((var vartype &optional check) default) term
               (values (list var default)
@@ -437,7 +515,7 @@ Internal function, used by [[defun*]] to parse lambda list terms.
         (t
          (error "Unknown keyword in lambda list: ~S"
                 last-amp-kwd))))))
- 
+
 
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -460,9 +538,15 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
           (ftype-args nil)
           (declarations nil)
           (checks nil)
-          (returns-clause (find 'returns body
+          (returns-clause (find :returns body
                                 :key #'(lambda (x)
-                                         (if (listp x) (car x) x))))
+                                         (if (listp x) (car x) nil))))
+          (pre-clause (find :pre body
+                            :key #'(lambda (x)
+                                     (if (listp x) (car x) nil))))
+          (post-clause (find :post body
+                             :key #'(lambda (x)
+                                      (if (listp x) (car x) nil))))
           (returns-type t)
           (returns-check nil)
           (final-form nil)
@@ -472,9 +556,9 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
         ;; Extract the qualifiers (eg :AFTER, :AROUND etc)
         (push arglist method-combo-keywords)
         (loop for term in body
-             while (not (listp term))
-           do (push term method-combo-keywords)
-             (pop body))
+              while (not (listp term))
+              do (push term method-combo-keywords)
+                 (pop body))
         (setf arglist (car body))
         (setf body (cdr body)))
       (dolist (term arglist)
@@ -487,6 +571,11 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
           (t
            (multiple-value-bind (form-term decl ftype-term check)
                (defun*-term term amp :def-type toplevel-form-name)
+             (when (ignored-variable? form-term)
+               (let ((new-term (gensym "IGNORED-")))
+                 (if decl (setf decl (subst new-term form-term decl)))
+                 (setf form-term new-term)
+                 (push (list 'ignore form-term) declarations)))
              (push form-term form-args)
              (if decl (push decl declarations))
              (if ftype-term (push ftype-term ftype-args))
@@ -496,12 +585,18 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
           (setf returns-type rtype)
           (if rcheck (setf returns-check rcheck))
           (if (and rcheck (symbolp rcheck))
-              (setf returns-check `(,rcheck return-value))))
+              (setf returns-check `(,rcheck result)))
+          (setf returns-check (list returns-check)))
         (setf body (remove returns-clause body :test #'eql)))
+      (when post-clause
+        (setf returns-check (cdr post-clause))
+        (setf body (remove post-clause body :test #'eql)))
+      (when pre-clause
+        (setf body (remove pre-clause body :test #'eql)))
       (when (and fname (listp fname)
                  (not (eql 'setf (car fname))))
         (when returns-clause
-          (error "DEFUN* ~A ... also contains 'RETURNS' clause in body"
+          (error "DEFUN* ~A ... also contains ':RETURNS' clause in body"
                  fname))
         (destructuring-bind (fun-name arrow rtype &optional rcheck) fname
           (unless (eql arrow +DEFUN*-ARROW-SYMBOL+)
@@ -511,69 +606,93 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
           (setf returns-type rtype)
           (if rcheck (setf returns-check rcheck))
           (if (and rcheck (symbolp rcheck))
-              (setf returns-check `(,rcheck return-value)))))
+              (setf returns-check `(,rcheck result)))))
       (multiple-value-bind (preamble docstring true-body)
-          (defstar/split-defun-body body)
-        (setf preamble 
+          (defstar/split-defun-body body (eql 'defgeneric toplevel-form-name))
+        (setf preamble
               `(,@(if declarations `((declare ,@declarations)) nil)
-                  ,@preamble))
+                ,@preamble))
         (if *check-argument-types-explicitly?*
             (setf preamble
                   (append
                    preamble
-                   (mapcar #'(lambda (decl)
-                               `(check-type ,(third decl) ,(second decl)))
-                           declarations))))
+                   (remove nil
+                           (mapcar #'(lambda (decl)
+                                       (unless (eql (car decl) 'ignore)
+                                         `(check-type ,(third decl) ,(second decl))))
+                                   declarations)))))
         (setf true-body
               `(,@(if (and checks (not (eql 'defgeneric toplevel-form-name)))
                       (mapcar #'(lambda (check)
-                                  `(assert ,check)) checks)
+                                  (assert-precondition
+                                   fname check
+                                   (defstar/varnames-in-arglist form-args))) checks)
                       nil)
-                  ,@true-body))
+                ,@true-body))
         (setf form-args (reverse form-args)
               ftype-args (reverse ftype-args)
               checks (reverse checks))
         (if (and returns-check (symbolp returns-check))
-            (setf returns-check `(,returns-check return-value)))
+            (setf returns-check `(,returns-check result)))
         (setf final-form
-              `(,toplevel-form-name ,@(if fname (list fname) nil)
-                                    ,@method-combo-keywords
-                                    ,form-args
-                                    ,@(cond
-                                       ((and docstring
-                                             (eql 'defgeneric
-                                                  toplevel-form-name))
-                                        `((:documentation ,docstring)))
-                                       (docstring
-                                        (list docstring))
-                                       (t nil))
-                                    ,@(if (eql 'defgeneric toplevel-form-name)
-                                          nil preamble)
-                                    ,@(cond
-                                       ((eql 'defgeneric toplevel-form-name)
-                                        true-body)
-                                       ((and returns-check
-                                             (listp returns-type)
-                                             (eq 'values (car returns-type)))
-                                        `((the ,returns-type
-                                            (let ((return-value
-                                                   (multiple-value-list
-                                                    (progn ,@true-body))))
-                                              (assert ,returns-check)
-                                              (values-list return-value)))))
-                                       (returns-check
-                                        `((the ,returns-type
-                                            (let ((return-value
-                                                   (progn ,@true-body)))
-                                              (assert ,returns-check)
-                                              return-value))))
-                                       (returns-type
-                                        `((the ,returns-type
-                                            ,(if (cdr true-body)
-                                                 `(progn ,@true-body)
-                                                 (car true-body)))))
-                                       (t
-                                        true-body))))
+              `(,@(if (eql :method fname) nil `(,toplevel-form-name))
+                ,@(if fname (list fname) nil)
+                ,@method-combo-keywords
+                ,form-args
+                ,@(cond
+                    ((and docstring
+                          (eql 'defgeneric
+                               toplevel-form-name))
+                     `((:documentation ,docstring)))
+                    (docstring
+                     (list docstring))
+                    (t nil))
+                ,@(if (eql 'defgeneric toplevel-form-name)
+                      nil preamble)
+                ,@(if pre-clause
+                      (mapcar (lambda (check)
+                                (assert-precondition
+                                 fname check
+                                 (defstar/varnames-in-arglist
+                                     form-args)))
+                              (cdr pre-clause)))
+                ,@(cond
+                    ((eql 'defgeneric toplevel-form-name)
+                     true-body)
+                    ((and returns-check
+                          (listp returns-type)
+                          (eq 'values (car returns-type)))
+                     `((the ,returns-type
+                            (let ((result
+                                    (multiple-value-list
+                                     (block ,fname ,@true-body))))
+                              ,@(mapcar
+                                 (lambda (check)
+                                   (assert-postcondition
+                                    fname check
+                                    (defstar/varnames-in-arglist
+                                        form-args)))
+                                 returns-check)
+                              (values-list result)))))
+                    (returns-check
+                     `((the ,returns-type
+                            (let ((result
+                                    (block ,fname ,@true-body)))
+                              ,@(mapcar
+                                 (lambda (check)
+                                   (assert-postcondition
+                                    fname check
+                                    (defstar/varnames-in-arglist
+                                        form-args)))
+                                 returns-check)
+                              result))))
+                    (returns-type
+                     `((the ,returns-type
+                            ,(if (cdr true-body)
+                                 `(block ,fname ,@true-body)
+                                 (car true-body)))))
+                    (t
+                     true-body))))
         (cond
           ((and (or declarations returns-type)
                 (not (member toplevel-form-name '(defmethod flet labels
@@ -614,7 +733,7 @@ Internal macro, used by [[defvar*]] and
 
 
 
-;;;; (@> "Exported macros") ===================================================
+;;;; <<Exported macros>> ======================================================
 
 
 ;;; <<defun*>>
@@ -629,13 +748,13 @@ Internal macro, used by [[defvar*]] and
   Where:
   - =TYPE= is any valid type specifier
   - =FORM= is any form, which must return non-nil if the assertion is satisfied,
-    nil otherwise. Within the form, the symbol =RETURN-VALUE= is bound to the
+    nil otherwise. Within the form, the symbol =RESULT= is bound to the
     value that is about to be returned by the function.
   - =PREDICATE-SYMBOL= is a symbol, the name of a function that accepts a single
-    argument. Equivalent to the form =(PREDICATE-SYMBOL RETURN-VALUE)=.
+    argument. Equivalent to the form =(PREDICATE-SYMBOL RESULT)=.
 
     /Note:/ if the latter (list) form for fname is used, the =DEFUN*= body may
-    /not/ also contain a =returns= form. Also note that the latter form cannot
+    /not/ also contain a =:returns= form. Also note that the latter form cannot
     currently be used when defining a =(setf ...)= function or method.
 - ARGLIST :: a =DEFUN*= LAMBDA LIST, which uses the following grammar:
   : arglist =   var-term*
@@ -657,11 +776,22 @@ Internal macro, used by [[defvar*]] and
   - =DEFAULT= and =SUPPLIED-P= are the default value, and a variable that will
     indicate whether the argument was supplied.
 - BODY :: Body of the function form. This may contain a docstring in the usual
-  place, and may also a single special form beginning with =returns=:
-  : returns-form = (RETURNS TYPE [assertion])
-  If the =returns= form contains an assertion, then within that assertion,
-  the symbol =return-value= is bound to the value that the function is
-  about to return.
+  place, and may also contain:
+  - a single special form beginning with =:returns=:
+    : returns-form = (:RETURNS TYPE [assertion])
+    If the =:returns= form contains an assertion, then within that assertion,
+    the symbol =RESULT= is bound to the value that the function is
+    about to return.
+  - a single special form beginning with =:pre= followed by one or more
+    expressions, which will be evaluated before any other code in the body.
+    All of the expressions must evaluate to non-nil, or an error is signalled.
+    : pre-form = (:PRE [assertion] [assertion]*)
+  - a single special form beginning with =:post= followed by one or more
+    expressions, which will be evaluated just prior to the function returning.
+    All of the expressions must evaluate to non-nil, or an error is signalled.
+    Within the :post clause, =result= is bound to the return value of the
+    function.
+    : post-form = (:POST [assertion] [assertion]*)
 
 * Description
 Equivalent to =(DEFUN fname arglist . body)=, but:
@@ -669,10 +799,13 @@ Equivalent to =(DEFUN fname arglist . body)=, but:
   forms within the function body
 - If a return type is declared for the function itself, this will be turned
   into a global =DECLAIM= form that immediately precedes the function.
-- All assertions within the lambda list will be checked before the function body
-  is entered.
-- Any assertion within a =returns= form will be checked before the function
-  returns a value.
+- Any variables whose names are '_' are renamed with unique symbols
+  and declared 'ignored' within the function body. This provides a quick way
+  to ignore arguments or parts of arguments.
+- All assertions within the lambda list or =:pre= form will be checked before
+  the function body is entered.
+- Any assertions within a =:returns= form or =:post= form will be checked
+  before the function returns a value.
 
 * Examples
 ;;; ;; Very simple example
@@ -682,11 +815,17 @@ Equivalent to =(DEFUN fname arglist . body)=, but:
 ;;; ;; Example with assertion for 'b' argument, checked before the
 ;;; ;; body of the function is entered.
 ;;; (defun* div ((a real) (b real (/= b 0)))
-;;;    (returns real)
+;;;    (:returns real)
+;;;    (/ a b))
+
+;;; ;; Similar to above example but using :pre clause.
+;;; (defun* div ((a real) (b real))
+;;;    (:returns real)
+;;;    (:pre (/= b 0))
 ;;;    (/ a b))
 
 ;;; (defun* sum (&rest (nums real))  ; type of 'rest' var refers to
-;;;    (returns real)                ; the type of each list element, ie
+;;;    (:returns real)                ; the type of each list element, ie
 ;;;    (apply #'+ nums))             ; nums must be a list of REALs
 
 ;;; (defun* (sum -> real) (&rest (nums real))  ; alternative form
@@ -742,9 +881,11 @@ and assertions as per [[defun*]].
 ;;; <<defgeneric*>>
 (defmacro defgeneric* (fname generic-arglist &body options)
   "* Arguments
-- FNAME :: Name of the generic function.
+- FNAME :: Name of the generic function. Handles names of the form (SETF X)
+  correctly.
 - GENERIC-ARGLIST :: Follows the same grammar the arglist for [[defun*]]
-  forms, except that =&REST, &KEY= and =&OPTIONAL= arguments must be of the form:
+  forms, except that =&REST, &KEY= and =&OPTIONAL= arguments must be of
+  the form:
   : arg =   VARNAME
   :       | (VARNAME TYPE)
 - OPTIONS :: Options to DEFGENERIC. The first of these may be a simple string,
@@ -753,6 +894,9 @@ and assertions as per [[defun*]].
 * Description
 Usage is exactly the same as [[defun*]], except that value-checking assertions
 are ignored.
+
+If you define any methods inside the form using `:method' clauses, they can
+use [[defmethod*]]-style argument lists, :pre and :post clauses, and so on.
 
 Note that you can declare types for arguments in the generic function
 argument list. Be careful that these do not clash with method definitions.
@@ -768,7 +912,15 @@ the generic function.
 ;;; (defgeneric* (length -> integer) ((seq sequence) &key (start integer))
 ;;;    ...options...)
 "
-  (safe-define 'defgeneric fname generic-arglist options))
+  (safe-define 'defgeneric fname
+               generic-arglist
+               (mapcar (lambda (option)
+                         (if (and (listp option)
+                                  (eql :method (first option)))
+                             (safe-define 'defmethod :method
+                                          (second option) (cddr option))
+                             option))
+                       options)))
 
 
 ;;; <<defvar*>>
@@ -851,50 +1003,101 @@ See [[flet*]] for more details."
 (defmacro lambda* (arglist &body body)
   "* Description
 Like =LAMBDA=, but =ARGLIST= and body have the same syntax as for [[defun*]].
- A =returns= form can be used within the function body to
+ A =:returns= form can be used within the function body to
 declare its return type."
   (safe-define 'lambda nil arglist body))
 
 
 
 ;; Future ideas for *let:
-;; ((a . b) FORM)  ;; destructuring
 ;; (#(a b) FORM)   ;; destructuring a vector
-;; ((:values a b) FORM)  ;; mvbind
 ;; _ or nil = 'ignored' variable
 
+
+(defun let*-aux (clauses body)
+  (let ((clause (car clauses))
+        (new-var nil)
+        (ignored-vars nil))
+    (cond
+      ((null clauses)
+       (cons 'progn body))
+      ((and (listp clause) (<= (length clause) 2)
+            (not (atom (first clause))))
+       (setf (first clause)
+             (map-tree (lambda (term) (cond
+                                   ((ignored-variable? term)
+                                    (let ((new-term (gensym "IGNORED-")))
+                                      (push new-term ignored-vars)
+                                      new-term))
+                                   (t term)))
+                       (first clause)))
+       (if (eql :values (first (first clause))) ; mvbind
+           `(multiple-value-bind ,(cdr (first clause)) ,(second clause)
+              ,@(if ignored-vars `((declare (ignore ,@ignored-vars))))
+              ,(let*-aux (cdr clauses) body))
+           ;; else
+           `(destructuring-bind ,(first clause) ,(second clause)
+              ,@(if ignored-vars `((declare (ignore ,@ignored-vars))))
+              ,(let*-aux (cdr clauses) body))))
+      ((atom clause)
+       `(let (,clause)
+          ,(let*-aux (cdr clauses) body)))
+      ((<= (length clause) 2)
+       (if (ignored-variable? (first clause))
+           (setf new-var (gensym "IGNORED-")))
+       `(let ((,(or new-var (first clause)) ,(second clause)))
+          ,@(if new-var `((declare (ignore ,new-var))) nil)
+          ,(let*-aux (cdr clauses) body)))
+      (t
+       `(let ((,(first clause) ,(third clause)))
+          ;; Declarations at the 'head' of (inside) a binding form will affect
+          ;; the binding itself.
+          (declare (,(second clause) ,(first clause)))
+          ,(let*-aux (cdr clauses) body))))))
+
+
+
 ;;; <<let*>>
-(defmacro *let (clauses &body body)
+(defmacro *let ((&rest clauses) &body body)
   "* Arguments
 - CLAUSES :: A series of zero or more clauses taking the form:
 : clause =   VARNAME
 :          | (VARNAME FORM)
+:          | (LAMBDA-LIST FORM)
+:          | ((&values VAR...) FORM)
 :          | (VARNAME TYPE FORM)
 - BODY :: The body of the form (implicit =progn=).
 * Description
-Expands to a =LET*= form, but if any clauses contain type information,
-that information is moved into a declaration at the beginning of the
-form's body.
+Behaves like LET*, but:
+- When types are given between the variable name and expression, these
+  are converted to declarations within the scope of the LET form.
+- When the form to be bound is a lambda-list, behaves like DESTRUCTURING-BIND.
+- When the form to be bound is a list whose first element is :values,
+  behaves like MULTIPLE-VALUE-BIND, using the rest of the elements in
+  the form as the variables to be bound.
+- Any variables whose names are '_', either bare or inside a form to be
+  destructured, will be renamed with unique symbols and declared 'ignored'
+  within the body. This provides a quick way to ignore arguments or parts
+  of arguments.
 * Example
 ;;; (*let ((name \"Bob\")
 ;;;        (age integer 40)
-;;;        (sex (member :male :female) :male))
+;;;        (sex (member :male :female) :male)
+;;;        ((num street &optional suburb) address)
+;;;        ((&values day month year) birthday))
 ;;;    ...body...)
+Expands to:
+;;; (let ((name \"Bob\"))
+;;;   (let ((age 40))
+;;;     (declare (integer age))
+;;;     (let ((sex :male))
+;;;       (declare ((member :male :female) sex))
+;;;       (destructuring-bind
+;;;           (num street &optional suburb) address
+;;;         (multiple-value-bind (day month year) birthday
+;;;           ...body...)))))
 "
-  (let ((plain-clauses nil)
-        (declarations nil))
-    (dolist (clause clauses)
-      (cond
-        ((or (atom clause) (<= (length clause) 2))
-         (push clause plain-clauses))
-        (t
-         (push `(,(car clause) (the ,(second clause) ,(third clause)))
-               plain-clauses)
-         (push `(,(second clause) ,(car clause)) declarations))))
-    `(let* ,(reverse plain-clauses)
-       ,@(if declarations `((declare ,@declarations)) (list nil))
-       ,@body)))
-
+  (let*-aux clauses body))
 
 
 ;;;; End of DEFSTAR

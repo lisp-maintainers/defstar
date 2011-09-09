@@ -1,4 +1,4 @@
-;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; Base: 10 -*-
+;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; coding: utf-8-unix -*- ;;;;;;;;80
 ;;;;
 ;;;;    This file is part of DEFSTAR, by Paul Sexton
 ;;;;    Released under the Gnu Public License version 3
