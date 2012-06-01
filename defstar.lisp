@@ -36,6 +36,7 @@
            #:labels*
            #:lambda*
            #:*let
+           #:nlet
            ;;#:returns
            #:result
            #:*check-argument-types-explicitly?*
@@ -387,6 +388,8 @@ undefined.
 In practise, essentially all modern lisps do perform type checking
 based on declarations, especially when the =SAFETY= setting is high. ")
 
+(defvar *use-contextl* nil
+  "Bound to true if the ContextL package is currently loaded.")
 
 (defun assert-precondition (fname clause varnames)
   (let* ((fname (or fname "anonymous function"))
@@ -401,7 +404,7 @@ based on declarations, especially when the =SAFETY= setting is high. ")
 (defun assert-postcondition (fname clause varnames)
   (let* ((fname (or fname "anonymous function"))
          (msg (with-output-to-string (s)
-                (format s "When returning from ~A postcondition violated: ~A.~%"
+                (format s "When returning from ~A, postcondition violated: ~A.~%"
                         fname clause)
                 (format s "Return value: ~~S~%")
                 (dolist (var-name varnames)
@@ -433,97 +436,117 @@ Internal function, used by [[defun*]] to parse lambda list terms.
 
 * See Also
 - [[defun*]]"
-    (flet ((check-clause (check var)
-             (if (and check (symbolp check))
-                 (list check var)
-                 check)))
-      (cond
-        ((null last-amp-kwd)
-         (cond
-           ((listp term)
-            (cond
-              ((and (eql 'defmethod def-type)
-                    (listp (car term)))
-               (destructuring-bind ((var vartype &optional check) varclass) term
-                 (values (list var varclass) (list 'type vartype var) varclass
-                         (check-clause check var))))
-              ((eql 'defmethod def-type)
-               (destructuring-bind (var varclass &optional check) term
-                 (values (list var varclass) nil varclass
-                         (check-clause check var))))
-              ((eql 'defgeneric def-type)
-               (destructuring-bind (var vartype) term
-                 (values var (list 'type vartype var) vartype
-                         nil)))
-              (t
-               (destructuring-bind (var vartype &optional check) term
-                 (values var (list 'type vartype var) vartype
-                         (check-clause check var))))))
-           (t
-            (values term nil t nil))))
-        ((eql '&rest last-amp-kwd)
-         (cond
-           ((listp term)
-            (destructuring-bind (var vartype &optional check) term
-              (values var nil vartype (check-clause check var))))
-           (t
-            (values term nil t nil))))
-        ((or (eql '&optional last-amp-kwd)
-             (eql '&key last-amp-kwd))
-         (cond
-           ((and (listp term)
-                 (eql 'defgeneric def-type))
-            (destructuring-bind (var vartype) term
-              (values var nil
-                      (if (eql '&key last-amp-kwd)
-                          (list (defstar/make-keyword var) vartype)
-                          vartype)
-                      nil)))
-           ((and (listp term) (listp (car term)))
-            (destructuring-bind ((var vartype &optional check)
-                                 default &optional supplied-p) term
-              (values (if supplied-p
-                          (list var default supplied-p)
-                          (list var default))
-                      (list 'type vartype var)
-                      (if (eql '&key last-amp-kwd)
-                          (list (defstar/make-keyword var) vartype)
-                          vartype)
-                      (check-clause check var))))
-           ((listp term)
-            (values term nil (if (eql '&key last-amp-kwd)
-                                 (list (defstar/make-keyword (car term)) t)
-                                 t)
-                    nil))
-           (t
-            (values term nil (if (eql '&key last-amp-kwd)
-                                 (list (defstar/make-keyword term) t)
-                                 t)
-                    nil))))
-        ((eql '&aux last-amp-kwd)
-         (cond
-           ((and (listp term) (listp (car term)))
-            (destructuring-bind ((var vartype &optional check) default) term
-              (values (list var default)
-                      (list 'type vartype var)
-                      nil (check-clause check var))))
-           (t
-            (values term nil nil nil))))
-        ((eql '&allow-other-keys last-amp-kwd)
-         (error
-          "Malformed lambda list: &ALLOW-OTHER-KEYS must be last term"))
-        (t
-         (error "Unknown keyword in lambda list: ~S"
-                last-amp-kwd))))))
+    (let ((layered-defmethod
+            (if *use-contextl*
+                (find-symbol "DEFINE-LAYERED-METHOD" :contextl)
+                (gensym)))
+          (layered-defgeneric
+            (if *use-contextl*
+                (find-symbol "DEFINE-LAYERED-FUNCTION" :contextl)
+                (gensym))))
+      (flet ((check-clause (check var)
+               (if (and check (symbolp check))
+                   (list check var)
+                   check)))
+        (cond
+          ((null last-amp-kwd)
+           (cond
+             ((listp term)
+              (cond
+                ((or (eql def-type 'defmethod)
+                     (eql def-type layered-defmethod))
+                 (if (listp (car term))
+                     (destructuring-bind ((var vartype &optional check) varclass)
+                         term
+                       (values (list var varclass)
+                               (list 'type vartype var)
+                               varclass
+                               (check-clause check var)))
+                     ;; else
+                     (destructuring-bind (var varclass &optional check) term
+                       (values (list var varclass)
+                               nil
+                               varclass
+                               (check-clause check var)))))
+                ((or (eql def-type 'defgeneric)
+                     (eql def-type layered-defgeneric))
+                 (destructuring-bind (var vartype) term
+                   (values var (list 'type vartype var) vartype
+                           nil)))
+                (t
+                 (destructuring-bind (var vartype &optional check) term
+                   (values var (list 'type vartype var) vartype
+                           (check-clause check var))))))
+             (t
+              (values term nil t nil))))
+          ((eql '&rest last-amp-kwd)
+           (cond
+             ((listp term)
+              (destructuring-bind (var vartype &optional check) term
+                (values var nil vartype (check-clause check var))))
+             (t
+              (values term nil t nil))))
+          ((or (eql '&optional last-amp-kwd)
+               (eql '&key last-amp-kwd))
+           (cond
+             ((and (listp term)
+                   (or (eql def-type 'defgeneric)
+                       (eql def-type layered-defgeneric)))
+              (destructuring-bind (var vartype) term
+                (values var nil
+                        (if (eql '&key last-amp-kwd)
+                            (list (defstar/make-keyword var) vartype)
+                            vartype)
+                        nil)))
+             ((and (listp term) (listp (car term)))
+              (destructuring-bind ((var vartype &optional check)
+                                   default &optional supplied-p) term
+                (values (if supplied-p
+                            (list var default supplied-p)
+                            (list var default))
+                        (list 'type vartype var)
+                        (if (eql '&key last-amp-kwd)
+                            (list (defstar/make-keyword var) vartype)
+                            vartype)
+                        (check-clause check var))))
+             ((listp term)
+              (values term nil (if (eql '&key last-amp-kwd)
+                                   (list (defstar/make-keyword (car term)) t)
+                                   t)
+                      nil))
+             (t
+              (values term nil (if (eql '&key last-amp-kwd)
+                                   (list (defstar/make-keyword term) t)
+                                   t)
+                      nil))))
+          ((eql '&aux last-amp-kwd)
+           (cond
+             ((and (listp term) (listp (car term)))
+              (destructuring-bind ((var vartype &optional check) default) term
+                (values (list var default)
+                        (list 'type vartype var)
+                        nil (check-clause check var))))
+             (t
+              (values term nil nil nil))))
+          ((eql '&allow-other-keys last-amp-kwd)
+           (error
+            "Malformed lambda list: &ALLOW-OTHER-KEYS must be last term"))
+          (t
+           (error "Unknown keyword in lambda list: ~S"
+                  last-amp-kwd)))))))
 
 
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (defun safe-define (toplevel-form-name fname arglist body)
+  (defun safe-define (toplevel-form-name fname arglist body
+                      &key generic-function-name)
     "* Arguments
 - TOPLEVEL-FORM-NAME :: Symbol denoting the type of toplevel form being defined.
 Currently handles ='DEFUN, 'DEFMETHOD, 'FLET, 'LABELS, 'LAMBDA, 'DEFGENERIC=.
 - FNAME, ARGLIST, BODY :: see [[defun*]].
+- GENERIC-FUNCTION-NAME :: supplied for methods defined via a `:method'
+clause inside a `defgeneric*' form. A symbol naming the generic function to
+which the methods belong.
 
 * Returns
 A =defun, defmethod, defgeneric= or =lambda= form, or =flet= or
@@ -533,34 +556,72 @@ A =defun, defmethod, defgeneric= or =lambda= form, or =flet= or
 Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
 [[LAMBDA*]], [[FLET*]], and [[LABELS*]].
 "
-    (let ((method-combo-keywords nil)
-          (form-args nil)
-          (ftype-args nil)
-          (declarations nil)
-          (checks nil)
-          (returns-clause (find :returns body
-                                :key #'(lambda (x)
-                                         (if (listp x) (car x) nil))))
-          (pre-clause (find :pre body
-                            :key #'(lambda (x)
-                                     (if (listp x) (car x) nil))))
-          (post-clause (find :post body
+    (let* ((*use-contextl* (find :contextl *features*))
+           (layered-defgeneric
+             (if *use-contextl*
+                 (find-symbol "DEFINE-LAYERED-FUNCTION" :contextl)
+                 (gensym)))
+           (layered-defmethod
+             (if *use-contextl*
+                 (find-symbol "DEFINE-LAYERED-METHOD" :contextl)
+                 (gensym)))
+           (defgeneric? (or (eql 'defgeneric toplevel-form-name)
+                            (eql layered-defgeneric toplevel-form-name)))
+           (method-combo-keywords nil)
+           (layer nil)
+           (form-args nil)
+           (ftype-args nil)
+           (declarations nil)
+           (checks nil)
+           (returns-clause (find :returns body
+                                 :key #'(lambda (x)
+                                          (if (listp x) (car x) nil))))
+           (pre-clause (find :pre body
                              :key #'(lambda (x)
                                       (if (listp x) (car x) nil))))
-          (returns-type t)
-          (returns-check nil)
-          (final-form nil)
-          (amp nil))
+           (post-clause (find :post body
+                              :key #'(lambda (x)
+                                       (if (listp x) (car x) nil))))
+           (returns-type t)
+           (returns-check nil)
+           (final-form nil)
+           (amp nil)
+           (name-for-block (let ((basename (or generic-function-name fname)))
+                             (cond
+                               ((symbolp basename)
+                                 basename)
+                               ((listp basename) ; (setf foo)
+                                 (second basename))
+                               (t
+                                (error "Don't know how to get block name from function name ~S" basename))))))
+
+      ;; Extract method qualifiers (eg :AFTER, :AROUND etc)
       (when (and (eql 'defmethod toplevel-form-name)
                  (not (listp arglist)))
-        ;; Extract the qualifiers (eg :AFTER, :AROUND etc)
         (push arglist method-combo-keywords)
         (loop for term in body
               while (not (listp term))
               do (push term method-combo-keywords)
                  (pop body))
+        (setf method-combo-keywords (reverse method-combo-keywords))
+        (when (and *use-contextl*
+                   (member (car method-combo-keywords) '(:in :in-layer)))
+          (setf layer (second method-combo-keywords))
+          (setf toplevel-form-name layered-defmethod)
+          (setf method-combo-keywords (cddr method-combo-keywords)))
         (setf arglist (car body))
         (setf body (cdr body)))
+
+      ;; Extract (:layered ...) clause from defgeneric* options
+      (when (and *use-contextl*
+                 (eql 'defgeneric toplevel-form-name)
+                 (assoc :layered (remove-if-not #'listp body)))
+        (let ((clause (assoc :layered (remove-if-not #'listp body))))
+          (when (or (null (cdr clause))
+                    (second clause))
+            (setf toplevel-form-name layered-defgeneric)
+            (setf body (remove clause body :test #'equal)))))
+
       (dolist (term arglist)
         (cond
           ((defstar/ampersand-symbol? term)
@@ -580,19 +641,25 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
              (if decl (push decl declarations))
              (if ftype-term (push ftype-term ftype-args))
              (if check (push check checks))))))
+
       (when returns-clause
         (destructuring-bind (rtype &optional rcheck) (cdr returns-clause)
+          ;;(break)
           (setf returns-type rtype)
           (if rcheck (setf returns-check rcheck))
           (if (and rcheck (symbolp rcheck))
               (setf returns-check `(,rcheck result)))
-          (setf returns-check (list returns-check)))
+          (if returns-check
+              (setf returns-check (list returns-check))))
         (setf body (remove returns-clause body :test #'eql)))
+
       (when post-clause
         (setf returns-check (cdr post-clause))
         (setf body (remove post-clause body :test #'eql)))
+
       (when pre-clause
         (setf body (remove pre-clause body :test #'eql)))
+
       (when (and fname (listp fname)
                  (not (eql 'setf (car fname))))
         (when returns-clause
@@ -608,7 +675,13 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
           (if (and rcheck (symbolp rcheck))
               (setf returns-check `(,rcheck result)))))
       (multiple-value-bind (preamble docstring true-body)
-          (defstar/split-defun-body body (eql 'defgeneric toplevel-form-name))
+          (defstar/split-defun-body body defgeneric?)
+        (when (and defgeneric?
+                   (find-if #'stringp true-body))
+          (setf docstring (format nil "~{~&~A~}"
+                                  (remove-if-not #'stringp true-body)))
+          (setf true-body (remove-if #'stringp true-body)))
+
         (setf preamble
               `(,@(if declarations `((declare ,@declarations)) nil)
                 ,@preamble))
@@ -622,11 +695,12 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
                                          `(check-type ,(third decl) ,(second decl))))
                                    declarations)))))
         (setf true-body
-              `(,@(if (and checks (not (eql 'defgeneric toplevel-form-name)))
+              `(,@(if (and checks (not defgeneric?))
                       (mapcar #'(lambda (check)
                                   (assert-precondition
                                    fname check
-                                   (defstar/varnames-in-arglist form-args))) checks)
+                                   (defstar/varnames-in-arglist form-args)))
+                              checks)
                       nil)
                 ,@true-body))
         (setf form-args (reverse form-args)
@@ -637,18 +711,16 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
         (setf final-form
               `(,@(if (eql :method fname) nil `(,toplevel-form-name))
                 ,@(if fname (list fname) nil)
+                ,@(if layer `(:in-layer ,layer) nil)
                 ,@method-combo-keywords
                 ,form-args
                 ,@(cond
-                    ((and docstring
-                          (eql 'defgeneric
-                               toplevel-form-name))
+                    ((and docstring defgeneric?)
                      `((:documentation ,docstring)))
                     (docstring
                      (list docstring))
                     (t nil))
-                ,@(if (eql 'defgeneric toplevel-form-name)
-                      nil preamble)
+                ,@(if defgeneric? nil preamble)
                 ,@(if pre-clause
                       (mapcar (lambda (check)
                                 (assert-precondition
@@ -657,31 +729,34 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
                                      form-args)))
                               (cdr pre-clause)))
                 ,@(cond
-                    ((eql 'defgeneric toplevel-form-name)
-                     true-body)
+                    (defgeneric?
+                        true-body)
                     ((and returns-check
                           (listp returns-type)
                           (eq 'values (car returns-type)))
                      `((the ,returns-type
                             (let ((result
                                     (multiple-value-list
-                                     (block ,fname ,@true-body))))
+                                     (block ,name-for-block
+                                       ,@true-body))))
                               ,@(mapcar
                                  (lambda (check)
                                    (assert-postcondition
-                                    fname check
+                                    (or generic-function-name fname) check
                                     (defstar/varnames-in-arglist
                                         form-args)))
                                  returns-check)
                               (values-list result)))))
                     (returns-check
+                     (format t "returns-check: ~S~%" returns-check)
                      `((the ,returns-type
                             (let ((result
-                                    (block ,fname ,@true-body)))
+                                    (block ,name-for-block
+                                      ,@true-body)))
                               ,@(mapcar
                                  (lambda (check)
                                    (assert-postcondition
-                                    fname check
+                                    (or generic-function-name fname) check
                                     (defstar/varnames-in-arglist
                                         form-args)))
                                  returns-check)
@@ -689,14 +764,20 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
                     (returns-type
                      `((the ,returns-type
                             ,(if (cdr true-body)
-                                 `(block ,fname ,@true-body)
+                                 `(block ,name-for-block
+                                    ,@true-body)
                                  (car true-body)))))
                     (t
                      true-body))))
         (cond
           ((and (or declarations returns-type)
-                (not (member toplevel-form-name '(defmethod flet labels
-                                                  lambda))))
+                (not (eql :method (car final-form)))
+                (not (member toplevel-form-name `(defmethod
+                                                     defgeneric
+                                                     ,layered-defgeneric
+                                                   ,layered-defmethod
+                                                   flet labels
+                                                   lambda))))
            `(progn
               (declaim (ftype (function ,ftype-args ,returns-type) ,fname))
               ,final-form))
@@ -854,7 +935,13 @@ keyword) is assumed to be a specialised lambda list term of the form =(VARNAME
 CLASS [assertion])=, rather than a DEFUN* type-declaring term.
 
 The syntax of METHOD-ARGLIST is therefore:
-: arglist =   method-term*
+: arglist-and-qualifiers =   [qualifier]* method-arglist
+: qualifier =  :in-layer LAYER
+:            | :in LAYER
+:            | :around
+:            | :before
+:            | :after  (etc)
+: method-arglist = method-term*
 :           | (method-term* [&optional opt-term+])
 :           | (method-term* [&key opt-term+])
 :           | (method-term* [&rest rest-term])
@@ -862,6 +949,10 @@ The syntax of METHOD-ARGLIST is therefore:
 :               | (VARNAME CLASS [assertion])
 :               | ((VARNAME TYPE/CLASS [assertion]) CLASS)
 The rest of the syntax is the same as for DEFUN*.
+
+If the :in or :in-layer qualifier is present (they are synonymous), this
+form will generate a ContextL `define-layered-method' form rather than a
+`defmethod'.
 
 * Description
 Equivalent to =(DEFMETHOD FNAME METHOD-ARGLIST . body)= with type declarations
@@ -888,8 +979,12 @@ and assertions as per [[defun*]].
   the form:
   : arg =   VARNAME
   :       | (VARNAME TYPE)
-- OPTIONS :: Options to DEFGENERIC. The first of these may be a simple string,
-  which will be treated as equivalent to =(:documentation STRING)=.
+- OPTIONS :: Options to DEFGENERIC. Any of these may be simple strings,
+  which will be concatenated together and the resulting string treated as
+  equivalent to =(:documentation STRING)=.
+  One extra option is allowed -- (:layered BOOL). If this is present and BOOL
+  is a non-nil constant, the form will generate a ContextL
+  `define-layered-function' rather than `defgeneric'.
 
 * Description
 Usage is exactly the same as [[defun*]], except that value-checking assertions
@@ -918,7 +1013,11 @@ the generic function.
                          (if (and (listp option)
                                   (eql :method (first option)))
                              (safe-define 'defmethod :method
-                                          (second option) (cddr option))
+                                          (second option) (cddr option)
+                                          :generic-function-name
+                                          (if (listp fname)
+                                              (car fname) fname))
+                             ;; else
                              option))
                        options)))
 
@@ -1009,72 +1108,100 @@ declare its return type."
 
 
 
-;; Future ideas for *let:
-;; (#(a b) FORM)   ;; destructuring a vector
-;; _ or nil = 'ignored' variable
-
-
-(defun let*-aux (clauses body)
-  (let ((clause (car clauses))
-        (new-var nil)
-        (ignored-vars nil))
+(defun named-*let-aux (name clauses body)
+  (let ((dec nil)
+        (wrappers nil)
+        (arglist nil)
+        (vals nil))
+    (dolist (clause clauses)
+      (cond
+        ((atom clause)
+         (push clause arglist)
+         (push nil vals))
+        ((and (listp (car clause))
+              (eql :values (caar clause)))
+         ;; (:values a b) -- bind multiple values =============================
+         (let* ((arg (gensym "MVARG"))
+                (decls nil)
+                (vars (mapcar
+                       (lambda (var)
+                         (cond
+                           ((listp var)
+                            (push `(,(second var) ,(first var)) decls)
+                            (first var))
+                           ((ignored-variable? var)
+                            (let ((new-term (gensym "IGNORED-")))
+                              (push `(ignore ,new-term) decls)
+                              new-term))
+                           (t var)))
+                       (cdr (car clause)))))
+           (push arg arglist)
+           (push `(destructuring-bind ,vars ,arg
+                    ,@(if decls `((declare ,@decls))))
+                 wrappers)
+           (push `(multiple-value-list ,(second clause)) vals)))
+        ((listp (first clause))
+         ;; destructuring =====================================================
+         (let* ((arg (gensym "DARG"))
+                (decls nil)
+                (lhs
+                  (map-tree (lambda (term) (cond
+                                        ((ignored-variable? term)
+                                         (let ((new-term (gensym "IGNORED-")))
+                                           (push `(ignore ,new-term) decls)
+                                           new-term))
+                                        (t term)))
+                            (first clause))))
+           (push arg arglist)
+           (push `(destructuring-bind ,lhs ,arg
+                    ,@(if decls `((declare ,@decls))))
+                 wrappers)
+           (push (second clause) vals)))
+        ((= 3 (length clause))
+         ;; variable with type ================================================
+         (push (first clause) arglist)
+         (push `(,(nth 1 clause) ,(nth 0 clause)) dec)
+         (push (nth (1- (length clause)) clause) vals))
+        (t
+         (push (first clause) arglist)
+         (push (second clause) vals))))
+    (if dec
+        (push `(declare ,@dec) body))
+    (dolist (wrapper wrappers)
+      (setf body (list (append wrapper body))))
     (cond
-      ((null clauses)
-       (cons 'progn body))
-      ((and (listp clause) (<= (length clause) 2)
-            (not (atom (first clause))))
-       (setf (first clause)
-             (map-tree (lambda (term) (cond
-                                   ((ignored-variable? term)
-                                    (let ((new-term (gensym "IGNORED-")))
-                                      (push new-term ignored-vars)
-                                      new-term))
-                                   (t term)))
-                       (first clause)))
-       (if (eql :values (first (first clause))) ; mvbind
-           `(multiple-value-bind ,(cdr (first clause)) ,(second clause)
-              ,@(if ignored-vars `((declare (ignore ,@ignored-vars))))
-              ,(let*-aux (cdr clauses) body))
-           ;; else
-           `(destructuring-bind ,(first clause) ,(second clause)
-              ,@(if ignored-vars `((declare (ignore ,@ignored-vars))))
-              ,(let*-aux (cdr clauses) body))))
-      ((atom clause)
-       `(let (,clause)
-          ,(let*-aux (cdr clauses) body)))
-      ((<= (length clause) 2)
-       (if (ignored-variable? (first clause))
-           (setf new-var (gensym "IGNORED-")))
-       `(let ((,(or new-var (first clause)) ,(second clause)))
-          ,@(if new-var `((declare (ignore ,new-var))) nil)
-          ,(let*-aux (cdr clauses) body)))
+      (name
+       `(labels ((,name ,(reverse arglist)
+                   ,@body))
+          (,name ,@(reverse vals))))
       (t
-       `(let ((,(first clause) ,(third clause)))
-          ;; Declarations at the 'head' of (inside) a binding form will affect
-          ;; the binding itself.
-          (declare (,(second clause) ,(first clause)))
-          ,(let*-aux (cdr clauses) body))))))
+       ;; no name -- just make a let*
+       `(let* ,(reverse (mapcar #'list arglist vals))
+          ,@body)))))
 
 
 
-;;; <<let*>>
+;;; <<*let>>
 (defmacro *let ((&rest clauses) &body body)
   "* Arguments
 - CLAUSES :: A series of zero or more clauses taking the form:
 : clause =   VARNAME
 :          | (VARNAME FORM)
 :          | (LAMBDA-LIST FORM)
-:          | ((&values VAR...) FORM)
+:          | ((:values VAR...) FORM)
 :          | (VARNAME TYPE FORM)
 - BODY :: The body of the form (implicit =progn=).
 * Description
 Behaves like LET*, but:
 - When types are given between the variable name and expression, these
   are converted to declarations within the scope of the LET form.
-- When the form to be bound is a lambda-list, behaves like DESTRUCTURING-BIND.
+- When the form to be bound is a list or cons cell, behaves like
+  DESTRUCTURING-BIND.
 - When the form to be bound is a list whose first element is :values,
   behaves like MULTIPLE-VALUE-BIND, using the rest of the elements in
-  the form as the variables to be bound.
+  the form as the variables to be bound. Those elements may be symbols,
+  or lists of the form (SYMBOL TYPE), in which case the bound symbol will
+  be declared to be of the given type.
 - Any variables whose names are '_', either bare or inside a form to be
   destructured, will be renamed with unique symbols and declared 'ignored'
   within the body. This provides a quick way to ignore arguments or parts
@@ -1084,7 +1211,7 @@ Behaves like LET*, but:
 ;;;        (age integer 40)
 ;;;        (sex (member :male :female) :male)
 ;;;        ((num street &optional suburb) address)
-;;;        ((&values day month year) birthday))
+;;;        ((:values (day fixnum) month year) birthday))
 ;;;    ...body...)
 Expands to:
 ;;; (let ((name \"Bob\"))
@@ -1095,9 +1222,25 @@ Expands to:
 ;;;       (destructuring-bind
 ;;;           (num street &optional suburb) address
 ;;;         (multiple-value-bind (day month year) birthday
+;;;           (declare (fixnum day))
 ;;;           ...body...)))))
 "
-  (let*-aux clauses body))
+  (named-*let-aux nil clauses body))
 
 
-;;;; End of DEFSTAR
+(defmacro nlet (name (&rest bindings) &body body)
+  "Identical to *LET, but recursion can occur by calling (NAME ARGS...)
+within BODY, where each argument in ARGS matches one binding.
+The same as Scheme's named LET. Note that the macro does NOT perform tail
+call optimisation. (All modern lisp compilers will perform TCO of the generated
+code however.)
+* Example
+;;; (nlet fact ((n 5))
+;;;    (if (= 1 n)
+;;;       n
+;;;       (* n (fact (1- n)))))"
+  (named-*let-aux name bindings body))
+
+
+
+;;;; defstar.lisp ends here ===================================================
