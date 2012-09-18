@@ -536,6 +536,15 @@ Internal function, used by [[defun*]] to parse lambda list terms.
                   last-amp-kwd)))))))
 
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun ignored-in-preamble? (varname preamble)
+    (find varname
+          (apply #'append (mapcar #'cdr
+                                  (remove-if-not
+                                   (lambda (c) (eql (car c) 'ignore))
+                                   (apply #'append
+                                          (mapcar #'cdr preamble))))))))
+
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun safe-define (toplevel-form-name fname arglist body
@@ -691,7 +700,9 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
                    preamble
                    (remove nil
                            (mapcar #'(lambda (decl)
-                                       (unless (eql (car decl) 'ignore)
+                                       (unless (or (eql (car decl) 'ignore)
+                                                   (ignored-in-preamble?
+                                                    (third decl) preamble))
                                          `(check-type ,(third decl) ,(second decl))))
                                    declarations)))))
         (setf true-body
@@ -748,7 +759,6 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
                                  returns-check)
                               (values-list result)))))
                     (returns-check
-                     (format t "returns-check: ~S~%" returns-check)
                      `((the ,returns-type
                             (let ((result
                                     (block ,name-for-block
