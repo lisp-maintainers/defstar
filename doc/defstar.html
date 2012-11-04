@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-lang="en" xml:lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>The DEFSTAR package</title>
 <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
+<meta name="title" content="The DEFSTAR package"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2011-09-09 17:55:41 "/>
+<meta name="generated" content="2012-09-18T15:25+1200"/>
 <meta name="author" content="Paul Sexton"/>
 <meta name="description" content=""/>
 <meta name="keywords" content=""/>
@@ -128,6 +128,7 @@ lang="en" xml:lang="en">
 <li><a href="#sec-1-7-2-7">1.7.2.7 Inherited Macro: <code>flet*</code></a></li>
 <li><a href="#sec-1-7-2-8">1.7.2.8 Inherited Macro: <code>labels*</code></a></li>
 <li><a href="#sec-1-7-2-9">1.7.2.9 Inherited Macro: <code>lambda*</code></a></li>
+<li><a href="#sec-1-7-2-10">1.7.2.10 Inherited Macro: <code>nlet</code></a></li>
 </ul></li>
 </ul>
 </li>
@@ -137,6 +138,7 @@ lang="en" xml:lang="en">
 <li><a href="#sec-1-8-2">1.8.2 D</a></li>
 <li><a href="#sec-1-8-3">1.8.3 F</a></li>
 <li><a href="#sec-1-8-4">1.8.4 L</a></li>
+<li><a href="#sec-1-8-5">1.8.5 N</a></li>
 </ul></li>
 </ul>
 </li>
@@ -153,6 +155,9 @@ lang="en" xml:lang="en">
 <ul>
 <li>Uses:
     <a href="#package-common-lisp">common-lisp</a>
+</li>
+<li>Used by:
+    <a href="#package-ptable">ptable</a>
 </li>
 </ul>
 
@@ -178,6 +183,9 @@ The macros allow:
 <li>easy inclusion of type declarations within lambda lists
 </li>
 <li>easy inclusion of return type declarations in function and method definitions
+</li>
+<li>easy declaration of variables as 'ignored', by the use of '<sub>'</sub> as a placeholder
+  in argument lists.
 </li>
 <li>easy inclusion of assertions for each argument and for the function's
   return value, thus allowing simple programming by contract.
@@ -213,128 +221,130 @@ does not depend on any other libraries.
 
 
 
-<pre class="src src-lisp"><span style="color: #db7093;">;; </span><span style="color: #db7093;">Define a simple function that adds two numbers, both of which</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">are declared to be real.</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #1e90ff;">sum</span> <span style="color: #696969;">((</span>a <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>b <span style="color: #8b7500;">real</span><span style="color: #696969;">))</span>
-   <span style="color: #696969;">(</span><span style="color: #1e90ff;">+</span> a b<span style="color: #696969;">))</span>
+<pre class="src src-lisp"><span style="color: #d05780;">;; </span><span style="color: #d05780;">Define a simple function that adds two numbers, both of which</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">are declared to be real.</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #1b78fe;">sum</span> <span style="color: #555555;">((</span>a <span style="color: #776304;">real</span><span style="color: #555555;">)</span> <span style="color: #555555;">(</span>b <span style="color: #776304;">real</span><span style="color: #555555;">))</span>
+   <span style="color: #555555;">(</span><span style="color: #1b78fe;">+</span> a b<span style="color: #555555;">))</span>
 
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">Now also declare that the function returns a real.</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">sum</span> -&gt; <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">((</span>a <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>b <span style="color: #8b7500;">real</span><span style="color: #696969;">))</span>
-   <span style="color: #696969;">(</span><span style="color: #1e90ff;">+</span> a b<span style="color: #696969;">))</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">Now also declare that the function returns a real.</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">sum</span> -&gt; <span style="color: #776304;">real</span><span style="color: #555555;">)</span> <span style="color: #555555;">((</span>a <span style="color: #776304;">real</span><span style="color: #555555;">)</span> <span style="color: #555555;">(</span>b <span style="color: #776304;">real</span><span style="color: #555555;">))</span>
+   <span style="color: #555555;">(</span><span style="color: #1b78fe;">+</span> a b<span style="color: #555555;">))</span>
 
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">Another way of declaring the function's return type.</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #1e90ff;">sum</span> <span style="color: #696969;">((</span>a <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>b <span style="color: #8b7500;">real</span><span style="color: #696969;">))</span>
-   <span style="color: #696969;">(</span><span style="color: #4169e1;">:returns</span> <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span>
-   <span style="color: #696969;">(</span><span style="color: #1e90ff;">+</span> a b<span style="color: #696969;">))</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">Another way of declaring the function's return type.</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #1b78fe;">sum</span> <span style="color: #555555;">((</span>a <span style="color: #776304;">real</span><span style="color: #555555;">)</span> <span style="color: #555555;">(</span>b <span style="color: #776304;">real</span><span style="color: #555555;">))</span>
+   <span style="color: #555555;">(</span><span style="color: #7171F3;">:returns</span> <span style="color: #776304;">real</span><span style="color: #555555;">)</span>
+   <span style="color: #555555;">(</span><span style="color: #1b78fe;">+</span> a b<span style="color: #555555;">))</span>
 
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">We want to ensure that a and b are never negative.</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">One way is to alter the type declarations:</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">sum</span> -&gt; <span style="color: #696969;">(</span><span style="color: #8b7500;">real</span> <span style="color: #2aa198;">0</span><span style="color: #696969;">))</span> <span style="color: #696969;">((</span>a <span style="color: #696969;">(</span><span style="color: #8b7500;">real</span> <span style="color: #2aa198;">0</span><span style="color: #696969;">))</span> <span style="color: #696969;">(</span>b <span style="color: #696969;">(</span><span style="color: #8b7500;">real</span> <span style="color: #2aa198;">0</span><span style="color: #696969;">)))</span>
-   <span style="color: #696969;">(</span><span style="color: #1e90ff;">+</span> a b<span style="color: #696969;">))</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">We want to ensure that a and b are never negative.</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">One way is to alter the type declarations:</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">sum</span> -&gt; <span style="color: #555555;">(</span><span style="color: #776304;">real</span> <span style="color: #2aa198;">0</span><span style="color: #555555;">))</span> <span style="color: #555555;">((</span>a <span style="color: #555555;">(</span><span style="color: #776304;">real</span> <span style="color: #2aa198;">0</span><span style="color: #555555;">))</span> <span style="color: #555555;">(</span>b <span style="color: #555555;">(</span><span style="color: #776304;">real</span> <span style="color: #2aa198;">0</span><span style="color: #555555;">)))</span>
+   <span style="color: #555555;">(</span><span style="color: #1b78fe;">+</span> a b<span style="color: #555555;">))</span>
 
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">Another way is to define a new type:</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">deftype</span> <span style="color: #8b7500;">natural</span> <span style="color: #696969;">()</span> '<span style="color: #696969;">(</span><span style="color: #8b7500;">real</span> <span style="color: #2aa198;">0</span><span style="color: #696969;">))</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">sum</span> -&gt; natural<span style="color: #696969;">)</span> <span style="color: #696969;">((</span>a natural<span style="color: #696969;">)</span> <span style="color: #696969;">(</span>b natural<span style="color: #696969;">))</span>
-   <span style="color: #696969;">(</span><span style="color: #1e90ff;">+</span> a b<span style="color: #696969;">))</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">Another way is to define a new type:</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">deftype</span> <span style="color: #776304;">natural</span> <span style="color: #555555;">()</span> '<span style="color: #555555;">(</span><span style="color: #776304;">real</span> <span style="color: #2aa198;">0</span><span style="color: #555555;">))</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">sum</span> -&gt; natural<span style="color: #555555;">)</span> <span style="color: #555555;">((</span>a natural<span style="color: #555555;">)</span> <span style="color: #555555;">(</span>b natural<span style="color: #555555;">))</span>
+   <span style="color: #555555;">(</span><span style="color: #1b78fe;">+</span> a b<span style="color: #555555;">))</span>
 
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">Another way is to use assertions:</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">sum</span> -&gt; <span style="color: #8b7500;">real</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">&gt;=</span> result <span style="color: #2aa198;">0</span><span style="color: #696969;">))</span> <span style="color: #696969;">((</span>a <span style="color: #8b7500;">real</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">&gt;=</span> a <span style="color: #2aa198;">0</span><span style="color: #696969;">))</span> <span style="color: #696969;">(</span>b <span style="color: #8b7500;">real</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">&gt;=</span> b <span style="color: #2aa198;">0</span><span style="color: #696969;">)))</span>
-   <span style="color: #696969;">(</span><span style="color: #1e90ff;">+</span> a b<span style="color: #696969;">))</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">Another way is to use assertions:</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">sum</span> -&gt; <span style="color: #776304;">real</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">&gt;=</span> result <span style="color: #2aa198;">0</span><span style="color: #555555;">))</span> <span style="color: #555555;">((</span>a <span style="color: #776304;">real</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">&gt;=</span> a <span style="color: #2aa198;">0</span><span style="color: #555555;">))</span> <span style="color: #555555;">(</span>b <span style="color: #776304;">real</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">&gt;=</span> b <span style="color: #2aa198;">0</span><span style="color: #555555;">)))</span>
+   <span style="color: #555555;">(</span><span style="color: #1b78fe;">+</span> a b<span style="color: #555555;">))</span>
 
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">Or:</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #1e90ff;">sum</span> <span style="color: #696969;">((</span>a <span style="color: #8b7500;">real</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">&gt;=</span> a <span style="color: #2aa198;">0</span><span style="color: #696969;">))</span> <span style="color: #696969;">(</span>b <span style="color: #8b7500;">real</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">&gt;=</span> b <span style="color: #2aa198;">0</span><span style="color: #696969;">)))</span>
-   <span style="color: #696969;">(</span><span style="color: #4169e1;">:returns</span> <span style="color: #8b7500;">real</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">&gt;=</span> result <span style="color: #2aa198;">0</span><span style="color: #696969;">))</span>
-   <span style="color: #696969;">(</span><span style="color: #1e90ff;">+</span> a b<span style="color: #696969;">))</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">Or:</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #1b78fe;">sum</span> <span style="color: #555555;">((</span>a <span style="color: #776304;">real</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">&gt;=</span> a <span style="color: #2aa198;">0</span><span style="color: #555555;">))</span> <span style="color: #555555;">(</span>b <span style="color: #776304;">real</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">&gt;=</span> b <span style="color: #2aa198;">0</span><span style="color: #555555;">)))</span>
+   <span style="color: #555555;">(</span><span style="color: #7171F3;">:returns</span> <span style="color: #776304;">real</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">&gt;=</span> result <span style="color: #2aa198;">0</span><span style="color: #555555;">))</span>
+   <span style="color: #555555;">(</span><span style="color: #1b78fe;">+</span> a b<span style="color: #555555;">))</span>
 
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">Or, using the feature that the names of single-argument predicate</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">functions can be used as assertions:</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">naturalp</span> -&gt; <span style="color: #8b7500;">boolean</span><span style="color: #696969;">)</span> <span style="color: #696969;">((</span>x <span style="color: #8b7500;">real</span><span style="color: #696969;">))</span>
-   <span style="color: #696969;">(</span><span style="color: #1e90ff;">not</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">minusp</span> x<span style="color: #696969;">)))</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">Or, using the feature that the names of single-argument predicate</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">functions can be used as assertions:</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">naturalp</span> -&gt; <span style="color: #776304;">boolean</span><span style="color: #555555;">)</span> <span style="color: #555555;">((</span>x <span style="color: #776304;">real</span><span style="color: #555555;">))</span>
+   <span style="color: #555555;">(</span><span style="color: #1b78fe;">not</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">minusp</span> x<span style="color: #555555;">)))</span>
 ...
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">sum</span> -&gt; <span style="color: #8b7500;">real</span> naturalp<span style="color: #696969;">)</span> <span style="color: #696969;">((</span>a <span style="color: #8b7500;">real</span> naturalp<span style="color: #696969;">)</span> <span style="color: #696969;">(</span>b <span style="color: #8b7500;">real</span> naturalp<span style="color: #696969;">))</span>
-   <span style="color: #696969;">(</span><span style="color: #1e90ff;">+</span> a b<span style="color: #696969;">))</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">sum</span> -&gt; <span style="color: #776304;">real</span> naturalp<span style="color: #555555;">)</span> <span style="color: #555555;">((</span>a <span style="color: #776304;">real</span> naturalp<span style="color: #555555;">)</span> <span style="color: #555555;">(</span>b <span style="color: #776304;">real</span> naturalp<span style="color: #555555;">))</span>
+   <span style="color: #555555;">(</span><span style="color: #1b78fe;">+</span> a b<span style="color: #555555;">))</span>
 
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">Another approach is to use :pre and :post clauses. Each contains one</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">more forms, ALL of which must evaluate to non-nil. Within :post</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">forms, result is bound to the value that the function or form</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">is about to return.</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">sum</span> -&gt; <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">((</span>a <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>b <span style="color: #8b7500;">real</span><span style="color: #696969;">))</span>
-   <span style="color: #696969;">(</span><span style="color: #4169e1;">:pre</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">&gt;=</span> a <span style="color: #2aa198;">0</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">&gt;=</span> b <span style="color: #2aa198;">0</span><span style="color: #696969;">))</span>
-   <span style="color: #696969;">(</span><span style="color: #4169e1;">:post</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">&gt;=</span> result <span style="color: #2aa198;">0</span><span style="color: #696969;">))</span>
-   <span style="color: #696969;">(</span><span style="color: #1e90ff;">+</span> a b<span style="color: #696969;">))</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">Another approach is to use :pre and :post clauses. Each contains one</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">more forms, ALL of which must evaluate to non-nil. Within :post</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">forms, result is bound to the value that the function or form</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">is about to return.</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">sum</span> -&gt; <span style="color: #776304;">real</span><span style="color: #555555;">)</span> <span style="color: #555555;">((</span>a <span style="color: #776304;">real</span><span style="color: #555555;">)</span> <span style="color: #555555;">(</span>b <span style="color: #776304;">real</span><span style="color: #555555;">))</span>
+   <span style="color: #555555;">(</span><span style="color: #7171F3;">:pre</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">&gt;=</span> a <span style="color: #2aa198;">0</span><span style="color: #555555;">)</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">&gt;=</span> b <span style="color: #2aa198;">0</span><span style="color: #555555;">))</span>
+   <span style="color: #555555;">(</span><span style="color: #7171F3;">:post</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">&gt;=</span> result <span style="color: #2aa198;">0</span><span style="color: #555555;">))</span>
+   <span style="color: #555555;">(</span><span style="color: #1b78fe;">+</span> a b<span style="color: #555555;">))</span>
 
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">A function that returns multiple values.</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">floor</span> -&gt; <span style="color: #696969;">(</span><span style="color: #1e90ff;">values</span> <span style="color: #8b7500;">integer</span> <span style="color: #8b7500;">integer</span><span style="color: #696969;">))</span> <span style="color: #696969;">((</span>n <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>d <span style="color: #8b7500;">real</span><span style="color: #696969;">))</span>
-   <span style="color: #696969;">(</span>cl:floor n d<span style="color: #696969;">))</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">A function that returns multiple values.</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">floor</span> -&gt; <span style="color: #555555;">(</span><span style="color: #1b78fe;">values</span> <span style="color: #776304;">integer</span> <span style="color: #776304;">integer</span><span style="color: #555555;">))</span> <span style="color: #555555;">((</span>n <span style="color: #776304;">real</span><span style="color: #555555;">)</span> <span style="color: #555555;">(</span>d <span style="color: #776304;">real</span><span style="color: #555555;">))</span>
+   <span style="color: #555555;">(</span>cl:floor n d<span style="color: #555555;">))</span>
 
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">It is possible to use assertions with functions that return</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">multiple values. When a function is declared to return multiple</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">values, RESULT will be bound to a LIST of those values.</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #1e90ff;">floor</span> <span style="color: #696969;">((</span>n <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>d <span style="color: #8b7500;">real</span><span style="color: #696969;">))</span>
-   <span style="color: #696969;">(</span><span style="color: #4169e1;">:returns</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">values</span> <span style="color: #8b7500;">integer</span> <span style="color: #8b7500;">integer</span><span style="color: #696969;">)</span>
-            <span style="color: #696969;">(</span><span style="color: #1e90ff;">&lt;</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">second</span> result<span style="color: #696969;">)</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">first</span> result<span style="color: #696969;">)))</span>
-   <span style="color: #696969;">(</span>cl:floor n d<span style="color: #696969;">))</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">Example of ignoring arguments</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">*let</span> <span style="color: #555555;">(((</span>top . _<span style="color: #555555;">)</span> <span style="color: #1b78fe;">list</span><span style="color: #555555;">))</span>
+   <span style="color: #555555;">(</span><span style="color: #9e1b4d;">print</span> top<span style="color: #555555;">))</span>
 
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">To declare that a function returns an unspecified number of</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">values, of unspecified types:</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">floor</span> -&gt; <span style="color: #696969;">(</span><span style="color: #1e90ff;">values</span><span style="color: #696969;">))</span> <span style="color: #696969;">((</span>n <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>d <span style="color: #8b7500;">real</span><span style="color: #696969;">))</span>
-   ...<span style="color: #696969;">)</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">It is possible to use assertions with functions that return</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">multiple values. When a function is declared to return multiple</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">values, RESULT will be bound to a LIST of those values.</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #1b78fe;">floor</span> <span style="color: #555555;">((</span>n <span style="color: #776304;">real</span><span style="color: #555555;">)</span> <span style="color: #555555;">(</span>d <span style="color: #776304;">real</span><span style="color: #555555;">))</span>
+   <span style="color: #555555;">(</span><span style="color: #7171F3;">:returns</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">values</span> <span style="color: #776304;">integer</span> <span style="color: #776304;">integer</span><span style="color: #555555;">)</span>
+            <span style="color: #555555;">(</span><span style="color: #1b78fe;">&lt;</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">second</span> result<span style="color: #555555;">)</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">first</span> result<span style="color: #555555;">)))</span>
+   <span style="color: #555555;">(</span>cl:floor n d<span style="color: #555555;">))</span>
 
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">The type of a &amp;REST argument can be declared. The declaration</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">refers to the types of each element in the list of arguments</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">stored in the &amp;REST argument.</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">+</span> -&gt; <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span><span style="color: #8b7500;">&amp;rest</span> <span style="color: #696969;">(</span>numbers <span style="color: #8b7500;">real</span><span style="color: #696969;">))</span>
-   <span style="color: #696969;">(</span><span style="color: #1e90ff;">apply</span> #'cl:+ numbers<span style="color: #696969;">))</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">To declare that a function returns an unspecified number of</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">values, of unspecified types:</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">floor</span> -&gt; <span style="color: #555555;">(</span><span style="color: #1b78fe;">values</span><span style="color: #555555;">))</span> <span style="color: #555555;">((</span>n <span style="color: #776304;">real</span><span style="color: #555555;">)</span> <span style="color: #555555;">(</span>d <span style="color: #776304;">real</span><span style="color: #555555;">))</span>
+   ...<span style="color: #555555;">)</span>
 
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">More complicated lambda list.</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">Note that the function and its first argument do not have type</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">declarations.</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">Also note the syntax of typed keyword arguments:</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">((var TYPE [ASSERTION]) DEFAULT [SUPPLIEDP])</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">Note that &amp;OPTIONAL arguments use the same syntax.</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #1e90ff;">my-find</span> <span style="color: #696969;">(</span>item <span style="color: #696969;">(</span>seq <span style="color: #8b7500;">sequence</span><span style="color: #696969;">)</span> <span style="color: #8b7500;">&amp;key</span> <span style="color: #696969;">(</span>from-end <span style="color: #8b7500;">boolean</span><span style="color: #696969;">)</span>
-                 <span style="color: #696969;">((</span>test <span style="color: #696969;">(</span><span style="color: #8b4789;">or</span> <span style="color: #1e90ff;">null</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">function</span> <span style="color: #696969;">(</span><span style="color: #87cefa;">t</span><span style="color: #696969;">))))</span> <span style="color: #87cefa;">nil</span><span style="color: #696969;">)</span>
-                 <span style="color: #696969;">((</span>test-not <span style="color: #696969;">(</span><span style="color: #8b4789;">or</span> <span style="color: #1e90ff;">null</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">function</span> <span style="color: #696969;">(</span><span style="color: #87cefa;">t</span><span style="color: #696969;">))))</span> <span style="color: #87cefa;">nil</span><span style="color: #696969;">)</span>
-                 <span style="color: #696969;">((</span>key <span style="color: #696969;">(</span><span style="color: #8b4789;">or</span> <span style="color: #1e90ff;">null</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">function</span> <span style="color: #696969;">(</span><span style="color: #87cefa;">t</span><span style="color: #696969;">))))</span> <span style="color: #87cefa;">nil</span><span style="color: #696969;">)</span>
-                 <span style="color: #696969;">(</span>start <span style="color: #8b7500;">fixnum</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>end <span style="color: #8b7500;">fixnum</span><span style="color: #696969;">))</span>
-   ...function body...<span style="color: #696969;">)</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">The type of a &amp;REST argument can be declared. The declaration</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">refers to the types of each element in the list of arguments</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">stored in the &amp;REST argument.</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">+</span> -&gt; <span style="color: #776304;">real</span><span style="color: #555555;">)</span> <span style="color: #555555;">(</span><span style="color: #776304;">&amp;rest</span> <span style="color: #555555;">(</span>numbers <span style="color: #776304;">real</span><span style="color: #555555;">))</span>
+   <span style="color: #555555;">(</span><span style="color: #1b78fe;">apply</span> #'cl:+ numbers<span style="color: #555555;">))</span>
 
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">Example of method definition. All the arguments in the arglist are</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">normal 'specialised' arguments like you would usually find in a</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">method definition. The form still allows you to include an assertion</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">with each argument, however ('plusp' in this case).</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defmethod*</span> <span style="color: #696969;">(</span>cell-value -&gt; <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span> <span style="color: #4169e1;">:around</span> <span style="color: #696969;">((</span>sheet <span style="color: #8b7500;">&lt;Sheet&gt;</span><span style="color: #696969;">)</span>
-                                          <span style="color: #696969;">(</span>x <span style="color: #8b7500;">integer</span> <span style="color: #1e90ff;">plusp</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>y <span style="color: #8b7500;">integer</span> <span style="color: #1e90ff;">plusp</span><span style="color: #696969;">))</span>
-   ...<span style="color: #696969;">)</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">More complicated lambda list.</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">Note that the function and its first argument do not have type</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">declarations.</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">Also note the syntax of typed keyword arguments:</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">((var TYPE [ASSERTION]) DEFAULT [SUPPLIEDP])</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">Note that &amp;OPTIONAL arguments use the same syntax.</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #1b78fe;">my-find</span> <span style="color: #555555;">(</span>item <span style="color: #555555;">(</span>seq <span style="color: #776304;">sequence</span><span style="color: #555555;">)</span> <span style="color: #776304;">&amp;key</span> <span style="color: #555555;">(</span>from-end <span style="color: #776304;">boolean</span><span style="color: #555555;">)</span>
+                 <span style="color: #555555;">((</span>test <span style="color: #555555;">(</span><span style="color: #763176;">or</span> <span style="color: #1b78fe;">null</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">function</span> <span style="color: #555555;">(</span><span style="color: #4e8d8e;">t</span><span style="color: #555555;">))))</span> <span style="color: #4e8d8e;">nil</span><span style="color: #555555;">)</span>
+                 <span style="color: #555555;">((</span>test-not <span style="color: #555555;">(</span><span style="color: #763176;">or</span> <span style="color: #1b78fe;">null</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">function</span> <span style="color: #555555;">(</span><span style="color: #4e8d8e;">t</span><span style="color: #555555;">))))</span> <span style="color: #4e8d8e;">nil</span><span style="color: #555555;">)</span>
+                 <span style="color: #555555;">((</span>key <span style="color: #555555;">(</span><span style="color: #763176;">or</span> <span style="color: #1b78fe;">null</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">function</span> <span style="color: #555555;">(</span><span style="color: #4e8d8e;">t</span><span style="color: #555555;">))))</span> <span style="color: #4e8d8e;">nil</span><span style="color: #555555;">)</span>
+                 <span style="color: #555555;">(</span>start <span style="color: #776304;">fixnum</span><span style="color: #555555;">)</span> <span style="color: #555555;">(</span>end <span style="color: #776304;">fixnum</span><span style="color: #555555;">))</span>
+   ...function body...<span style="color: #555555;">)</span>
 
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">Note that when you declare a return type for a method, the method</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">body will perform type-checking, but no toplevel DECLAIM form will</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">be generated.</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">Example of method definition. All the arguments in the arglist are</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">normal 'specialised' arguments like you would usually find in a</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">method definition. The form still allows you to include an assertion</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">with each argument, however ('plusp' in this case).</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defmethod*</span> <span style="color: #555555;">(</span>cell-value -&gt; <span style="color: #776304;">real</span><span style="color: #555555;">)</span> <span style="color: #7171F3;">:around</span> <span style="color: #555555;">((</span>sheet <span style="color: #776304;">&lt;Sheet&gt;</span><span style="color: #555555;">)</span>
+                                          <span style="color: #555555;">(</span>x <span style="color: #776304;">integer</span> <span style="color: #1b78fe;">plusp</span><span style="color: #555555;">)</span> <span style="color: #555555;">(</span>y <span style="color: #776304;">integer</span> <span style="color: #1b78fe;">plusp</span><span style="color: #555555;">))</span>
+   ...<span style="color: #555555;">)</span>
 
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">CLOS function dispatch based on classes is limited; you cannot specialise</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">on user-defined types unless they are proper classes, for example.</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">You may therefore sometimes want to declare that a method's argument</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">is of a particular type, as well as declaring its class for specialisation</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">as you normally would.</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">Here is an example. Note the similarity to the syntax for keyword</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">arguments.</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defmethod*</span> <span style="color: #696969;">(</span>cell-value -&gt; <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span> <span style="color: #4169e1;">:around</span> <span style="color: #696969;">((</span>sheet <span style="color: #8b7500;">&lt;Sheet&gt;</span><span style="color: #696969;">)</span>
-                                          <span style="color: #696969;">((</span>x natural <span style="color: #1e90ff;">plusp</span><span style="color: #696969;">)</span> <span style="color: #8b7500;">integer</span><span style="color: #696969;">)</span>
-                                          <span style="color: #696969;">((</span>y natural <span style="color: #1e90ff;">plusp</span><span style="color: #696969;">)</span> <span style="color: #8b7500;">integer</span><span style="color: #696969;">))</span>
-   ...<span style="color: #696969;">)</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">Note that when you declare a return type for a method, the method</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">body will perform type-checking, but no toplevel DECLAIM form will</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">be generated.</span>
 
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">Example of DEFGENERIC*, mainly useful to declare the return type</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">of a set of methods. Note the documentation string can appear after</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">the argument list, similar to DEFUN.</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defgeneric*</span> <span style="color: #696969;">(</span>cell-value -&gt; <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>sheet x y<span style="color: #696969;">)</span>
-  <span style="color: #2e8b57; font-style: italic;">"Return the value of the cell at coordinates X,Y in SHEET."</span><span style="color: #696969;">)</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">CLOS function dispatch based on classes is limited; you cannot specialise</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">on user-defined types unless they are proper classes, for example.</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">You may therefore sometimes want to declare that a method's argument</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">is of a particular type, as well as declaring its class for specialisation</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">as you normally would.</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">Here is an example. Note the similarity to the syntax for keyword</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">arguments.</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defmethod*</span> <span style="color: #555555;">(</span>cell-value -&gt; <span style="color: #776304;">real</span><span style="color: #555555;">)</span> <span style="color: #7171F3;">:around</span> <span style="color: #555555;">((</span>sheet <span style="color: #776304;">&lt;Sheet&gt;</span><span style="color: #555555;">)</span>
+                                          <span style="color: #555555;">((</span>x natural <span style="color: #1b78fe;">plusp</span><span style="color: #555555;">)</span> <span style="color: #776304;">integer</span><span style="color: #555555;">)</span>
+                                          <span style="color: #555555;">((</span>y natural <span style="color: #1b78fe;">plusp</span><span style="color: #555555;">)</span> <span style="color: #776304;">integer</span><span style="color: #555555;">))</span>
+   ...<span style="color: #555555;">)</span>
 
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">DEFGENERIC* can also be used to declare types of arguments. Be careful</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">that these don't clash with specialisers in method definitions.</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defgeneric*</span> <span style="color: #696969;">(</span>cell-value -&gt; <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>sheet <span style="color: #696969;">(</span>x natural<span style="color: #696969;">)</span> <span style="color: #696969;">(</span>y natural<span style="color: #696969;">)))</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">Example of DEFGENERIC*, mainly useful to declare the return type</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">of a set of methods. Note the documentation string can appear after</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">the argument list, similar to DEFUN.</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defgeneric*</span> <span style="color: #555555;">(</span>cell-value -&gt; <span style="color: #776304;">real</span><span style="color: #555555;">)</span> <span style="color: #555555;">(</span>sheet x y<span style="color: #555555;">)</span>
+  <span style="color: #267a45; font-style: italic;">"Return the value of the cell at coordinates X,Y in SHEET."</span><span style="color: #555555;">)</span>
+
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">DEFGENERIC* can also be used to declare types of arguments. Be careful</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">that these don't clash with specialisers in method definitions.</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defgeneric*</span> <span style="color: #555555;">(</span>cell-value -&gt; <span style="color: #776304;">real</span><span style="color: #555555;">)</span> <span style="color: #555555;">(</span>sheet <span style="color: #555555;">(</span>x natural<span style="color: #555555;">)</span> <span style="color: #555555;">(</span>y natural<span style="color: #555555;">)))</span>
 </pre>
-
-
 
 
 </div>
@@ -350,11 +360,9 @@ does not depend on any other libraries.
 
 
 
-<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789;">defvar*</span> <span style="color: #696969;">(</span><span style="color: #f4a460;">*user-name*</span> <span style="color: #1e90ff;">string</span><span style="color: #696969;">)</span> <span style="color: #008b00;">"Bob"</span><span style="color: #696969;">)</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defparameter*</span> <span style="color: #696969;">(</span><span style="color: #f4a460;">*file-position*</span> <span style="color: #696969;">(</span><span style="color: #8b7500;">integer</span> <span style="color: #2aa198;">0</span><span style="color: #696969;">))</span> <span style="color: #2aa198;">0</span><span style="color: #696969;">)</span>
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">defvar*</span> <span style="color: #555555;">(</span><span style="color: #ef924e;">*user-name*</span> <span style="color: #1b78fe;">string</span><span style="color: #555555;">)</span> <span style="color: #107b03;">"Bob"</span><span style="color: #555555;">)</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defparameter*</span> <span style="color: #555555;">(</span><span style="color: #ef924e;">*file-position*</span> <span style="color: #555555;">(</span><span style="color: #776304;">integer</span> <span style="color: #2aa198;">0</span><span style="color: #555555;">))</span> <span style="color: #2aa198;">0</span><span style="color: #555555;">)</span>
 </pre>
-
-
 
 
 </div>
@@ -406,15 +414,13 @@ if a value does not match its declared type.
 
 
 
-<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789;">defmethod</span> <span style="color: #696969;">(</span><span style="color: #b03060;">setf</span> <span style="color: #696969;">(</span>foo -&gt; <span style="color: #8b7500;">integer</span><span style="color: #696969;">))</span> <span style="color: #696969;">(</span>...args...<span style="color: #696969;">)</span>   <span style="color: #db7093;">; </span><span style="color: #db7093;">illegal</span>
-   ...<span style="color: #696969;">)</span>
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">defmethod</span> <span style="color: #555555;">(</span><span style="color: #9e1b4d;">setf</span> <span style="color: #555555;">(</span>foo -&gt; <span style="color: #776304;">integer</span><span style="color: #555555;">))</span> <span style="color: #555555;">(</span>...args...<span style="color: #555555;">)</span>   <span style="color: #d05780;">; </span><span style="color: #d05780;">illegal</span>
+   ...<span style="color: #555555;">)</span>
 
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defmethod</span> <span style="color: #696969;">(</span><span style="color: #b03060;">setf</span> foo<span style="color: #696969;">)</span> <span style="color: #696969;">(</span>...args...<span style="color: #696969;">)</span>
-   <span style="color: #696969;">(</span><span style="color: #4169e1;">:returns</span> <span style="color: #8b7500;">integer</span><span style="color: #696969;">)</span>                  <span style="color: #db7093;">; </span><span style="color: #db7093;">legal</span>
-   ...<span style="color: #696969;">)</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defmethod</span> <span style="color: #555555;">(</span><span style="color: #9e1b4d;">setf</span> foo<span style="color: #555555;">)</span> <span style="color: #555555;">(</span>...args...<span style="color: #555555;">)</span>
+   <span style="color: #555555;">(</span><span style="color: #7171F3;">:returns</span> <span style="color: #776304;">integer</span><span style="color: #555555;">)</span>                  <span style="color: #d05780;">; </span><span style="color: #d05780;">legal</span>
+   ...<span style="color: #555555;">)</span>
 </pre>
-
-
 
 
 </div>
@@ -436,26 +442,24 @@ rather than normal strings.
 
 
 
-<pre class="src src-lisp"><span style="color: #db7093;">;; </span><span style="color: #db7093;">fontify doc strings in correct face</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">lisp-mode already fontifies 'defun*' correctly</span>
-<span style="color: #696969;">(</span>put '<span style="color: #8b4789;">defvar*</span>   'doc-string-elt <span style="color: #2aa198;">3</span><span style="color: #696969;">)</span>
-<span style="color: #696969;">(</span>put '<span style="color: #8b4789;">defparameter*</span>   'doc-string-elt <span style="color: #2aa198;">3</span><span style="color: #696969;">)</span>
-<span style="color: #696969;">(</span>put '<span style="color: #8b4789;">lambda*</span>   'doc-string-elt <span style="color: #2aa198;">2</span><span style="color: #696969;">)</span>
+<pre class="src src-lisp"><span style="color: #d05780;">;; </span><span style="color: #d05780;">fontify doc strings in correct face</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">lisp-mode already fontifies 'defun*' correctly</span>
+<span style="color: #555555;">(</span>put '<span style="color: #763176;">defvar*</span>   'doc-string-elt <span style="color: #2aa198;">3</span><span style="color: #555555;">)</span>
+<span style="color: #555555;">(</span>put '<span style="color: #763176;">defparameter*</span>   'doc-string-elt <span style="color: #2aa198;">3</span><span style="color: #555555;">)</span>
+<span style="color: #555555;">(</span>put '<span style="color: #763176;">lambda*</span>   'doc-string-elt <span style="color: #2aa198;">2</span><span style="color: #555555;">)</span>
 
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defvar</span> <span style="color: #f4a460;">*lisp-special-forms*</span>
-      <span style="color: #696969;">(</span>regexp-opt '<span style="color: #696969;">(</span><span style="color: #008b00;">"defvar*"</span>
-                    <span style="color: #008b00;">"defconstant*"</span>
-                    <span style="color: #008b00;">"defparameter*"</span>
-                    <span style="color: #008b00;">"defgeneric*"</span>
-                    <span style="color: #008b00;">"defmethod*"</span>
-                    <span style="color: #008b00;">"lambda*"</span>
-                    <span style="color: #008b00;">"flet*"</span>
-                    <span style="color: #008b00;">"labels*"</span><span style="color: #696969;">)</span> 'words<span style="color: #696969;">))</span>
-<span style="color: #696969;">(</span>font-lock-add-keywords 'lisp-mode
- `<span style="color: #696969;">((</span>,<span style="color: #f4a460;">*lisp-special-forms*</span> . font-lock-keyword-face<span style="color: #696969;">)))</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defvar</span> <span style="color: #ef924e;">*lisp-special-forms*</span>
+      <span style="color: #555555;">(</span>regexp-opt '<span style="color: #555555;">(</span><span style="color: #107b03;">"defvar*"</span>
+                    <span style="color: #107b03;">"defconstant*"</span>
+                    <span style="color: #107b03;">"defparameter*"</span>
+                    <span style="color: #107b03;">"defgeneric*"</span>
+                    <span style="color: #107b03;">"defmethod*"</span>
+                    <span style="color: #107b03;">"lambda*"</span>
+                    <span style="color: #107b03;">"flet*"</span>
+                    <span style="color: #107b03;">"labels*"</span><span style="color: #555555;">)</span> 'words<span style="color: #555555;">))</span>
+<span style="color: #555555;">(</span>font-lock-add-keywords 'lisp-mode
+ `<span style="color: #555555;">((</span>,<span style="color: #ef924e;">*lisp-special-forms*</span> . font-lock-keyword-face<span style="color: #555555;">)))</span>
 </pre>
-
-
 
 
 </div>
@@ -504,12 +508,12 @@ rather than normal strings.
 
 
 <pre class="example">
-T
+nil
 </pre>
 
 
 <p>
-Type: <code>boolean</code>
+Type: <code>null</code>
 </p>
 
 </div>
@@ -580,12 +584,10 @@ based on declarations, especially when the <code>SAFETY</code> setting is high.
 
 
 
-<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789;">*let</span> <span style="color: #696969;">(</span><span style="color: #8b7500;">&amp;rest</span> clauses<span style="color: #696969;">)</span>
-  <span style="color: #8b7500;">&amp;body</span>
-  body<span style="color: #696969;">)</span>
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">*let</span> <span style="color: #555555;">(</span><span style="color: #776304;">&amp;rest</span> clauses<span style="color: #555555;">)</span>
+  <span style="color: #776304;">&amp;body</span>
+  body<span style="color: #555555;">)</span>
 </pre>
-
-
 
 
 </div>
@@ -606,7 +608,7 @@ based on declarations, especially when the <code>SAFETY</code> setting is high.
 clause =   VARNAME
          | (VARNAME FORM)
          | (LAMBDA-LIST FORM)
-         | ((&amp;values VAR...) FORM)
+         | ((:values VAR...) FORM)
          | (VARNAME TYPE FORM)
 </pre>
 
@@ -630,11 +632,19 @@ Behaves like LET*, but:
 <li>When types are given between the variable name and expression, these
   are converted to declarations within the scope of the LET form.
 </li>
-<li>When the form to be bound is a lambda-list, behaves like DESTRUCTURING-BIND.
+<li>When the form to be bound is a list or cons cell, behaves like
+  DESTRUCTURING-BIND.
 </li>
-<li>When the form to be bound is a list whole first element is &amp;values,
+<li>When the form to be bound is a list whose first element is :values,
   behaves like MULTIPLE-VALUE-BIND, using the rest of the elements in
-  the form as the variables to be bound.
+  the form as the variables to be bound. Those elements may be symbols,
+  or lists of the form (SYMBOL TYPE), in which case the bound symbol will
+  be declared to be of the given type.
+</li>
+<li>Any variables whose names are '<sub>'</sub>, either bare or inside a form to be
+  destructured, will be renamed with unique symbols and declared 'ignored'
+  within the body. This provides a quick way to ignore arguments or parts
+  of arguments.
 </li>
 </ul>
 
@@ -650,33 +660,30 @@ Behaves like LET*, but:
 
 
 
-<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789;">*let</span> <span style="color: #696969;">((</span>name <span style="color: #008b00;">"Bob"</span><span style="color: #696969;">)</span>
-       <span style="color: #696969;">(</span>age <span style="color: #8b7500;">integer</span> <span style="color: #2aa198;">40</span><span style="color: #696969;">)</span>
-       <span style="color: #696969;">(</span>sex <span style="color: #696969;">(</span><span style="color: #1e90ff;">member</span> <span style="color: #4169e1;">:male</span> <span style="color: #4169e1;">:female</span><span style="color: #696969;">)</span> <span style="color: #4169e1;">:male</span><span style="color: #696969;">)</span>
-       <span style="color: #696969;">((</span>num street <span style="color: #8b7500;">&amp;optional</span> suburb<span style="color: #696969;">)</span> address<span style="color: #696969;">)</span>
-       <span style="color: #696969;">((</span><span style="color: #8b7500;">&amp;values</span> day month year<span style="color: #696969;">)</span> birthday<span style="color: #696969;">))</span>
-   ...body...<span style="color: #696969;">)</span>
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">*let</span> <span style="color: #555555;">((</span>name <span style="color: #107b03;">"Bob"</span><span style="color: #555555;">)</span>
+       <span style="color: #555555;">(</span>age <span style="color: #776304;">integer</span> <span style="color: #2aa198;">40</span><span style="color: #555555;">)</span>
+       <span style="color: #555555;">(</span>sex <span style="color: #555555;">(</span><span style="color: #1b78fe;">member</span> <span style="color: #7171F3;">:male</span> <span style="color: #7171F3;">:female</span><span style="color: #555555;">)</span> <span style="color: #7171F3;">:male</span><span style="color: #555555;">)</span>
+       <span style="color: #555555;">((</span>num street <span style="color: #776304;">&amp;optional</span> suburb<span style="color: #555555;">)</span> address<span style="color: #555555;">)</span>
+       <span style="color: #555555;">((</span><span style="color: #7171F3;">:values</span> <span style="color: #555555;">(</span>day <span style="color: #776304;">fixnum</span><span style="color: #555555;">)</span> month year<span style="color: #555555;">)</span> birthday<span style="color: #555555;">))</span>
+   ...body...<span style="color: #555555;">)</span>
 </pre>
-
-
 
 <p>
 Expands to:
 </p>
 
 
-<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789;">let</span> <span style="color: #696969;">((</span>name <span style="color: #008b00;">"Bob"</span><span style="color: #696969;">))</span>
-  <span style="color: #696969;">(</span><span style="color: #8b4789;">let</span> <span style="color: #696969;">((</span>age <span style="color: #2aa198;">40</span><span style="color: #696969;">))</span>
-    <span style="color: #696969;">(</span><span style="color: #8b4789;">declare</span> <span style="color: #696969;">(</span><span style="color: #8b7500;">integer</span> age<span style="color: #696969;">))</span>
-    <span style="color: #696969;">(</span><span style="color: #8b4789;">let</span> <span style="color: #696969;">((</span>sex <span style="color: #4169e1;">:male</span><span style="color: #696969;">))</span>
-      <span style="color: #696969;">(</span><span style="color: #8b4789;">declare</span> <span style="color: #696969;">((</span><span style="color: #1e90ff;">member</span> <span style="color: #4169e1;">:male</span> <span style="color: #4169e1;">:female</span><span style="color: #696969;">)</span> sex<span style="color: #696969;">))</span>
-      <span style="color: #696969;">(</span><span style="color: #8b4789;">destructuring-bind</span>
-          <span style="color: #696969;">(</span>num street <span style="color: #8b7500;">&amp;optional</span> suburb<span style="color: #696969;">)</span> address
-        <span style="color: #696969;">(</span><span style="color: #8b4789;">multiple-value-bind</span> <span style="color: #696969;">(</span>day month year<span style="color: #696969;">)</span> birthday
-          ...body...<span style="color: #696969;">)))))</span>
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">let</span> <span style="color: #555555;">((</span>name <span style="color: #107b03;">"Bob"</span><span style="color: #555555;">))</span>
+  <span style="color: #555555;">(</span><span style="color: #763176;">let</span> <span style="color: #555555;">((</span>age <span style="color: #2aa198;">40</span><span style="color: #555555;">))</span>
+    <span style="color: #555555;">(</span><span style="color: #763176;">declare</span> <span style="color: #555555;">(</span><span style="color: #776304;">integer</span> age<span style="color: #555555;">))</span>
+    <span style="color: #555555;">(</span><span style="color: #763176;">let</span> <span style="color: #555555;">((</span>sex <span style="color: #7171F3;">:male</span><span style="color: #555555;">))</span>
+      <span style="color: #555555;">(</span><span style="color: #763176;">declare</span> <span style="color: #555555;">((</span><span style="color: #1b78fe;">member</span> <span style="color: #7171F3;">:male</span> <span style="color: #7171F3;">:female</span><span style="color: #555555;">)</span> sex<span style="color: #555555;">))</span>
+      <span style="color: #555555;">(</span><span style="color: #763176;">destructuring-bind</span>
+          <span style="color: #555555;">(</span>num street <span style="color: #776304;">&amp;optional</span> suburb<span style="color: #555555;">)</span> address
+        <span style="color: #555555;">(</span><span style="color: #763176;">multiple-value-bind</span> <span style="color: #555555;">(</span>day month year<span style="color: #555555;">)</span> birthday
+          <span style="color: #555555;">(</span><span style="color: #763176;">declare</span> <span style="color: #555555;">(</span><span style="color: #776304;">fixnum</span> day<span style="color: #555555;">))</span>
+          ...body...<span style="color: #555555;">)))))</span>
 </pre>
-
-
 
 
 
@@ -710,13 +717,11 @@ Expands to:
 
 
 
-<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789;">defgeneric*</span> fname
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">defgeneric*</span> fname
     generic-arglist
-  <span style="color: #8b7500;">&amp;body</span>
-  options<span style="color: #696969;">)</span>
+  <span style="color: #776304;">&amp;body</span>
+  options<span style="color: #555555;">)</span>
 </pre>
-
-
 
 
 </div>
@@ -741,8 +746,12 @@ arg =   VARNAME
 </pre>
 
 </dd>
-<dt>OPTIONS</dt><dd>Options to DEFGENERIC. The first of these may be a simple string,
-  which will be treated as equivalent to <code>(:documentation STRING)</code>.
+<dt>OPTIONS</dt><dd>Options to DEFGENERIC. Any of these may be simple strings,
+  which will be concatenated together and the resulting string treated as
+  equivalent to <code>(:documentation STRING)</code>.
+  One extra option is allowed &ndash; (:layered BOOL). If this is present and BOOL
+  is a non-nil constant, the form will generate a ContextL
+  `define-layered-function' rather than `defgeneric'.
 </dd>
 </dl>
 
@@ -783,15 +792,13 @@ the generic function.
 
 
 
-<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789;">defgeneric*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">length</span> -&gt; <span style="color: #8b7500;">integer</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>seq <span style="color: #8b7500;">&amp;key</span> start<span style="color: #696969;">)</span>
-   <span style="color: #2e8b57; font-style: italic;">"Return the length of the sequence SEQ."</span>
-   ...options...<span style="color: #696969;">)</span>
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">defgeneric*</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">length</span> -&gt; <span style="color: #776304;">integer</span><span style="color: #555555;">)</span> <span style="color: #555555;">(</span>seq <span style="color: #776304;">&amp;key</span> start<span style="color: #555555;">)</span>
+   <span style="color: #267a45; font-style: italic;">"Return the length of the sequence SEQ."</span>
+   ...options...<span style="color: #555555;">)</span>
 
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defgeneric*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">length</span> -&gt; <span style="color: #8b7500;">integer</span><span style="color: #696969;">)</span> <span style="color: #696969;">((</span>seq <span style="color: #8b7500;">sequence</span><span style="color: #696969;">)</span> <span style="color: #8b7500;">&amp;key</span> <span style="color: #696969;">(</span>start <span style="color: #8b7500;">integer</span><span style="color: #696969;">))</span>
-   ...options...<span style="color: #696969;">)</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defgeneric*</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">length</span> -&gt; <span style="color: #776304;">integer</span><span style="color: #555555;">)</span> <span style="color: #555555;">((</span>seq <span style="color: #776304;">sequence</span><span style="color: #555555;">)</span> <span style="color: #776304;">&amp;key</span> <span style="color: #555555;">(</span>start <span style="color: #776304;">integer</span><span style="color: #555555;">))</span>
+   ...options...<span style="color: #555555;">)</span>
 </pre>
-
-
 
 
 
@@ -825,13 +832,11 @@ the generic function.
 
 
 
-<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789;">defmethod*</span> fname
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">defmethod*</span> fname
     method-arglist
-  <span style="color: #8b7500;">&amp;body</span>
-  body<span style="color: #696969;">)</span>
+  <span style="color: #776304;">&amp;body</span>
+  body<span style="color: #555555;">)</span>
 </pre>
-
-
 
 
 </div>
@@ -852,7 +857,13 @@ keyword) is assumed to be a specialised lambda list term of the form <code>(VARN
 <p>
 The syntax of METHOD-ARGLIST is therefore:
 </p><pre class="example">
-arglist =   method-term*
+arglist-and-qualifiers =   [qualifier]* method-arglist
+qualifier =  :in-layer LAYER
+           | :in LAYER
+           | :around
+           | :before
+           | :after  (etc)
+method-arglist = method-term*
           | (method-term* [&amp;optional opt-term+])
           | (method-term* [&amp;key opt-term+])
           | (method-term* [&amp;rest rest-term])
@@ -862,6 +873,11 @@ method-term = VARNAME
 </pre>
 
 <p>The rest of the syntax is the same as for DEFUN*.
+</p>
+<p>
+If the :in or :in-layer qualifier is present (they are synonymous), this
+form will generate a ContextL `define-layered-method' form rather than a
+`defmethod'.
 </p>
 </div>
 
@@ -888,15 +904,13 @@ and assertions as per <a href="#defun">defun*</a>.
 
 
 
-<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789;">deftype</span> <span style="color: #8b7500;">positive-integer</span> <span style="color: #696969;">()</span> `<span style="color: #696969;">(</span><span style="color: #8b7500;">integer</span> <span style="color: #2aa198;">1</span><span style="color: #696969;">))</span>
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">deftype</span> <span style="color: #776304;">positive-integer</span> <span style="color: #555555;">()</span> `<span style="color: #555555;">(</span><span style="color: #776304;">integer</span> <span style="color: #2aa198;">1</span><span style="color: #555555;">))</span>
 
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defmethod</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">make-coords</span> -&gt; <span style="color: #696969;">(</span><span style="color: #1e90ff;">cons</span> positive-integer positive-integer<span style="color: #696969;">))</span>
-               <span style="color: #696969;">(((</span>x positive-integer<span style="color: #696969;">)</span> <span style="color: #8b7500;">integer</span><span style="color: #696969;">)</span>
-                <span style="color: #696969;">((</span>y positive-integer<span style="color: #696969;">)</span> <span style="color: #8b7500;">integer</span><span style="color: #696969;">))</span>
-   <span style="color: #696969;">(</span><span style="color: #1e90ff;">cons</span> x y<span style="color: #696969;">))</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defmethod</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">make-coords</span> -&gt; <span style="color: #555555;">(</span><span style="color: #1b78fe;">cons</span> positive-integer positive-integer<span style="color: #555555;">))</span>
+               <span style="color: #555555;">(((</span>x positive-integer<span style="color: #555555;">)</span> <span style="color: #776304;">integer</span><span style="color: #555555;">)</span>
+                <span style="color: #555555;">((</span>y positive-integer<span style="color: #555555;">)</span> <span style="color: #776304;">integer</span><span style="color: #555555;">))</span>
+   <span style="color: #555555;">(</span><span style="color: #1b78fe;">cons</span> x y<span style="color: #555555;">))</span>
 </pre>
-
-
 
 
 
@@ -930,10 +944,8 @@ and assertions as per <a href="#defun">defun*</a>.
 
 
 
-<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789;">defparameter*</span> var value <span style="color: #8b7500;">&amp;optional</span> docstring<span style="color: #696969;">)</span>
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">defparameter*</span> var value <span style="color: #776304;">&amp;optional</span> docstring<span style="color: #555555;">)</span>
 </pre>
-
-
 
 
 </div>
@@ -980,13 +992,11 @@ See <a href="#defvar">defvar*</a> for more details.
 
 
 
-<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #1e90ff;">fname</span>
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #1b78fe;">fname</span>
     arglist
-  <span style="color: #8b7500;">&amp;body</span>
-  body<span style="color: #696969;">)</span>
+  <span style="color: #776304;">&amp;body</span>
+  body<span style="color: #555555;">)</span>
 </pre>
-
-
 
 
 </div>
@@ -1110,6 +1120,10 @@ Equivalent to <code>(DEFUN fname arglist . body)</code>, but:
 <li>If a return type is declared for the function itself, this will be turned
   into a global <code>DECLAIM</code> form that immediately precedes the function.
 </li>
+<li>Any variables whose names are '<sub>'</sub> are renamed with unique symbols
+  and declared 'ignored' within the function body. This provides a quick way
+  to ignore arguments or parts of arguments.
+</li>
 <li>All assertions within the lambda list or <code>:pre</code> form will be checked before
   the function body is entered.
 </li>
@@ -1131,66 +1145,54 @@ Equivalent to <code>(DEFUN fname arglist . body)</code>, but:
 
 
 
-<pre class="src src-lisp"><span style="color: #db7093;">;; </span><span style="color: #db7093;">Very simple example</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">add</span> -&gt; <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">((</span>a <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>b <span style="color: #8b7500;">real</span><span style="color: #696969;">))</span>
-  <span style="color: #696969;">(</span><span style="color: #1e90ff;">+</span> a b<span style="color: #696969;">))</span>
+<pre class="src src-lisp"><span style="color: #d05780;">;; </span><span style="color: #d05780;">Very simple example</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">add</span> -&gt; <span style="color: #776304;">real</span><span style="color: #555555;">)</span> <span style="color: #555555;">((</span>a <span style="color: #776304;">real</span><span style="color: #555555;">)</span> <span style="color: #555555;">(</span>b <span style="color: #776304;">real</span><span style="color: #555555;">))</span>
+  <span style="color: #555555;">(</span><span style="color: #1b78fe;">+</span> a b<span style="color: #555555;">))</span>
 </pre>
 
 
 
-
-
-<pre class="src src-lisp"><span style="color: #db7093;">;; </span><span style="color: #db7093;">Example with assertion for 'b' argument, checked before the</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">body of the function is entered.</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #1e90ff;">div</span> <span style="color: #696969;">((</span>a <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>b <span style="color: #8b7500;">real</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">/=</span> b <span style="color: #2aa198;">0</span><span style="color: #696969;">)))</span>
-   <span style="color: #696969;">(</span><span style="color: #4169e1;">:returns</span> <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span>
-   <span style="color: #696969;">(</span><span style="color: #1e90ff;">/</span> a b<span style="color: #696969;">))</span>
+<pre class="src src-lisp"><span style="color: #d05780;">;; </span><span style="color: #d05780;">Example with assertion for 'b' argument, checked before the</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">body of the function is entered.</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #1b78fe;">div</span> <span style="color: #555555;">((</span>a <span style="color: #776304;">real</span><span style="color: #555555;">)</span> <span style="color: #555555;">(</span>b <span style="color: #776304;">real</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">/=</span> b <span style="color: #2aa198;">0</span><span style="color: #555555;">)))</span>
+   <span style="color: #555555;">(</span><span style="color: #7171F3;">:returns</span> <span style="color: #776304;">real</span><span style="color: #555555;">)</span>
+   <span style="color: #555555;">(</span><span style="color: #1b78fe;">/</span> a b<span style="color: #555555;">))</span>
 </pre>
 
 
 
-
-
-<pre class="src src-lisp"><span style="color: #db7093;">;; </span><span style="color: #db7093;">Similar to above example but using :pre clause.</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #1e90ff;">div</span> <span style="color: #696969;">((</span>a <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>b <span style="color: #8b7500;">real</span><span style="color: #696969;">))</span>
-   <span style="color: #696969;">(</span><span style="color: #4169e1;">:returns</span> <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span>
-   <span style="color: #696969;">(</span><span style="color: #4169e1;">:pre</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">/=</span> b <span style="color: #2aa198;">0</span><span style="color: #696969;">))</span>
-   <span style="color: #696969;">(</span><span style="color: #1e90ff;">/</span> a b<span style="color: #696969;">))</span>
+<pre class="src src-lisp"><span style="color: #d05780;">;; </span><span style="color: #d05780;">Similar to above example but using :pre clause.</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #1b78fe;">div</span> <span style="color: #555555;">((</span>a <span style="color: #776304;">real</span><span style="color: #555555;">)</span> <span style="color: #555555;">(</span>b <span style="color: #776304;">real</span><span style="color: #555555;">))</span>
+   <span style="color: #555555;">(</span><span style="color: #7171F3;">:returns</span> <span style="color: #776304;">real</span><span style="color: #555555;">)</span>
+   <span style="color: #555555;">(</span><span style="color: #7171F3;">:pre</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">/=</span> b <span style="color: #2aa198;">0</span><span style="color: #555555;">))</span>
+   <span style="color: #555555;">(</span><span style="color: #1b78fe;">/</span> a b<span style="color: #555555;">))</span>
 </pre>
 
 
 
-
-
-<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #1e90ff;">sum</span> <span style="color: #696969;">(</span><span style="color: #8b7500;">&amp;rest</span> <span style="color: #696969;">(</span>nums <span style="color: #8b7500;">real</span><span style="color: #696969;">))</span>  <span style="color: #db7093;">; </span><span style="color: #db7093;">type of 'rest' var refers to</span>
-   <span style="color: #696969;">(</span><span style="color: #4169e1;">:returns</span> <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span>                <span style="color: #db7093;">; </span><span style="color: #db7093;">the type of each list element, ie</span>
-   <span style="color: #696969;">(</span><span style="color: #1e90ff;">apply</span> #'<span style="color: #1e90ff;">+</span> nums<span style="color: #696969;">))</span>             <span style="color: #db7093;">; </span><span style="color: #db7093;">nums must be a list of REALs</span>
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #1b78fe;">sum</span> <span style="color: #555555;">(</span><span style="color: #776304;">&amp;rest</span> <span style="color: #555555;">(</span>nums <span style="color: #776304;">real</span><span style="color: #555555;">))</span>  <span style="color: #d05780;">; </span><span style="color: #d05780;">type of 'rest' var refers to</span>
+   <span style="color: #555555;">(</span><span style="color: #7171F3;">:returns</span> <span style="color: #776304;">real</span><span style="color: #555555;">)</span>                <span style="color: #d05780;">; </span><span style="color: #d05780;">the type of each list element, ie</span>
+   <span style="color: #555555;">(</span><span style="color: #1b78fe;">apply</span> #'<span style="color: #1b78fe;">+</span> nums<span style="color: #555555;">))</span>             <span style="color: #d05780;">; </span><span style="color: #d05780;">nums must be a list of REALs</span>
 </pre>
 
 
 
-
-
-<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">sum</span> -&gt; <span style="color: #8b7500;">real</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span><span style="color: #8b7500;">&amp;rest</span> <span style="color: #696969;">(</span>nums <span style="color: #8b7500;">real</span><span style="color: #696969;">))</span>  <span style="color: #db7093;">; </span><span style="color: #db7093;">alternative form</span>
-   <span style="color: #696969;">(</span><span style="color: #1e90ff;">apply</span> #'<span style="color: #1e90ff;">+</span> nums<span style="color: #696969;">))</span>                       <span style="color: #db7093;">; </span><span style="color: #db7093;">for above example</span>
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">sum</span> -&gt; <span style="color: #776304;">real</span><span style="color: #555555;">)</span> <span style="color: #555555;">(</span><span style="color: #776304;">&amp;rest</span> <span style="color: #555555;">(</span>nums <span style="color: #776304;">real</span><span style="color: #555555;">))</span>  <span style="color: #d05780;">; </span><span style="color: #d05780;">alternative form</span>
+   <span style="color: #555555;">(</span><span style="color: #1b78fe;">apply</span> #'<span style="color: #1b78fe;">+</span> nums<span style="color: #555555;">))</span>                       <span style="color: #d05780;">; </span><span style="color: #d05780;">for above example</span>
 </pre>
 
 
 
-
-
-<pre class="src src-lisp"><span style="color: #db7093;">;; </span><span style="color: #db7093;">This function and first argument have no type declarations.</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">Keyword argument 'test' accepts a function that takes</span>
-<span style="color: #db7093;">;; </span><span style="color: #db7093;">two arguments of any type.</span>
-<span style="color: #696969;">(</span><span style="color: #8b4789;">defun*</span> <span style="color: #1e90ff;">find-in-tree</span> <span style="color: #696969;">(</span>item <span style="color: #696969;">(</span>tree <span style="color: #1e90ff;">cons</span><span style="color: #696969;">)</span>
-                      <span style="color: #8b7500;">&amp;key</span> <span style="color: #696969;">((</span>test <span style="color: #696969;">(</span><span style="color: #1e90ff;">function</span> <span style="color: #696969;">(</span><span style="color: #87cefa;">t</span> <span style="color: #87cefa;">t</span><span style="color: #696969;">)))</span> #'<span style="color: #1e90ff;">equal</span><span style="color: #696969;">))</span>
- <span style="color: #696969;">(</span><span style="color: #8b4789;">or</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">funcall</span> test item tree<span style="color: #696969;">)</span>
-     <span style="color: #696969;">(</span><span style="color: #8b4789;">and</span> <span style="color: #696969;">(</span><span style="color: #1e90ff;">consp</span> tree<span style="color: #696969;">)</span>
-          <span style="color: #696969;">(</span><span style="color: #8b4789;">or</span> <span style="color: #696969;">(</span>find-in-tree item <span style="color: #696969;">(</span><span style="color: #1e90ff;">car</span> tree<span style="color: #696969;">))</span>
-              <span style="color: #696969;">(</span>find-in-tree item <span style="color: #696969;">(</span><span style="color: #1e90ff;">cdr</span> tree<span style="color: #696969;">))))))</span>
+<pre class="src src-lisp"><span style="color: #d05780;">;; </span><span style="color: #d05780;">This function and first argument have no type declarations.</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">Keyword argument 'test' accepts a function that takes</span>
+<span style="color: #d05780;">;; </span><span style="color: #d05780;">two arguments of any type.</span>
+<span style="color: #555555;">(</span><span style="color: #763176;">defun*</span> <span style="color: #1b78fe;">find-in-tree</span> <span style="color: #555555;">(</span>item <span style="color: #555555;">(</span>tree <span style="color: #1b78fe;">cons</span><span style="color: #555555;">)</span>
+                      <span style="color: #776304;">&amp;key</span> <span style="color: #555555;">((</span>test <span style="color: #555555;">(</span><span style="color: #1b78fe;">function</span> <span style="color: #555555;">(</span><span style="color: #4e8d8e;">t</span> <span style="color: #4e8d8e;">t</span><span style="color: #555555;">)))</span> #'<span style="color: #1b78fe;">equal</span><span style="color: #555555;">))</span>
+ <span style="color: #555555;">(</span><span style="color: #763176;">or</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">funcall</span> test item tree<span style="color: #555555;">)</span>
+     <span style="color: #555555;">(</span><span style="color: #763176;">and</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">consp</span> tree<span style="color: #555555;">)</span>
+          <span style="color: #555555;">(</span><span style="color: #763176;">or</span> <span style="color: #555555;">(</span>find-in-tree item <span style="color: #555555;">(</span><span style="color: #1b78fe;">car</span> tree<span style="color: #555555;">))</span>
+              <span style="color: #555555;">(</span>find-in-tree item <span style="color: #555555;">(</span><span style="color: #1b78fe;">cdr</span> tree<span style="color: #555555;">))))))</span>
 </pre>
-
-
 
 
 
@@ -1224,10 +1226,8 @@ Equivalent to <code>(DEFUN fname arglist . body)</code>, but:
 
 
 
-<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789;">defvar*</span> var value <span style="color: #8b7500;">&amp;optional</span> docstring<span style="color: #696969;">)</span>
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">defvar*</span> var value <span style="color: #776304;">&amp;optional</span> docstring<span style="color: #555555;">)</span>
 </pre>
-
-
 
 
 </div>
@@ -1295,10 +1295,8 @@ and declares it to be of type <code>TYPE</code>, if given.
 
 
 
-<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789;">defvar*</span> <span style="color: #696969;">(</span><span style="color: #f4a460;">*file-name*</span> <span style="color: #1e90ff;">string</span><span style="color: #696969;">)</span> <span style="color: #008b00;">"~/log.txt"</span><span style="color: #696969;">)</span>
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">defvar*</span> <span style="color: #555555;">(</span><span style="color: #ef924e;">*file-name*</span> <span style="color: #1b78fe;">string</span><span style="color: #555555;">)</span> <span style="color: #107b03;">"~/log.txt"</span><span style="color: #555555;">)</span><span style="color: #ffff00; background-color: #400000; font-weight: bold;"> </span>
 </pre>
-
-
 
 
 
@@ -1332,12 +1330,10 @@ and declares it to be of type <code>TYPE</code>, if given.
 
 
 
-<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789;">flet*</span> clauses
-  <span style="color: #8b7500;">&amp;body</span>
-  body<span style="color: #696969;">)</span>
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">flet*</span> clauses
+  <span style="color: #776304;">&amp;body</span>
+  body<span style="color: #555555;">)</span>
 </pre>
-
-
 
 
 </div>
@@ -1388,13 +1384,11 @@ arglist and body have the same syntax as for <a href="#defun">defun*</a>.
 
 
 
-<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789;">defun</span> <span style="color: #1e90ff;">foo</span> <span style="color: #696969;">(</span>name x y<span style="color: #696969;">)</span>
-   <span style="color: #696969;">(</span><span style="color: #8b4789;">flet*</span> <span style="color: #696969;">(((</span>area -&gt; <span style="color: #8b7500;">integer</span><span style="color: #696969;">)</span> <span style="color: #696969;">((</span>x <span style="color: #8b7500;">integer</span><span style="color: #696969;">)</span> <span style="color: #696969;">(</span>y <span style="color: #8b7500;">integer</span><span style="color: #696969;">))</span>
-             <span style="color: #696969;">(</span><span style="color: #1e90ff;">*</span> x y<span style="color: #696969;">)))</span>
-      <span style="color: #696969;">(</span><span style="color: #1e90ff;">format</span> <span style="color: #87cefa;">t</span> <span style="color: #008b00;">"Area of ~A is ~D.~%"</span> name <span style="color: #696969;">(</span>area x y<span style="color: #696969;">))))</span>
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">defun</span> <span style="color: #1b78fe;">foo</span> <span style="color: #555555;">(</span>name x y<span style="color: #555555;">)</span>
+   <span style="color: #555555;">(</span><span style="color: #763176;">flet*</span> <span style="color: #555555;">(((</span>area -&gt; <span style="color: #776304;">integer</span><span style="color: #555555;">)</span> <span style="color: #555555;">((</span>x <span style="color: #776304;">integer</span><span style="color: #555555;">)</span> <span style="color: #555555;">(</span>y <span style="color: #776304;">integer</span><span style="color: #555555;">))</span>
+             <span style="color: #555555;">(</span><span style="color: #1b78fe;">*</span> x y<span style="color: #555555;">)))</span>
+      <span style="color: #555555;">(</span><span style="color: #1b78fe;">format</span> <span style="color: #4e8d8e;">t</span> <span style="color: #107b03;">"Area of </span><span style="color: #00ff00; font-weight: bold;">~A</span><span style="color: #107b03;"> is </span><span style="color: #00ff00; font-weight: bold;">~D</span><span style="color: #107b03;">.</span><span style="color: #00ff00; font-weight: bold;">~%</span><span style="color: #107b03;">"</span> name <span style="color: #555555;">(</span>area x y<span style="color: #555555;">))))</span>
 </pre>
-
-
 
 
 
@@ -1428,12 +1422,10 @@ arglist and body have the same syntax as for <a href="#defun">defun*</a>.
 
 
 
-<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789;">labels*</span> clauses
-  <span style="color: #8b7500;">&amp;body</span>
-  body<span style="color: #696969;">)</span>
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">labels*</span> clauses
+  <span style="color: #776304;">&amp;body</span>
+  body<span style="color: #555555;">)</span>
 </pre>
-
-
 
 
 </div>
@@ -1495,12 +1487,10 @@ See <a href="#flet">flet*</a> for more details.
 
 
 
-<pre class="src src-lisp"><span style="color: #696969;">(</span><span style="color: #8b4789;">lambda*</span> arglist
-  <span style="color: #8b7500;">&amp;body</span>
-  body<span style="color: #696969;">)</span>
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">lambda*</span> arglist
+  <span style="color: #776304;">&amp;body</span>
+  body<span style="color: #555555;">)</span>
 </pre>
-
-
 
 
 </div>
@@ -1519,6 +1509,80 @@ declare its return type.
 </p>
 
 
+<hr/>
+
+<p>
+<a name="nlet" id="nlet"></a>
+<a name="macro-nlet" id="macro-nlet"></a>
+</p>
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1-7-2-10" class="outline-5">
+<h5 id="sec-1-7-2-10"><span class="section-number-5">1.7.2.10</span> Inherited Macro: <code>nlet</code></h5>
+<div class="outline-text-5" id="text-1-7-2-10">
+
+
+
+
+</div>
+
+<div id="outline-container-1-7-2-10-1" class="outline-6">
+<h6 id="sec-1-7-2-10-1"><span class="section-number-6">1.7.2.10.1</span> Syntax</h6>
+<div class="outline-text-6" id="text-1-7-2-10-1">
+
+
+
+
+
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">nlet</span> name
+    <span style="color: #555555;">(</span><span style="color: #776304;">&amp;rest</span> bindings<span style="color: #555555;">)</span>
+  <span style="color: #776304;">&amp;body</span>
+  body<span style="color: #555555;">)</span>
+</pre>
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-1-7-2-10-2" class="outline-6">
+<h6 id="sec-1-7-2-10-2"><span class="section-number-6">1.7.2.10.2</span> Description</h6>
+<div class="outline-text-6" id="text-1-7-2-10-2">
+
+
+<p>
+Identical to *LET, but recursion can occur by calling (NAME ARGS&hellip;)
+within BODY, where each argument in ARGS matches one binding.
+The same as Scheme's named LET. Note that the macro does NOT perform tail
+call optimisation. (All modern lisp compilers will perform TCO of the generated
+code however.)
+</p></div>
+
+</div>
+
+<div id="outline-container-1-7-2-10-3" class="outline-6">
+<h6 id="sec-1-7-2-10-3"><span class="section-number-6">1.7.2.10.3</span> Example</h6>
+<div class="outline-text-6" id="text-1-7-2-10-3">
+
+
+
+
+
+<pre class="src src-lisp"><span style="color: #555555;">(</span><span style="color: #763176;">nlet</span> fact <span style="color: #555555;">((</span>n <span style="color: #2aa198;">5</span><span style="color: #555555;">))</span>
+   <span style="color: #555555;">(</span><span style="color: #763176;">if</span> <span style="color: #555555;">(</span><span style="color: #1b78fe;">=</span> <span style="color: #2aa198;">1</span> n<span style="color: #555555;">)</span>
+      n
+      <span style="color: #555555;">(</span><span style="color: #1b78fe;">*</span> n <span style="color: #555555;">(</span>fact <span style="color: #555555;">(</span><span style="color: #1b78fe;">1-</span> n<span style="color: #555555;">)))))</span>
+</pre>
+
+
+
+
+
 
 
 </div>
@@ -1534,7 +1598,7 @@ declare its return type.
 
 
 <p>
- <a href="#index-D">D</a>  <a href="#index-F">F</a>  <a href="#index-L">L</a>  <a href="#index-NONALPHABETIC">NONALPHABETIC</a>
+ <a href="#index-D">D</a>  <a href="#index-F">F</a>  <a href="#index-L">L</a>  <a href="#index-N">N</a>  <a href="#index-nonalphabetic">nonalphabetic</a>
 </p>
 
 
@@ -1547,7 +1611,7 @@ declare its return type.
 
 
 <p>
-<a name="index-NONALPHABETIC" id="index-NONALPHABETIC"></a>
+<a name="index-nonalphabetic" id="index-nonalphabetic"></a>
 </p><ul>
 <li><a href="#variable-check-argument-types-explicitly..3f.."><code>*check-argument-types explicitly?*</code></a>, Variable
 </li>
@@ -1628,6 +1692,26 @@ declare its return type.
 
 
 
+</div>
+
+</div>
+
+<div id="outline-container-1-8-5" class="outline-4">
+<h4 id="sec-1-8-5"><span class="section-number-4">1.8.5</span> N</h4>
+<div class="outline-text-4" id="text-1-8-5">
+
+
+
+<p>
+<a name="index-N" id="index-N"></a>
+</p><ul>
+<li><a href="#macro-nlet"><code>nlet</code></a>, Macro
+</li>
+</ul>
+
+
+
+
 
 
 </div>
@@ -1649,9 +1733,9 @@ The latest version of CLOD is available <a href="http://bitbucket.org/eeeickythu
 </div>
 
 <div id="postamble">
-<p class="date">Date: 2011-09-09 17:55:41 </p>
+<p class="date">Date: 2012-09-18T15:25+1200</p>
 <p class="author">Author: Paul Sexton</p>
-<p class="creator">Org version 7.7 with Emacs version 23</p>
+<p class="creator">Org version N/A with Emacs version 24</p>
 <a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a>
 
 </div>

@@ -25,9 +25,7 @@
 (defsystem defstar
     :name "defstar"
     :version "1.0.0"
-    :author "eeeickythump@gmail.com"
+    :author "Paul Sexton <eeeickythump@gmail.com>"
+    :description "defstar: macros allowing easy inline type declarations for
+variables and and function return values."
     :components ((:file "defstar")))
-
-
-
-

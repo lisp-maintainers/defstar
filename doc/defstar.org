@@ -13,6 +13,8 @@
 
 - Uses:
     [[package common-lisp][common-lisp]]
+- Used by:
+    [[package ptable][ptable]]
 
 ** Description
 
@@ -26,6 +28,8 @@ end, e.g. =DEFUN*=. (The exception is the =LET*= replacement, which is called
 The macros allow:
 - easy inclusion of type declarations within lambda lists
 - easy inclusion of return type declarations in function and method definitions
+- easy declaration of variables as 'ignored', by the use of '_' as a placeholder
+  in argument lists.
 - easy inclusion of assertions for each argument and for the function's
   return value, thus allowing simple programming by contract.
 
@@ -94,6 +98,10 @@ does not depend on any other libraries.
  ;; A function that returns multiple values.
  (defun* (floor -> (values integer integer)) ((n real) (d real))
     (cl:floor n d))
+
+ ;; Example of ignoring arguments
+ (*let (((top . _) list))
+    (print top))
 
  ;; It is possible to use assertions with functions that return
  ;; multiple values. When a function is declared to return multiple
@@ -250,9 +258,9 @@ rather than normal strings.
 
 ***** Value
 
-: T
+: nil
 
-Type: =boolean=
+Type: =null=
 
 
 ***** Description
@@ -268,7 +276,7 @@ a string in a variable that is declared to be of type integer, are
 undefined.
 
 In practise, essentially all modern lisps do perform type checking
-based on declarations, especially when the =SAFETY= setting is high.
+based on declarations, especially when the =SAFETY= setting is high. 
 
 
 
@@ -299,7 +307,7 @@ based on declarations, especially when the =SAFETY= setting is high.
 : clause =   VARNAME
 :          | (VARNAME FORM)
 :          | (LAMBDA-LIST FORM)
-:          | ((&values VAR...) FORM)
+:          | ((:values VAR...) FORM)
 :          | (VARNAME TYPE FORM)
 - BODY :: The body of the form (implicit =progn=).
 ***** Description
@@ -307,10 +315,17 @@ based on declarations, especially when the =SAFETY= setting is high.
 Behaves like LET*, but:
 - When types are given between the variable name and expression, these
   are converted to declarations within the scope of the LET form.
-- When the form to be bound is a lambda-list, behaves like DESTRUCTURING-BIND.
-- When the form to be bound is a list whole first element is &values,
+- When the form to be bound is a list or cons cell, behaves like
+  DESTRUCTURING-BIND.
+- When the form to be bound is a list whose first element is :values,
   behaves like MULTIPLE-VALUE-BIND, using the rest of the elements in
-  the form as the variables to be bound.
+  the form as the variables to be bound. Those elements may be symbols,
+  or lists of the form (SYMBOL TYPE), in which case the bound symbol will
+  be declared to be of the given type.
+- Any variables whose names are '_', either bare or inside a form to be
+  destructured, will be renamed with unique symbols and declared 'ignored'
+  within the body. This provides a quick way to ignore arguments or parts
+  of arguments.
 ***** Example
 
 #+BEGIN_SRC lisp
@@ -318,7 +333,7 @@ Behaves like LET*, but:
         (age integer 40)
         (sex (member :male :female) :male)
         ((num street &optional suburb) address)
-        ((&values day month year) birthday))
+        ((:values (day fixnum) month year) birthday))
     ...body...)
 #+END_SRC
 Expands to:
@@ -331,6 +346,7 @@ Expands to:
        (destructuring-bind
            (num street &optional suburb) address
          (multiple-value-bind (day month year) birthday
+           (declare (fixnum day))
            ...body...)))))
 #+END_SRC
 
@@ -362,8 +378,12 @@ Expands to:
   the form:
   : arg =   VARNAME
   :       | (VARNAME TYPE)
-- OPTIONS :: Options to DEFGENERIC. The first of these may be a simple string,
-  which will be treated as equivalent to =(:documentation STRING)=.
+- OPTIONS :: Options to DEFGENERIC. Any of these may be simple strings,
+  which will be concatenated together and the resulting string treated as
+  equivalent to =(:documentation STRING)=.
+  One extra option is allowed -- (:layered BOOL). If this is present and BOOL
+  is a non-nil constant, the form will generate a ContextL
+  `define-layered-function' rather than `defgeneric'.
 
 ***** Description
 
@@ -418,7 +438,13 @@ keyword) is assumed to be a specialised lambda list term of the form =(VARNAME
 CLASS [assertion])=, rather than a DEFUN* type-declaring term.
 
 The syntax of METHOD-ARGLIST is therefore:
-: arglist =   method-term*
+: arglist-and-qualifiers =   [qualifier]* method-arglist
+: qualifier =  :in-layer LAYER
+:            | :in LAYER
+:            | :around
+:            | :before
+:            | :after  (etc)
+: method-arglist = method-term*
 :           | (method-term* [&optional opt-term+])
 :           | (method-term* [&key opt-term+])
 :           | (method-term* [&rest rest-term])
@@ -426,6 +452,10 @@ The syntax of METHOD-ARGLIST is therefore:
 :               | (VARNAME CLASS [assertion])
 :               | ((VARNAME TYPE/CLASS [assertion]) CLASS)
 The rest of the syntax is the same as for DEFUN*.
+
+If the :in or :in-layer qualifier is present (they are synonymous), this
+form will generate a ContextL `define-layered-method' form rather than a
+`defmethod'.
 
 ***** Description
 
@@ -546,6 +576,9 @@ Equivalent to =(DEFUN fname arglist . body)=, but:
   forms within the function body
 - If a return type is declared for the function itself, this will be turned
   into a global =DECLAIM= form that immediately precedes the function.
+- Any variables whose names are '_' are renamed with unique symbols
+  and declared 'ignored' within the function body. This provides a quick way
+  to ignore arguments or parts of arguments.
 - All assertions within the lambda list or =:pre= form will be checked before
   the function body is entered.
 - Any assertions within a =:returns= form or =:post= form will be checked
@@ -636,7 +669,7 @@ and declares it to be of type =TYPE=, if given.
 ***** Examples
 
 #+BEGIN_SRC lisp
- (defvar* (*file-name* string) "~/log.txt")
+ (defvar* (*file-name* string) "~/log.txt") 
 #+END_SRC
 
 
@@ -733,19 +766,56 @@ Like =LAMBDA=, but =ARGLIST= and body have the same syntax as for [[defun*]].
 declare its return type.
 
 
+-----
+
+# link target 2: <<nlet>>
+# link target: <<macro nlet>>
+
+
+**** Inherited Macro: =nlet=                                                  :macro:
+
+
+***** Syntax
+
+#+BEGIN_SRC lisp
+(nlet name
+    (&rest bindings)
+  &body
+  body)
+#+END_SRC
+
+
+***** Description
+
+Identical to *LET, but recursion can occur by calling (NAME ARGS...)
+within BODY, where each argument in ARGS matches one binding.
+The same as Scheme's named LET. Note that the macro does NOT perform tail
+call optimisation. (All modern lisp compilers will perform TCO of the generated
+code however.)
+***** Example
+
+#+BEGIN_SRC lisp
+ (nlet fact ((n 5))
+    (if (= 1 n)
+       n
+       (* n (fact (1- n)))))
+#+END_SRC
+
+
+
 
 
 
 ** Index
 
- [[index D][D]]  [[index F][F]]  [[index L][L]]  [[index
-NONALPHABETIC][NONALPHABETIC]]
+ [[index D][D]]  [[index F][F]]  [[index L][L]]  [[index N][N]]  [[index
+nonalphabetic][nonalphabetic]]  
 
 
 *** Nonalphabetic
 
 
-# link target: <<index NONALPHABETIC>>
+# link target: <<index nonalphabetic>>
 - [[variable *check-argument-types-explicitly..3f..*][=*check-argument-types
   explicitly?*=]], Variable
 - [[macro *let][=*let=]], Macro
@@ -778,6 +848,14 @@ NONALPHABETIC][NONALPHABETIC]]
 # link target: <<index L>>
 - [[macro labels*][=labels*=]], Macro
 - [[macro lambda*][=lambda*=]], Macro
+
+
+
+*** N
+
+
+# link target: <<index N>>
+- [[macro nlet][=nlet=]], Macro
 
 
 
