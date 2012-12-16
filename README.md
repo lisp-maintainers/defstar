@@ -8,12 +8,13 @@ a star added at the end, e.g. `defun*`. (the exception is the `let*`
 replacement, which is called `*let`).
 
 The macros allow:
- - easy inclusion of type declarations for arguments in lambda lists
- - easy inclusion of return type declarations in function and method definitions
- - easy declaration of variables as 'ignored', by the use of '_' as a
-   placeholder variable in argument lists.
- - easy inclusion of assertions for each argument and for the function's
-   return value, thus allowing simple programming by contract.
+
+* easy inclusion of type declarations for arguments in lambda lists
+* easy inclusion of return type declarations in function and method definitions
+* easy declaration of variables as 'ignored', by the use of '_' as a
+  placeholder variable in argument lists.
+* easy inclusion of assertions for each argument and for the function's
+  return value, thus allowing simple programming by contract.
 
 See below for a detailed discussion of each macro, with usage examples.
 
@@ -32,34 +33,35 @@ any other libraries.
 
 The function-defining macros (`defun*`, `flet*`, `labels*`, `lambda*`) work the
 same as their normal counterparts, with the following exceptions:
- - Where the name of an argument appears in a lambda list, a clause of the
-   form `(name TYPE [TEST])` may appear instead. `TYPE` is any legal
-   Common Lisp type declaration, for example `integer` or `(real 0 100)`.
-   `TEST` is an optional test which the supplied value of the argument
-   must pass at runtime. This can be either an expression, or a symbol which
-   will be taken to be the name of a predicate function which will be called
-   with the value of `name` as its sole argument.
- - Where the name of the function appears, a clause of the form `(fname -> TYPE
-   [TEST])` may appear instead. Here, `TYPE` can be any legal Common Lisp type
-   declaration, and refers to the return value(s) of the function. `TEST` is an
-   optional expression or predicate function which will be called with the
-   variable `result` bound to the function's return value (or to a list if the
-   function returns multiple values). The test must return non-nil or an error
-   is signalled.
- - At toplevel within the function body, any or all of the following clauses
-   may be included:
-   - `(:returns TYPE)` - this declares the type of the function's return value.
+
+* Where the name of an argument appears in a lambda list, a clause of the form
+  `(name TYPE [TEST])` may appear instead. `TYPE` is any legal Common Lisp type
+  declaration, for example `integer` or `(real 0 100)`. `TEST` is an optional
+  test which the supplied value of the argument must pass at runtime. This can
+  be either an expression, or a symbol which will be taken to be the name of a
+  predicate function which will be called with the value of `name` as its sole
+  argument.
+* Where the name of the function appears, a clause of the form `(fname -> TYPE
+  [TEST])` may appear instead. Here, `TYPE` can be any legal Common Lisp type
+  declaration, and refers to the return value(s) of the function. `TEST` is an
+  optional expression or predicate function which will be called with the
+  variable `result` bound to the function's return value (or to a list if the
+  function returns multiple values). The test must return non-nil or an error
+  is signalled.
+* At toplevel within the function body, any or all of the following clauses may
+  be included:
+   * `(:returns TYPE)` - this declares the type of the function's return value.
      It should not be used it the type has been declared using the `(fname ->
      TYPE)` clause.
-   - `(:pre TEST+)` - where `TEST+` is one or more expressions or predicate
+   * `(:pre TEST+)` - where `TEST+` is one or more expressions or predicate
      function names. Each of these will be evaluated when the function is
      called. They must all return non-nil, or an error will be signalled.
-   - `(:post TEST+)` - these tests are all evaluated just before the function
+   * `(:post TEST+)` - these tests are all evaluated just before the function
      returns, with `result` bound to the return value (or to a list if the
      function returns multiple values). They must all return non-nil, or an
      error will be signalled.
- - One or more arguments in a lambda list may be named `_`. Any such arguments
-   will be given unique names and will be automatically declared `ignored`.
+* One or more arguments in a lambda list may be named `_`. Any such arguments
+  will be given unique names and will be automatically declared `ignored`.
 
 
 ### Examples of function definitions
@@ -259,21 +261,22 @@ Used to declare the types of global variables.
 ## `*let`
 
 This statement behaves like `let*`, with the following differences:
- - When a type is given between the variable name and expression, this is
-   converted to a local declaration of the type of the variable, within the
-   scope of the `*let` form.
- - When the form to be bound is a lambda list or cons cell, `*let` behaves like
-   `destructuring-bind`. The value of the expression is destructured and
-   elements are bound to the arguments in the lambda list or cons cell.
- - When the form to be bound is a list whose first element is `:values`, `*let`
-   behaves like `multiple-value-bind`, using the rest of the elements in the
-   form as the variables to be bound. Those elements may be symbols, or lists
-   of the form `(SYMBOL TYPE)`, in which case the bound symbol will be declared
-   to be of the given type.
- - Any variables whose names are '_', either bare or inside a form to be
-   destructured, will be renamed with unique symbols and declared `ignored`
-   within the body. This provides a quick way to ignore arguments or parts
-   of arguments.
+
+* When a type is given between the variable name and expression, this is
+  converted to a local declaration of the type of the variable, within the
+  scope of the `*let` form.
+* When the form to be bound is a lambda list or cons cell, `*let` behaves like
+  `destructuring-bind`. The value of the expression is destructured and
+  elements are bound to the arguments in the lambda list or cons cell.
+* When the form to be bound is a list whose first element is `:values`, `*let`
+  behaves like `multiple-value-bind`, using the rest of the elements in the
+  form as the variables to be bound. Those elements may be symbols, or lists of
+  the form `(SYMBOL TYPE)`, in which case the bound symbol will be declared to
+  be of the given type.
+* Any variables whose names are '_', either bare or inside a form to be
+  destructured, will be renamed with unique symbols and declared `ignored`
+  within the body. This provides a quick way to ignore arguments or parts of
+  arguments.
 
 For example,
 
