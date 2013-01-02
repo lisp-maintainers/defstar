@@ -329,7 +329,7 @@ Boolean.
 Predicate. Does the symbol =SYM= begin with an ampersand, such as =&ANY=,
 =&REST= and so on?"
     (and (symbolp sym)
-	 (eql #\& (char (format nil "~A" sym) 0)))))
+         (eql #\& (char (format nil "~A" sym) 0)))))
 
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -361,7 +361,7 @@ is replaced by the value of (FN ATOM)."
              (map-tree fn (cdr tree))))
       ((consp tree)
        (cons (map-tree fn (car tree))
-	     (map-tree fn (cdr tree))))
+             (map-tree fn (cdr tree))))
       (t
        (funcall fn tree)))))
 
@@ -599,8 +599,14 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
                              (cond
                                ((symbolp basename)
                                  basename)
-                               ((listp basename) ; (setf foo)
+                               ((and (listp basename)
+                                     (= (length basename) 2)
+                                     (eql 'setf (first basename)))
                                  (second basename))
+                               ((and (listp basename)
+                                     (>= (length basename) 3)
+                                     (eql +DEFUN*-ARROW-SYMBOL+ (second basename)))
+                                (first basename))
                                (t
                                 (error "Don't know how to get block name from function name ~S" basename))))))
 
@@ -654,7 +660,7 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
       (when returns-clause
         (destructuring-bind (rtype &optional rcheck) (cdr returns-clause)
           ;;(break)
-          (setf returns-type rtype)
+          (setf returns-type (if (eql :void rtype) '(values) rtype))
           (if rcheck (setf returns-check rcheck))
           (if (and rcheck (symbolp rcheck))
               (setf returns-check `(,rcheck result)))
@@ -679,7 +685,7 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
             (error "Malformed DEFUN* header: found ~S, expected arrow symbol (~S)"
                    arrow +DEFUN*-ARROW-SYMBOL+))
           (setf fname fun-name)
-          (setf returns-type rtype)
+          (setf returns-type (if (eql rtype :void) '(values) rtype))
           (if rcheck (setf returns-check rcheck))
           (if (and rcheck (symbolp rcheck))
               (setf returns-check `(,rcheck result)))))

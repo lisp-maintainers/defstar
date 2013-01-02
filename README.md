@@ -43,7 +43,9 @@ same as their normal counterparts, with the following exceptions:
   argument.
 * Where the name of the function appears, a clause of the form `(fname -> TYPE
   [TEST])` may appear instead. Here, `TYPE` can be any legal Common Lisp type
-  declaration, and refers to the return value(s) of the function. `TEST` is an
+  declaration, and refers to the return value(s) of the function. For functions
+  that return no values, the type specifier `(values)` should be used;
+  alternatively, `:void` can be used as a synonym for `(values)`. `TEST` is an
   optional expression or predicate function which will be called with the
   variable `result` bound to the function's return value (or to a list if the
   function returns multiple values). The test must return non-nil or an error
@@ -171,6 +173,20 @@ values, of unspecified types:
     :::cl
     (defun* (floor -> (values)) ((n real) (d real))
        ...)
+
+## No return values
+
+    :::cl
+    (defun* (print-message -> (values)) ((fmt string) &rest args)
+       (apply #'format t fmt args)
+       (values))
+
+The type specifier `:void` has been defined as a synonym for `(values)`:
+
+    :::cl
+    (defun* (print-message -> :void) ((fmt string) &rest args)
+       (apply #'format t fmt args)
+       (values))
 
 
 ## Type declarations for `&rest`, `&optional` and keyword arguments
