@@ -40,6 +40,7 @@
            ;;#:returns
            #:result
            #:*check-argument-types-explicitly?*
+           #:*use-closer-mop?*
            #:->)
   (:documentation
    "* Description
@@ -388,8 +389,16 @@ undefined.
 In practise, essentially all modern lisps do perform type checking
 based on declarations, especially when the =SAFETY= setting is high. ")
 
+
 (defvar *use-contextl* nil
   "Bound to true if the ContextL package is currently loaded.")
+
+
+(defvar *use-closer-mop?* nil
+  "If set to non-nil and the CLOSER-MOP package is loaded, use its
+DEFMETHOD and DEFGENERIC definitions rather than those from the
+COMMON-LISP package.")
+
 
 (defun assert-precondition (fname clause varnames)
   (let* ((fname (or fname "anonymous function"))
@@ -443,7 +452,17 @@ Internal function, used by [[defun*]] to parse lambda list terms.
           (layered-defgeneric
             (if *use-contextl*
                 (find-symbol "DEFINE-LAYERED-FUNCTION" :contextl)
-                (gensym))))
+                (gensym)))
+           (closer-defgeneric
+             (if (and *use-closer-mop?*
+                      (find :closer-mop *features*))
+                 (find-symbol "DEFGENERIC" :closer-mop)
+                 (gensym)))
+           (closer-defmethod
+             (if (and *use-closer-mop?*
+                      (find :closer-mop *features*))
+                 (find-symbol "DEFMETHOD" :closer-mop)
+                 (gensym))))
       (flet ((check-clause (check var)
                (if (and check (symbolp check))
                    (list check var)
@@ -454,6 +473,7 @@ Internal function, used by [[defun*]] to parse lambda list terms.
              ((listp term)
               (cond
                 ((or (eql def-type 'defmethod)
+                     (eql def-type closer-defmethod)
                      (eql def-type layered-defmethod))
                  (if (listp (car term))
                      (destructuring-bind ((var vartype &optional check) varclass)
@@ -469,6 +489,7 @@ Internal function, used by [[defun*]] to parse lambda list terms.
                                varclass
                                (check-clause check var)))))
                 ((or (eql def-type 'defgeneric)
+                     (eql def-type closer-defgeneric)
                      (eql def-type layered-defgeneric))
                  (destructuring-bind (var vartype) term
                    (values var (list 'type vartype var) vartype
@@ -491,6 +512,7 @@ Internal function, used by [[defun*]] to parse lambda list terms.
            (cond
              ((and (listp term)
                    (or (eql def-type 'defgeneric)
+                       (eql def-type closer-defgeneric)
                        (eql def-type layered-defgeneric)))
               (destructuring-bind (var vartype) term
                 (values var nil
@@ -574,7 +596,18 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
              (if *use-contextl*
                  (find-symbol "DEFINE-LAYERED-METHOD" :contextl)
                  (gensym)))
+           (closer-defgeneric
+             (if (and *use-closer-mop?*
+                      (find :closer-mop *features*))
+                 (find-symbol "DEFGENERIC" :closer-mop)
+                 (gensym)))
+           (closer-defmethod
+             (if (and *use-closer-mop?*
+                      (find :closer-mop *features*))
+                 (find-symbol "DEFMETHOD" :closer-mop)
+                 (gensym)))
            (defgeneric? (or (eql 'defgeneric toplevel-form-name)
+                            (eql closer-defgeneric toplevel-form-name)
                             (eql layered-defgeneric toplevel-form-name)))
            (method-combo-keywords nil)
            (layer nil)
@@ -598,11 +631,11 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
            (name-for-block (let ((basename (or generic-function-name fname)))
                              (cond
                                ((symbolp basename)
-                                 basename)
+                                basename)
                                ((and (listp basename)
                                      (= (length basename) 2)
                                      (eql 'setf (first basename)))
-                                 (second basename))
+                                (second basename))
                                ((and (listp basename)
                                      (>= (length basename) 3)
                                      (eql +DEFUN*-ARROW-SYMBOL+ (second basename)))
@@ -636,6 +669,13 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
                     (second clause))
             (setf toplevel-form-name layered-defgeneric)
             (setf body (remove clause body :test #'equal)))))
+
+      (when *use-closer-mop?*
+        (cond
+          ((eql 'defgeneric toplevel-form-name)
+           (setf toplevel-form-name closer-defgeneric))
+          ((eql 'defmethod toplevel-form-name)
+           (setf toplevel-form-name closer-defmethod))))
 
       (dolist (term arglist)
         (cond
@@ -790,8 +830,10 @@ Internal function. The workhorse for the macros [[DEFUN*]], [[DEFMETHOD*]],
                 (not (eql :method (car final-form)))
                 (not (member toplevel-form-name `(defmethod
                                                      defgeneric
-                                                     ,layered-defgeneric
+                                                   ,layered-defgeneric
                                                    ,layered-defmethod
+                                                   ,closer-defgeneric
+                                                   ,closer-defmethod
                                                    flet labels
                                                    lambda))))
            `(progn
